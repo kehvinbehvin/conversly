@@ -91,12 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
-- June 24, 2025: React state update race condition fix
-  - Identified that immediate React state updates in onConversationStart were causing WebSocket disconnections
-  - Added 500ms delay to state updates (setConversationId, setIsRecording, database mutation) after connection established
-  - WebSocket connection now remains stable throughout entire conversation flow
-  - Audio resource management properly implemented with cleanup on disconnect/error
-  - Complete conversation flow working from connection to natural ending
+- June 24, 2025: React re-render isolation fix for WebSocket stability
+  - Replaced timeout-based workarounds with proper React patterns using useRef and useCallback
+  - Isolated ElevenLabs WebSocket callbacks from component re-renders using stable callback references
+  - Prevented callback recreation on every render that was causing connection instability
+  - Implemented proper cleanup and resource management for audio streams and context
+  - WebSocket connection now stable regardless of parent component state changes
 - June 24, 2025: Client-side WebSocket disconnection fix
   - Fixed callback parameter mismatch in onDisconnect handler
   - Prevented premature onConversationEnd calls for user-initiated disconnects

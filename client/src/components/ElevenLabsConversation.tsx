@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { useConversation } from "@elevenlabs/react";
@@ -26,6 +26,68 @@ export default function ElevenLabsConversation({
   >(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
+  
+  // Use refs to prevent re-renders from affecting callbacks
+  const onConversationStartRef = useRef(onConversationStart);
+  const onConversationEndRef = useRef(onConversationEnd);
+  const onErrorRef = useRef(onError);
+  
+  // Update refs when props change without causing re-render
+  useEffect(() => {
+    onConversationStartRef.current = onConversationStart;
+    onConversationEndRef.current = onConversationEnd;
+    onErrorRef.current = onError;
+  }, [onConversationStart, onConversationEnd, onError]);
+
+  // Stable callback functions that won't change on re-renders
+  const handleConnect = useCallback((props: { conversationId: string }) => {
+    console.log("✅ Connected to ElevenLabs conversation:", props);
+    setIsConnecting(false);
+    setCurrentConversationId(props.conversationId);
+    onConversationStartRef.current?.(props.conversationId);
+  }, []);
+
+  const handleDisconnect = useCallback((details: any) => {
+    console.log("❌ Disconnected from ElevenLabs conversation:", details);
+    
+    setIsConnecting(false);
+    setSignedUrl(null);
+    
+    // Clean up audio resources when disconnected
+    if (audioStream) {
+      audioStream.getTracks().forEach(track => track.stop());
+      setAudioStream(null);
+    }
+    if (audioContext) {
+      audioContext.close();
+      setAudioContext(null);
+    }
+    
+    // Always end the conversation when disconnected - UI should reflect reality
+    const conversationId = details?.conversationId || currentConversationId;
+    if (conversationId) {
+      onConversationEndRef.current?.(conversationId);
+    }
+    setCurrentConversationId(null);
+  }, [audioStream, audioContext, currentConversationId]);
+
+  const handleError = useCallback((error: string) => {
+    console.error("🔥 ElevenLabs conversation error:", error);
+    setIsConnecting(false);
+    setSignedUrl(null);
+    
+    // Clean up audio resources on error
+    if (audioStream) {
+      audioStream.getTracks().forEach(track => track.stop());
+      setAudioStream(null);
+    }
+    if (audioContext) {
+      audioContext.close();
+      setAudioContext(null);
+    }
+    
+    onErrorRef.current?.(new Error(error));
+  }, [audioStream, audioContext]);
 
   const conversation = useConversation({
     debug: true, // Enable debug mode for more detailed logs

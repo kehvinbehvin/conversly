@@ -58,14 +58,13 @@ export default function Conversation() {
   const handleConversationStart = (elevenlabsId: string) => {
     console.log("Starting conversation with ID:", elevenlabsId);
     
-    // Delay state updates to avoid triggering disconnection
-    setTimeout(() => {
-      setConversationId(elevenlabsId);
-      setIsRecording(true);
-      setError(null);
-      // Create database record after connection is stable
-      createConversationMutation.mutate(elevenlabsId);
-    }, 500);
+    // Update state normally - the issue was elsewhere
+    setConversationId(elevenlabsId);
+    setIsRecording(true);
+    setError(null);
+    
+    // Create database record
+    createConversationMutation.mutate(elevenlabsId);
   };
 
   const handleConversationEnd = (elevenlabsId: string) => {
