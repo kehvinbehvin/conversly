@@ -31,10 +31,12 @@ export default function ElevenLabsConversation({
     debug: true, // Enable debug mode for more detailed logs
     onConnect: (props: { conversationId: string }) => {
       console.log("✅ Connected to ElevenLabs conversation:", props);
-      // Test 2: Add parent callback to see if this causes disconnect
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
-      onConversationStart?.(props.conversationId);
+      // Delay the parent callback to avoid immediate disconnection
+      setTimeout(() => {
+        onConversationStart?.(props.conversationId);
+      }, 100);
     },
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);
