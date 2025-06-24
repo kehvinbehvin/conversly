@@ -91,36 +91,24 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
-- June 24, 2025: Architectural separation of WebSocket state management
-  - Implemented ConversationProvider context to manage WebSocket connections globally
-  - Separated conversation session management from UI components that frequently re-render
-  - WebSocket instance now persists in context using useRef, isolated from component state changes
-  - ElevenLabsConversation component simplified to pure UI that consumes stable context
-  - Proper cleanup and resource management moved to provider level for better lifecycle control
-- June 24, 2025: Client-side WebSocket disconnection fix
-  - Fixed callback parameter mismatch in onDisconnect handler
-  - Prevented premature onConversationEnd calls for user-initiated disconnects
-  - Added proper conversation state validation before ending sessions
-  - Implemented small delay to prevent race conditions during session start
-  - Fixed React state management issues causing immediate disconnections
-- June 24, 2025: Microphone permission and WebSocket connection fix
-  - Added explicit microphone permission request before starting conversations
-  - Fixed immediate WebSocket disconnection issue caused by missing audio permissions
-  - Updated ElevenLabs callback signatures to match official SDK types
-  - Added user-friendly messaging about microphone access requirements
-  - Improved error handling for permission-related failures
-- June 24, 2025: ElevenLabs SDK integration and agent ID fix
-  - Integrated official ElevenLabs JavaScript SDK for server-side operations
-  - Fixed agent_id=undefined error in WebSocket connections
-  - Replaced manual fetch calls with SDK methods for better reliability
-  - Improved error handling and logging throughout conversation flow
-  - Cleaned up legacy code files and improved component architecture
+- June 24, 2025: Major codebase cleanup and architectural simplification
+  - Removed legacy conversation timer and recording state management
+  - Simplified conversation page to pure UI component without complex state
+  - Cleaned up ConversationContext by removing unused audio resource management
+  - Removed unnecessary props and state from ElevenLabsConversation component
+  - Eliminated duplicate code and unused imports throughout codebase
+  - Streamlined conversation flow to rely entirely on ElevenLabs SDK
 - June 24, 2025: Complete conversation flow implemented and tested
   - Real ElevenLabs integration with secure signed URL authentication
   - OpenAI analysis generating detailed feedback with highlights and suggestions
   - Automatic redirect from conversation to review page working
   - Webhook endpoint receiving and processing conversation data correctly
   - API key security implemented - no sensitive credentials exposed to frontend
+- June 24, 2025: Architectural separation using ElevenLabs SDK
+  - Implemented ConversationProvider context with useConversation hook from @elevenlabs/react
+  - Separated conversation session management from UI components
+  - Fixed React state management issues causing WebSocket disconnections
+  - Proper cleanup and resource management handled by ElevenLabs SDK
 
 ## Changelog
 - June 24, 2025: Initial setup and core functionality completion

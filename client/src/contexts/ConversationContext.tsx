@@ -1,6 +1,5 @@
 import { createContext, useContext, useRef, useEffect, useState, ReactNode } from "react";
 import { useConversation as useElevenLabsConversation } from "@elevenlabs/react";
-import { apiRequest } from "@/lib/queryClient";
 
 interface ConversationContextType {
   isConnecting: boolean;
@@ -38,11 +37,8 @@ export function ConversationProvider({
 }: ConversationProviderProps) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
   
   // Use refs to store stable references that persist across re-renders
-  const audioStreamRef = useRef<MediaStream | null>(null);
-  const audioContextRef = useRef<AudioContext | null>(null);
   const callbacksRef = useRef({
     onConversationStart,
     onConversationEnd,
@@ -69,17 +65,6 @@ export function ConversationProvider({
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);
       setIsConnecting(false);
-      setSignedUrl(null);
-      
-      // Clean up audio resources when disconnected
-      if (audioStreamRef.current) {
-        audioStreamRef.current.getTracks().forEach(track => track.stop());
-        audioStreamRef.current = null;
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-        audioContextRef.current = null;
-      }
       
       const conversationId = details?.conversationId || currentConversationId;
       if (conversationId) {
@@ -90,18 +75,6 @@ export function ConversationProvider({
     onError: (error: string) => {
       console.error("🔥 ElevenLabs conversation error:", error);
       setIsConnecting(false);
-      setSignedUrl(null);
-      
-      // Clean up audio resources on error
-      if (audioStreamRef.current) {
-        audioStreamRef.current.getTracks().forEach(track => track.stop());
-        audioStreamRef.current = null;
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-        audioContextRef.current = null;
-      }
-      
       callbacksRef.current.onError?.(new Error(error));
     },
     onMessage: (props: { message: string; source: string }) => {
@@ -117,14 +90,13 @@ export function ConversationProvider({
 
       // Request microphone permission
       console.log("🎤 Requesting microphone permission...");
-      const stream = await navigator.mediaDevices.getUserMedia({
+      await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
           sampleRate: 16000,
         },
       });
-      audioStreamRef.current = stream;
       console.log("✅ Microphone permission granted");
 
       // Initialize audio context
@@ -133,7 +105,6 @@ export function ConversationProvider({
       if (context.state === "suspended") {
         await context.resume();
       }
-      audioContextRef.current = context;
       console.log("Audio context state:", context.state);
 
       // Get signed URL
@@ -150,7 +121,6 @@ export function ConversationProvider({
       }
 
       console.log("📝 Received signed URL:", data.signedUrl);
-      setSignedUrl(data.signedUrl);
       
       console.log("🚀 Starting conversation session...");
       await conversation.startSession({
@@ -171,17 +141,6 @@ export function ConversationProvider({
         await conversation.endSession();
       }
       
-      // Clean up audio resources
-      if (audioStreamRef.current) {
-        audioStreamRef.current.getTracks().forEach(track => track.stop());
-        audioStreamRef.current = null;
-      }
-      if (audioContextRef.current) {
-        audioContextRef.current.close();
-        audioContextRef.current = null;
-      }
-      
-      setSignedUrl(null);
       setIsConnecting(false);
       setCurrentConversationId(null);
     } catch (error) {

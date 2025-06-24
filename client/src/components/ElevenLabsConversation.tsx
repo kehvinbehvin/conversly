@@ -4,22 +4,18 @@ import { useConversation } from "@/contexts/ConversationContext";
 
 interface ElevenLabsConversationProps {
   agentId: string;
-  disabled?: boolean;
 }
 
 export default function ElevenLabsConversation({
   agentId,
-  disabled = false,
 }: ElevenLabsConversationProps) {
   const { isConnecting, isConnected, startConversation, endConversation } = useConversation();
 
   const handleStartConversation = () => {
-    if (!disabled && !isConnecting) {
+    if (!isConnecting) {
       startConversation(agentId);
     }
   };
-
-  const isLoading = isConnecting;
 
   return (
     <div className="flex flex-col items-center space-y-6">
