@@ -22,14 +22,20 @@ export default function ElevenLabsConversation({
       {!isConnected ? (
         <Button
           onClick={handleStartConversation}
-          disabled={isLoading || disabled}
+          disabled={isConnecting}
           size="lg"
-          className="h-16 w-16 rounded-full bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 shadow-lg hover:shadow-xl transition-all duration-200"
+          className="bg-coral-600 hover:bg-coral-700 text-white px-8 py-6 rounded-full text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
         >
-          {isLoading ? (
-            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          {isConnecting ? (
+            <>
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              Connecting...
+            </>
           ) : (
-            <Mic className="h-8 w-8 text-white" />
+            <>
+              <Mic className="mr-2 h-5 w-5" />
+              Tap to start conversation
+            </>
           )}
         </Button>
       ) : (
@@ -44,7 +50,7 @@ export default function ElevenLabsConversation({
       )}
 
       <div className="text-center space-y-2">
-        {isLoading && (
+        {isConnecting && (
           <p className="text-sm text-muted-foreground">Connecting...</p>
         )}
         {isConnected && (
@@ -52,7 +58,7 @@ export default function ElevenLabsConversation({
             Connected - Conversation active
           </p>
         )}
-        {!isConnected && !isLoading && (
+        {!isConnected && !isConnecting && (
           <p className="text-sm text-muted-foreground">
             Tap to start conversation
           </p>
