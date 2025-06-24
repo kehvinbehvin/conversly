@@ -115,28 +115,64 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Helper function to verify ElevenLabs webhook signature
-  const verifyWebhookSignature = (payload: string, signature: string, secret: string): boolean => {
+  const verifyElevenLabsWebhook = (rawBody: Buffer, signatureHeader: string, secret: string) => {
     if (!secret) {
       console.warn("No webhook secret configured, skipping signature verification");
-      return true; // Skip verification if no secret is configured
+      return { isValid: true };
     }
-    
-    const expectedSignature = createHmac('sha256', secret)
-      .update(payload)
-      .digest('hex');
-    
-    const receivedSignature = signature.replace('sha256=', '');
-    
+
+    if (!signatureHeader) {
+      return { isValid: false, error: "Missing signature header" };
+    }
+
     try {
-      return timingSafeEqual(
+      // Parse ElevenLabs signature header format: "t=1719263154,v0=123abc456def..."
+      const headers = signatureHeader.split(',');
+      const timestampHeader = headers.find((e) => e.startsWith('t='));
+      const signatureHeader_v0 = headers.find((e) => e.startsWith('v0='));
+
+      if (!timestampHeader || !signatureHeader_v0) {
+        return { isValid: false, error: "Invalid signature header format" };
+      }
+
+      const timestamp = timestampHeader.substring(2);
+      const signature = signatureHeader_v0.substring(3);
+
+      // Validate timestamp range (not older than 30 minutes, not more than 5 minutes in future)
+      const reqTimestamp = Number(timestamp) * 1000;
+      if (isNaN(reqTimestamp)) {
+        return { isValid: false, error: "Invalid timestamp format" };
+      }
+
+      const now = Date.now();
+      const tolerance = 30 * 60 * 1000; // 30 minutes
+      const futureLimit = 5 * 60 * 1000; // 5 minutes
+
+      if (reqTimestamp < now - tolerance || reqTimestamp > now + futureLimit) {
+        return { isValid: false, error: "Timestamp outside allowable range" };
+      }
+
+      // Create expected signature
+      const payload = `${timestamp}.${rawBody}`;
+      const expectedSignature = createHmac('sha256', secret)
+        .update(payload, 'utf8')
+        .digest('hex');
+
+      // Compare signatures
+      const isValidSignature = timingSafeEqual(
         Buffer.from(expectedSignature, 'hex'),
-        Buffer.from(receivedSignature, 'hex')
+        Buffer.from(signature, 'hex')
       );
+
+      return { isValid: isValidSignature };
     } catch (error) {
       console.error("Signature verification error:", error);
-      return false;
+      return { isValid: false, error: "Signature verification failed" };
     }
   };
+
+  // Add raw body parsing middleware specifically for ElevenLabs webhook
+  app.use('/api/webhook/elevenlabs', express.raw({ type: '*/*' }));
 
   // ElevenLabs webhook endpoint
   app.post("/api/webhook/elevenlabs", async (req, res) => {
@@ -144,51 +180,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
     console.log("🎯 ElevenLabs webhook received at", new Date().toISOString());
     
     try {
+      // Only process POST requests
+      if (req.method !== 'POST') {
+        return res.status(405).json({ message: "Method not allowed" });
+      }
+
       // Log request headers for debugging
       console.log("📋 Webhook headers:", {
         'content-type': req.headers['content-type'],
         'elevenlabs-signature': req.headers['elevenlabs-signature'] ? 'present' : 'missing',
+        'ElevenLabs-Signature': req.headers['ElevenLabs-Signature'] ? 'present' : 'missing',
         'user-agent': req.headers['user-agent'],
         'content-length': req.headers['content-length']
       });
 
-      const signature = req.headers['elevenlabs-signature'] as string;
+      // Handle case-sensitive headers
+      const signatureHeader = req.headers['elevenlabs-signature'] || req.headers['ElevenLabs-Signature'] as string;
       const webhookSecret = process.env.ELEVENLABS_WEBHOOK_SECRET;
       
       // Log webhook secret configuration status
       console.log("🔑 Webhook secret configured:", webhookSecret ? 'yes' : 'no');
-      console.log("🔐 Signature provided:", signature ? 'yes' : 'no');
+      console.log("🔐 Signature provided:", signatureHeader ? 'yes' : 'no');
       
-      // Verify webhook signature if secret is configured
-      if (webhookSecret && signature) {
-        console.log("🔍 Verifying webhook signature...");
-        const payload = JSON.stringify(req.body);
-        console.log("📄 Payload for signature verification (length):", payload.length);
-        
-        const isValidSignature = verifyWebhookSignature(payload, signature, webhookSecret);
-        
-        if (!isValidSignature) {
-          console.error("❌ Invalid webhook signature");
-          console.error("🔍 Expected signature calculation for payload:", payload.substring(0, 100) + "...");
-          return res.status(401).json({ message: "Invalid signature" });
-        }
+      // Verify webhook signature
+      const verification = verifyElevenLabsWebhook(req.body, signatureHeader, webhookSecret);
+      
+      if (!verification.isValid) {
+        console.error("❌ Webhook verification failed:", verification.error);
+        const statusCode = verification.error?.includes("Timestamp") ? 403 : 401;
+        return res.status(statusCode).json({ message: verification.error || "Webhook verification failed" });
+      }
+      
+      if (webhookSecret) {
         console.log("✅ Webhook signature verified successfully");
-      } else if (webhookSecret && !signature) {
-        console.error("❌ Webhook secret configured but no signature provided");
-        return res.status(401).json({ message: "Missing signature" });
       } else {
         console.log("⚠️ Skipping signature verification (no secret configured)");
       }
       
-      // Log the complete webhook payload
-      console.log("📦 ElevenLabs webhook payload:", JSON.stringify(req.body, null, 2));
+      // Parse JSON from raw buffer
+      let webhookData;
+      try {
+        webhookData = JSON.parse(req.body.toString());
+      } catch (parseError) {
+        console.error("❌ Failed to parse webhook JSON:", parseError);
+        return res.status(400).json({ message: "Invalid JSON payload" });
+      }
       
-      const { conversation_id, transcript, audio_url } = req.body;
+      // Log the complete webhook payload
+      console.log("📦 ElevenLabs webhook payload:", JSON.stringify(webhookData, null, 2));
+      
+      const { conversation_id, transcript, audio_url } = webhookData;
       
       // Validate required fields
       if (!conversation_id) {
         console.error("❌ Missing conversation_id in webhook payload");
-        console.error("📋 Available fields:", Object.keys(req.body));
+        console.error("📋 Available fields:", Object.keys(webhookData));
         return res.status(400).json({ message: "Missing conversation_id" });
       }
       
@@ -333,7 +379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined,
         processingTime: processingTime,
-        requestBody: req.body
+        requestBody: webhookData
       });
       
       res.status(500).json({ 
