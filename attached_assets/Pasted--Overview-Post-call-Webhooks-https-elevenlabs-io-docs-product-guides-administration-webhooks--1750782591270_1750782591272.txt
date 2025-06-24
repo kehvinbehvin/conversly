@@ -1,0 +1,115 @@
+## Overview
+
+Post-call [Webhooks](https://elevenlabs.io/docs/product-guides/administration/webhooks) allow you to receive detailed information about a call after analysis is complete. When enabled, ElevenLabs will send a POST request to your specified endpoint with comprehensive call data, including transcripts, analysis results, and metadata.
+The data that is returned is the same data that is returned from the [Conversation API](https://elevenlabs.io/docs/conversational-ai/api-reference/conversations/get-conversations).
+
+## Enabling post-call webhooks
+
+Post-call webhooks can be enabled for all agents in your workspace through the Conversational AI [settings page](https://elevenlabs.io/app/conversational-ai/settings).
+
+![Post-call webhook settings](https://elevenlabs.io/docs/_files/https://elevenlabs.docs.buildwithfern.com/docs/2025-06-24T13:17:21.066Z/assets/images/conversational-ai/postcallwebhooksettings.png)
+
+Post call webhooks must return a 200 status code to be considered successful. Webhooks that
+repeatedly fail are auto disabled if there are 10 or more consecutive failures and the last
+successful delivery was more than 7 days ago or has never been successfully delivered.
+
+For HIPAA compliance, if a webhook fails we can not retry the webhook.
+
+### Authentication
+
+It is important for the listener to validate all incoming webhooks. Webhooks currently support authentication via HMAC signatures. Set up HMAC authentication by:
+
+- Securely storing the shared secret generated upon creation of the webhook
+- Verifying the ElevenLabs-Signature header in your endpoint using the shared secret
+
+The ElevenLabs-Signature takes the following format:
+
+```code-block text-sm
+
+1t=timestamp,v0=hash
+```
+
+The hash is equivalent to the hex encoded sha256 HMAC signature of `timestamp.request_body`. Both the hash and timestamp should be validated, an example is shown here:
+
+###### Python
+
+###### JavaScript
+
+Example python webhook handler using FastAPI:
+
+```code-block text-sm
+
+1from fastapi import FastAPI, Request2import time3import hmac4from hashlib import sha25656app = FastAPI()78# Example webhook handler9@app.post("/webhook")10async def receive_message(request: Request):11    payload = await request.body()12    headers = request.headers.get("elevenlabs-signature")13    if headers is None:14        return15    timestamp = headers.split(",")[0][2:]16    hmac_signature = headers.split(",")[1]1718    # Validate timestamp19    tolerance = int(time.time()) - 30 * 6020    if int(timestamp) < tolerance21        return2223    # Validate signature24    full_payload_to_sign = f"{timestamp}.{payload.decode('utf-8')}"25    mac = hmac.new(26        key=secret.encode("utf-8"),27        msg=full_payload_to_sign.encode("utf-8"),28        digestmod=sha256,29    )30    digest = 'v0=' + mac.hexdigest()31    if hmac_signature != digest:32        return3334    # Continue processing3536    return {"status": "received"}
+
+```
+
+### IP whitelisting
+
+For additional security, you can whitelist the following static egress IPs from which all ElevenLabs webhook requests originate:
+
+| Region | IP Address |
+| --- | --- |
+| US (Default) | 34.67.146.145 |
+| US (Default) | 34.59.11.47 |
+| EU | 35.204.38.71 |
+| EU | 34.147.113.54 |
+| Asia | 35.185.187.110 |
+| Asia | 35.247.157.189 |
+
+If your infrastructure requires strict IP-based access controls, adding these IPs to your firewall allowlist will ensure you only receive webhook requests from ElevenLabs’ systems.
+
+These static IPs are used across all ElevenLabs webhook services and will remain consistent. Using
+IP whitelisting in combination with HMAC signature validation provides multiple layers of
+security.
+
+## Webhook response structure
+
+The webhook payload contains the same data you would receive from a GET request to the Conversation API endpoint, with additional fields for event timing and type information.
+
+### Top-level fields
+
+| Field | Type | Description |
+| --- | --- | --- |
+| `type` | string | Type of event (always `post_call_transcription` in this case) |
+| `data` | object | Data for the conversation, what would be returned from the API |
+| `event_timestamp` | number | When this event occurred in unix time UTC |
+
+## Example webhook payload
+
+```code-block text-sm
+
+1{2  "type": "post_call_transcription",3  "event_timestamp": 1739537297,4  "data": {5    "agent_id": "xyz",6    "conversation_id": "abc",7    "status": "done",8    "transcript": [9      {10        "role": "agent",11        "message": "Hey there angelo. How are you?",12        "tool_calls": null,13        "tool_results": null,14        "feedback": null,15        "time_in_call_secs": 0,16        "conversation_turn_metrics": null17      },18      {19        "role": "user",20        "message": "Hey, can you tell me, like, a fun fact about 11 Labs?",21        "tool_calls": null,22        "tool_results": null,23        "feedback": null,24        "time_in_call_secs": 2,25        "conversation_turn_metrics": null26      },27      {28        "role": "agent",29        "message": "I do not have access to fun facts about Eleven Labs. However, I can share some general information about the company. Eleven Labs is an AI voice technology platform that specializes in voice cloning and text-to-speech...",30        "tool_calls": null,31        "tool_results": null,32        "feedback": null,33        "time_in_call_secs": 9,34        "conversation_turn_metrics": {35          "convai_llm_service_ttfb": {36            "elapsed_time": 0.370424701017327637          },38          "convai_llm_service_ttf_sentence": {39            "elapsed_time": 0.555118144955486140          }41        }42      }43    ],44    "metadata": {45      "start_time_unix_secs": 1739537297,46      "call_duration_secs": 22,47      "cost": 296,48      "deletion_settings": {49        "deletion_time_unix_secs": 1802609320,50        "deleted_logs_at_time_unix_secs": null,51        "deleted_audio_at_time_unix_secs": null,52        "deleted_transcript_at_time_unix_secs": null,53        "delete_transcript_and_pii": true,54        "delete_audio": true55      },56      "feedback": {57        "overall_score": null,58        "likes": 0,59        "dislikes": 060      },61      "authorization_method": "authorization_header",62      "charging": {63        "dev_discount": true64      },65      "termination_reason": ""66    },67    "analysis": {68      "evaluation_criteria_results": {},69      "data_collection_results": {},70      "call_successful": "success",71      "transcript_summary": "The conversation begins with the agent asking how Angelo is, but Angelo redirects the conversation by requesting a fun fact about 11 Labs. The agent acknowledges they don't have specific fun facts about Eleven Labs but offers to provide general information about the company. They briefly describe Eleven Labs as an AI voice technology platform specializing in voice cloning and text-to-speech technology. The conversation is brief and informational, with the agent adapting to the user's request despite not having the exact information asked for."72    },73    "conversation_initiation_client_data": {74      "conversation_config_override": {75        "agent": {76          "prompt": null,77          "first_message": null,78          "language": "en"79        },80        "tts": {81          "voice_id": null82        }83      },84      "custom_llm_extra_body": {},85      "dynamic_variables": {86        "user_name": "angelo"87      }88    }89  }90}
+
+```
+
+## Use cases
+
+### Automated call follow-ups
+
+Post-call webhooks enable you to build automated workflows that trigger immediately after a call ends. Here are some practical applications:
+
+#### CRM integration
+
+Update your customer relationship management system with conversation data as soon as a call completes:
+
+```code-block text-sm
+
+1// Example webhook handler2app.post('/webhook/elevenlabs', async (req, res) => {3  // HMAC validation code45  const { data } = req.body;67  // Extract key information8  const userId = data.metadata.user_id;9  const transcriptSummary = data.analysis.transcript_summary;10  const callSuccessful = data.analysis.call_successful;1112  // Update CRM record13  await updateCustomerRecord(userId, {14    lastInteraction: new Date(),15    conversationSummary: transcriptSummary,16    callOutcome: callSuccessful,17    fullTranscript: data.transcript,18  });1920  res.status(200).send('Webhook received');21});
+```
+
+### Stateful conversations
+
+Maintain conversation context across multiple interactions by storing and retrieving state:
+
+1. When a call starts, pass in your user id as a dynamic variable.
+2. When a call ends, set up your webhook endpoint to store conversation data in your database, based on the extracted user id from the dynamic\_variables.
+3. When the user calls again, you can retrieve this context and pass it to the new conversation into a {{previous\_topics}} dynamic variable.
+4. This creates a seamless experience where the agent “remembers” previous interactions
+
+```code-block text-sm
+
+1// Store conversation state when call ends2app.post('/webhook/elevenlabs', async (req, res) => {3  // HMAC validation code45  const { data } = req.body;6  const userId = data.metadata.user_id;78  // Store conversation state9  await db.userStates.upsert({10    userId,11    lastConversationId: data.conversation_id,12    lastInteractionTimestamp: data.metadata.start_time_unix_secs,13    conversationHistory: data.transcript,14    previousTopics: extractTopics(data.analysis.transcript_summary),15  });1617  res.status(200).send('Webhook received');18});1920// When initiating a new call, retrieve and use the state21async function initiateCall(userId) {22  // Get user's conversation state23  const userState = await db.userStates.findOne({ userId });2425  // Start new conversation with context from previous calls26  return await elevenlabs.startConversation({27    agent_id: 'xyz',28    conversation_id: generateNewId(),29    dynamic_variables: {30      user_name: userState.name,31      previous_conversation_id: userState.lastConversationId,32      previous_topics: userState.previousTopics.join(', '),33    },34  });35}
+
+```
+
+![Post-call webhook settings](https://elevenlabs.io/docs/conversational-ai/workflows/post-call-webhooks)
