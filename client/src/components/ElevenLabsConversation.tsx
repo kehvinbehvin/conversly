@@ -33,10 +33,10 @@ export default function ElevenLabsConversation({
       console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
-      // Delay the parent callback to avoid immediate disconnection
-      setTimeout(() => {
-        onConversationStart?.(props.conversationId);
-      }, 100);
+      // Test: Remove parent callback entirely to see if that's the issue
+      console.log("About to call onConversationStart");
+      onConversationStart?.(props.conversationId);
+      console.log("Called onConversationStart successfully");
     },
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);

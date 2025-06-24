@@ -57,9 +57,10 @@ export default function Conversation() {
 
   const handleConversationStart = (elevenlabsId: string) => {
     console.log("Starting conversation with ID:", elevenlabsId);
-    setConversationId(elevenlabsId);
-    setIsRecording(true);
-    setError(null);
+    // Test: Comment out ALL state updates to isolate the issue
+    // setConversationId(elevenlabsId);
+    // setIsRecording(true);
+    // setError(null);
     // startTimer();
 
     // Test: Comment out database mutation to see if this fixes disconnection
