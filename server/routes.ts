@@ -369,46 +369,58 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         console.log("📊 Call metadata:", callMetadata);
 
+        // Save transcript data to file store first
+        const transcriptFileData: TranscriptData = {
+          conversationId: "", // Will be set after finding/creating conversation
+          elevenlabsId: conversation_id,
+          transcript: webhookData.data?.transcript,
+          metadata: webhookData.data?.metadata,
+          analysis: webhookData.data?.analysis,
+          timestamp: Date.now(),
+        };
+
+        await fileStore.saveTranscript(transcriptFileData);
+        console.log("💾 Transcript saved to file store for ElevenLabs ID:", conversation_id);
+
         // Find conversation by ElevenLabs ID
         let conversation;
         try {
-          conversation =
-            await storage.getConversationByElevenlabsId(conversation_id);
+          conversation = await storage.getConversationByElevenlabsId(conversation_id);
         } catch (storageError) {
-          console.error(
-            "❌ Database error while finding conversation:",
-            storageError,
-          );
-          return res
-            .status(500)
-            .json({ message: "Database error finding conversation" });
+          console.error("❌ Database error while finding conversation:", storageError);
+          return res.status(500).json({ message: "Database error finding conversation" });
         }
 
         if (!conversation) {
-          console.error(
-            `❌ Conversation not found for ElevenLabs ID: ${conversation_id}`,
-          );
+          console.log(`🔍 No existing conversation found for ElevenLabs ID: ${conversation_id}, creating new one`);
 
-          // Log all existing conversations for debugging
-          try {
-            const allConversations = await storage.getConversationsByUserId(1); // Demo user
-            console.log(
-              "📋 Existing conversations:",
-              allConversations.map((c) => ({
-                id: c.id,
-                elevenlabsId: c.elevenlabsConversationId,
-                status: c.status,
-              })),
-            );
-          } catch (debugError) {
-            console.error(
-              "❌ Error fetching conversations for debug:",
-              debugError,
-            );
+          // Get demo user
+          const user = await storage.getUserByEmail("demo@conversly.com");
+          if (!user) {
+            console.error("❌ Demo user not found");
+            return res.status(404).json({ message: "Demo user not found" });
           }
 
-          return res.status(404).json({ message: "Conversation not found" });
+          // Create new conversation record
+          const conversationData = {
+            userId: user.id,
+            status: "completed" as const,
+            elevenlabsConversationId: conversation_id,
+            metadata: { webhookReceived: true, ...callMetadata },
+          };
+
+          try {
+            conversation = await storage.createConversation(conversationData);
+            console.log("✅ Created new conversation:", conversation.id, "for ElevenLabs ID:", conversation_id);
+          } catch (createError) {
+            console.error("❌ Failed to create conversation:", createError);
+            return res.status(500).json({ message: "Failed to create conversation" });
+          }
         }
+
+        // Update transcript file with conversation ID
+        transcriptFileData.conversationId = conversation.id.toString();
+        await fileStore.saveTranscript(transcriptFileData);
 
         console.log("✅ Found conversation:", {
           id: conversation.id,
@@ -541,6 +553,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true,
           processingTime: processingTime,
           conversationId: conversation.id,
+          elevenlabsId: conversation_id,
+          transcriptSaved: true,
           analysisPerformed: !!(transcriptText && transcriptText.trim()),
           transcriptTurns: transcriptArray?.length || 0,
           callDuration: callMetadata.duration,
@@ -550,73 +564,69 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("💥 Webhook processing failed:", {
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
-          processingTime: processingTime,
-          requestBody: webhookData,
+          elevenlabsId: webhookData?.data?.conversation_id,
+          processingTime,
         });
 
+        // Still try to save raw webhook data even if processing fails
+        try {
+          const rawTranscriptData: TranscriptData = {
+            conversationId: "error",
+            elevenlabsId: webhookData?.data?.conversation_id || "unknown",
+            transcript: webhookData?.data?.transcript,
+            metadata: webhookData?.data?.metadata,
+            analysis: webhookData?.data?.analysis,
+            timestamp: Date.now(),
+          };
+          await fileStore.saveTranscript(rawTranscriptData);
+          console.log("💾 Raw webhook data saved despite processing error");
+        } catch (saveError) {
+          console.error("❌ Failed to save raw webhook data:", saveError);
+        }
+
         res.status(500).json({
-          message: "Webhook processing failed",
-          error: error instanceof Error ? error.message : String(error),
-          processingTime: processingTime,
+          message: "Failed to process webhook",
+          error: error instanceof Error ? error.message : "Unknown error",
         });
       }
     },
   );
 
-  // Manually trigger analysis (for testing)
-  app.post("/api/conversations/:id/analyze", async (req, res) => {
-    try {
-      const id = parseInt(req.params.id);
-      const conversation = await storage.getConversation(id);
-
-      if (!conversation) {
-        return res.status(404).json({ message: "Conversation not found" });
+  // API endpoint to list saved transcripts
+  app.get(
+    "/api/transcripts",
+    express.json(),
+    express.urlencoded({ extended: false }),
+    async (req, res) => {
+      try {
+        const files = await fileStore.listTranscripts();
+        res.json({ transcripts: files });
+      } catch (error) {
+        res.status(500).json({ message: "Failed to list transcripts" });
       }
+    },
+  );
 
-      if (!conversation.transcript) {
-        return res
-          .status(400)
-          .json({ message: "No transcript available for analysis" });
+  // API endpoint to get a specific transcript
+  app.get(
+    "/api/transcripts/:elevenlabsId",
+    express.json(),
+    express.urlencoded({ extended: false }),
+    async (req, res) => {
+      try {
+        const { elevenlabsId } = req.params;
+        const transcript = await fileStore.getTranscript(elevenlabsId);
+        
+        if (!transcript) {
+          return res.status(404).json({ message: "Transcript not found" });
+        }
+        
+        res.json(transcript);
+      } catch (error) {
+        res.status(500).json({ message: "Failed to get transcript" });
       }
+    },
+  );
 
-      const analysis = await analyzeConversation(conversation.transcript);
-
-      const review = await storage.createReview({
-        conversationId: conversation.id,
-        highlights: analysis.highlights,
-        summary: analysis.summary,
-        overallRating: analysis.overallRating,
-        suggestions: analysis.suggestions,
-        strengths: analysis.strengths,
-      });
-
-      await storage.updateConversation(conversation.id, {
-        status: "analyzed",
-      });
-
-      res.json(review);
-    } catch (error) {
-      console.error("Manual analysis error:", error);
-      res.status(500).json({ message: "Analysis failed" });
-    }
-  });
-
-  // Get conversation review
-  app.get("/api/conversations/:id/review", async (req, res) => {
-    try {
-      const conversationId = parseInt(req.params.id);
-      const review = await storage.getReviewByConversationId(conversationId);
-
-      if (!review) {
-        return res.status(404).json({ message: "Review not found" });
-      }
-
-      res.json(review);
-    } catch (error) {
-      res.status(500).json({ message: "Failed to get review" });
-    }
-  });
-
-  const httpServer = createServer(app);
-  return httpServer;
+  return createServer(app);
 }

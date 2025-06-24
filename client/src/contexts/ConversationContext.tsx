@@ -56,10 +56,32 @@ export function ConversationProvider({
 
   // Use ElevenLabs SDK with stable callbacks
   const conversation = useElevenLabsConversation({
-    onConnect: (props: { conversationId: string }) => {
+    onConnect: async (props: { conversationId: string }) => {
       console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
+      
+      // Create database conversation record with the correct ElevenLabs ID
+      try {
+        const response = await fetch("/api/conversations", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            elevenlabsConversationId: props.conversationId,
+            metadata: { topic: "How was your weekend?" },
+          }),
+        });
+        
+        if (response.ok) {
+          const conversation = await response.json();
+          console.log("Database conversation created:", conversation.id, "for ElevenLabs ID:", props.conversationId);
+        } else {
+          console.error("Failed to create database conversation:", await response.text());
+        }
+      } catch (error) {
+        console.error("Error creating database conversation:", error);
+      }
+      
       callbacksRef.current.onConversationStart?.(props.conversationId);
     },
     onDisconnect: (details: any) => {
