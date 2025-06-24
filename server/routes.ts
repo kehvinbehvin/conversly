@@ -140,72 +140,207 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // ElevenLabs webhook endpoint
   app.post("/api/webhook/elevenlabs", async (req, res) => {
+    const startTime = Date.now();
+    console.log("🎯 ElevenLabs webhook received at", new Date().toISOString());
+    
     try {
+      // Log request headers for debugging
+      console.log("📋 Webhook headers:", {
+        'content-type': req.headers['content-type'],
+        'elevenlabs-signature': req.headers['elevenlabs-signature'] ? 'present' : 'missing',
+        'user-agent': req.headers['user-agent'],
+        'content-length': req.headers['content-length']
+      });
+
       const signature = req.headers['elevenlabs-signature'] as string;
       const webhookSecret = process.env.ELEVENLABS_WEBHOOK_SECRET;
       
+      // Log webhook secret configuration status
+      console.log("🔑 Webhook secret configured:", webhookSecret ? 'yes' : 'no');
+      console.log("🔐 Signature provided:", signature ? 'yes' : 'no');
+      
       // Verify webhook signature if secret is configured
       if (webhookSecret && signature) {
+        console.log("🔍 Verifying webhook signature...");
         const payload = JSON.stringify(req.body);
+        console.log("📄 Payload for signature verification (length):", payload.length);
+        
         const isValidSignature = verifyWebhookSignature(payload, signature, webhookSecret);
         
         if (!isValidSignature) {
-          console.error("Invalid webhook signature");
+          console.error("❌ Invalid webhook signature");
+          console.error("🔍 Expected signature calculation for payload:", payload.substring(0, 100) + "...");
           return res.status(401).json({ message: "Invalid signature" });
         }
+        console.log("✅ Webhook signature verified successfully");
+      } else if (webhookSecret && !signature) {
+        console.error("❌ Webhook secret configured but no signature provided");
+        return res.status(401).json({ message: "Missing signature" });
+      } else {
+        console.log("⚠️ Skipping signature verification (no secret configured)");
       }
       
-      console.log("ElevenLabs webhook received:", JSON.stringify(req.body, null, 2));
+      // Log the complete webhook payload
+      console.log("📦 ElevenLabs webhook payload:", JSON.stringify(req.body, null, 2));
       
       const { conversation_id, transcript, audio_url } = req.body;
       
+      // Validate required fields
       if (!conversation_id) {
+        console.error("❌ Missing conversation_id in webhook payload");
+        console.error("📋 Available fields:", Object.keys(req.body));
         return res.status(400).json({ message: "Missing conversation_id" });
       }
+      
+      console.log("🔍 Looking for conversation with ElevenLabs ID:", conversation_id);
 
       // Find conversation by ElevenLabs ID
-      const conversation = await storage.getConversationByElevenlabsId(conversation_id);
+      let conversation;
+      try {
+        conversation = await storage.getConversationByElevenlabsId(conversation_id);
+      } catch (storageError) {
+        console.error("❌ Database error while finding conversation:", storageError);
+        return res.status(500).json({ message: "Database error finding conversation" });
+      }
+      
       if (!conversation) {
-        console.log(`Conversation not found for ElevenLabs ID: ${conversation_id}`);
+        console.error(`❌ Conversation not found for ElevenLabs ID: ${conversation_id}`);
+        
+        // Log all existing conversations for debugging
+        try {
+          const allConversations = await storage.getConversationsByUserId(1); // Demo user
+          console.log("📋 Existing conversations:", allConversations.map(c => ({
+            id: c.id,
+            elevenlabsId: c.elevenlabsConversationId,
+            status: c.status
+          })));
+        } catch (debugError) {
+          console.error("❌ Error fetching conversations for debug:", debugError);
+        }
+        
         return res.status(404).json({ message: "Conversation not found" });
       }
 
-      // Update conversation with transcript and audio
-      await storage.updateConversation(conversation.id, {
-        transcript: transcript || "",
-        audioUrl: audio_url,
-        status: "completed"
+      console.log("✅ Found conversation:", {
+        id: conversation.id,
+        status: conversation.status,
+        hasTranscript: !!conversation.transcript,
+        hasAudioUrl: !!conversation.audioUrl
       });
+
+      // Log what we're updating
+      console.log("📝 Updating conversation with:", {
+        hasTranscript: !!(transcript && transcript.trim()),
+        transcriptLength: transcript ? transcript.length : 0,
+        hasAudioUrl: !!audio_url,
+        audioUrl: audio_url ? audio_url.substring(0, 50) + "..." : null
+      });
+
+      // Update conversation with transcript and audio
+      try {
+        await storage.updateConversation(conversation.id, {
+          transcript: transcript || "",
+          audioUrl: audio_url,
+          status: "completed"
+        });
+        console.log("✅ Conversation updated successfully");
+      } catch (updateError) {
+        console.error("❌ Error updating conversation:", updateError);
+        return res.status(500).json({ message: "Failed to update conversation" });
+      }
 
       // Analyze conversation with OpenAI if transcript is available
       if (transcript && transcript.trim()) {
+        console.log("🧠 Starting AI analysis for transcript (length:", transcript.length, "chars)");
+        
         try {
           const analysis = await analyzeConversation(transcript);
-          
-          await storage.createReview({
-            conversationId: conversation.id,
-            highlights: analysis.highlights,
-            summary: analysis.summary,
+          console.log("✅ AI analysis completed:", {
+            highlightsCount: analysis.highlights?.length || 0,
+            summaryLength: analysis.summary?.length || 0,
             overallRating: analysis.overallRating,
-            suggestions: analysis.suggestions,
-            strengths: analysis.strengths
+            suggestionsCount: analysis.suggestions?.length || 0,
+            strengthsCount: analysis.strengths?.length || 0
           });
+          
+          try {
+            await storage.createReview({
+              conversationId: conversation.id,
+              highlights: analysis.highlights,
+              summary: analysis.summary,
+              overallRating: analysis.overallRating,
+              suggestions: analysis.suggestions,
+              strengths: analysis.strengths
+            });
+            console.log("✅ Review created successfully");
+          } catch (reviewError) {
+            console.error("❌ Error creating review:", reviewError);
+            throw reviewError;
+          }
 
-          await storage.updateConversation(conversation.id, {
-            status: "analyzed"
-          });
+          try {
+            await storage.updateConversation(conversation.id, {
+              status: "analyzed"
+            });
+            console.log("✅ Conversation status updated to 'analyzed'");
+          } catch (statusError) {
+            console.error("❌ Error updating conversation status:", statusError);
+            throw statusError;
+          }
 
-          console.log(`Analysis completed for conversation ${conversation.id}`);
+          console.log(`🎉 Analysis completed successfully for conversation ${conversation.id}`);
         } catch (analysisError) {
-          console.error("Analysis failed:", analysisError);
+          console.error("❌ Analysis failed:", {
+            error: analysisError instanceof Error ? analysisError.message : String(analysisError),
+            stack: analysisError instanceof Error ? analysisError.stack : undefined,
+            conversationId: conversation.id,
+            transcriptLength: transcript.length
+          });
+          
+          // Try to update status to indicate analysis failed
+          try {
+            await storage.updateConversation(conversation.id, {
+              status: "analysis_failed"
+            });
+            console.log("⚠️ Conversation status updated to 'analysis_failed'");
+          } catch (statusUpdateError) {
+            console.error("❌ Failed to update status after analysis error:", statusUpdateError);
+          }
+          
           // Continue without failing the webhook
+          console.log("⚠️ Continuing webhook processing despite analysis failure");
         }
+      } else {
+        console.log("⚠️ No transcript available for analysis:", {
+          transcriptExists: !!transcript,
+          transcriptLength: transcript ? transcript.length : 0,
+          transcriptTrimmed: transcript ? transcript.trim().length : 0
+        });
       }
 
-      res.json({ success: true });
+      const processingTime = Date.now() - startTime;
+      console.log(`✅ Webhook processed successfully in ${processingTime}ms`);
+      
+      res.json({ 
+        success: true, 
+        processingTime: processingTime,
+        conversationId: conversation.id,
+        analysisPerformed: !!(transcript && transcript.trim())
+      });
     } catch (error) {
-      console.error("Webhook error:", error);
-      res.status(500).json({ message: "Webhook processing failed" });
+      const processingTime = Date.now() - startTime;
+      console.error("💥 Webhook processing failed:", {
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined,
+        processingTime: processingTime,
+        requestBody: req.body
+      });
+      
+      res.status(500).json({ 
+        message: "Webhook processing failed",
+        error: error instanceof Error ? error.message : String(error),
+        processingTime: processingTime
+      });
     }
   });
 
