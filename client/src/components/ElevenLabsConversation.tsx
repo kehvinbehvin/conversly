@@ -33,37 +33,31 @@ export default function ElevenLabsConversation({
       console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
-      // Test: Remove parent callback entirely to see if that's the issue
-      console.log("About to call onConversationStart");
+      // Call parent callback immediately since connection is stable
       onConversationStart?.(props.conversationId);
-      console.log("Called onConversationStart successfully");
     },
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);
-      // console.log("Disconnect reason:", details.reason);
-      // console.log("Disconnect code:", details.code);
-      // console.log("Disconnect details:", JSON.stringify(details, null, 2));
-
-      // setIsConnecting(false);
-      // setSignedUrl(null);
-
+      
+      setIsConnecting(false);
+      setSignedUrl(null);
+      
       // Clean up audio resources when disconnected
-      // if (audioStream) {
-      //   audioStream.getTracks().forEach(track => track.stop());
-      //   setAudioStream(null);
-      // }
-      // if (audioContext) {
-      //   audioContext.close();
-      //   setAudioContext(null);
-      // }
-
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        setAudioStream(null);
+      }
+      if (audioContext) {
+        audioContext.close();
+        setAudioContext(null);
+      }
+      
       // Always end the conversation when disconnected - UI should reflect reality
-      // Use the stored conversationId since disconnect details might not include it
-      // const conversationId = details?.conversationId || currentConversationId;
-      // if (conversationId) {
-      //   onConversationEnd?.(conversationId);
-      // }
-      // setCurrentConversationId(null);
+      const conversationId = details?.conversationId || currentConversationId;
+      if (conversationId) {
+        onConversationEnd?.(conversationId);
+      }
+      setCurrentConversationId(null);
     },
     onError: (error: string) => {
       console.error("🔥 ElevenLabs conversation error:", error);
