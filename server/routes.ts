@@ -1,5 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
+import { createHmac, timingSafeEqual } from "crypto";
 import { storage } from "./storage";
 import { analyzeConversation } from "./services/openai";
 import { z } from "zod";
@@ -78,9 +79,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Helper function to verify ElevenLabs webhook signature
+  const verifyWebhookSignature = (payload: string, signature: string, secret: string): boolean => {
+    if (!secret) {
+      console.warn("No webhook secret configured, skipping signature verification");
+      return true; // Skip verification if no secret is configured
+    }
+    
+    const expectedSignature = createHmac('sha256', secret)
+      .update(payload)
+      .digest('hex');
+    
+    const receivedSignature = signature.replace('sha256=', '');
+    
+    try {
+      return timingSafeEqual(
+        Buffer.from(expectedSignature, 'hex'),
+        Buffer.from(receivedSignature, 'hex')
+      );
+    } catch (error) {
+      console.error("Signature verification error:", error);
+      return false;
+    }
+  };
+
   // ElevenLabs webhook endpoint
   app.post("/api/webhook/elevenlabs", async (req, res) => {
     try {
+      const signature = req.headers['elevenlabs-signature'] as string;
+      const webhookSecret = process.env.ELEVENLABS_WEBHOOK_SECRET;
+      
+      // Verify webhook signature if secret is configured
+      if (webhookSecret && signature) {
+        const payload = JSON.stringify(req.body);
+        const isValidSignature = verifyWebhookSignature(payload, signature, webhookSecret);
+        
+        if (!isValidSignature) {
+          console.error("Invalid webhook signature");
+          return res.status(401).json({ message: "Invalid signature" });
+        }
+      }
+      
       console.log("ElevenLabs webhook received:", req.body);
       
       const { conversation_id, transcript, audio_url } = req.body;

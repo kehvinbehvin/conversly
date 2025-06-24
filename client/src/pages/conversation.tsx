@@ -4,9 +4,9 @@ import { useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mic, MicOff, Clock, AlertCircle } from "lucide-react";
+import { Mic, Clock, AlertCircle } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
-import { elevenLabsService } from "@/lib/elevenlabs";
+import ElevenLabsConversation from "@/components/ElevenLabsConversation";
 
 export default function Conversation() {
   const [, setLocation] = useLocation();
@@ -15,38 +15,24 @@ export default function Conversation() {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [timeElapsed, setTimeElapsed] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [dbConversationId, setDbConversationId] = useState<number | null>(null);
 
-  // Start conversation mutation
-  const startConversationMutation = useMutation({
-    mutationFn: async () => {
-      // Create conversation record
+  // Create conversation in database
+  const createConversationMutation = useMutation({
+    mutationFn: async (elevenlabsId: string) => {
       const response = await apiRequest("POST", "/api/conversations", {
-        elevenlabsConversationId: `mock_${Date.now()}`,
+        elevenlabsConversationId: elevenlabsId,
         metadata: { topic: "How was your weekend?" }
       });
       return response.json();
     },
-    onSuccess: async (conversation) => {
-      try {
-        // Start ElevenLabs conversation (using mock for now)
-        const elevenlabsId = await elevenLabsService.mockStartConversation();
-        
-        // Update conversation with ElevenLabs ID
-        await apiRequest("PUT", `/api/conversations/${conversation.id}`, {
-          elevenlabsConversationId: elevenlabsId
-        });
-        
-        setConversationId(elevenlabsId);
-        setIsRecording(true);
-        startTimer();
-      } catch (error) {
-        console.error("Failed to start ElevenLabs conversation:", error);
-        setError("Failed to start voice conversation. Please try again.");
-      }
+    onSuccess: (conversation) => {
+      setDbConversationId(conversation.id);
+      console.log("Database conversation created:", conversation.id);
     },
     onError: (error) => {
-      console.error("Failed to create conversation:", error);
-      setError("Failed to create conversation. Please try again.");
+      console.error("Failed to create conversation record:", error);
+      setError("Failed to create conversation record. Please try again.");
     }
   });
 
@@ -63,14 +49,31 @@ export default function Conversation() {
     }, 1000);
   };
 
-  const endConversation = () => {
+  const handleConversationStart = (elevenlabsId: string) => {
+    setConversationId(elevenlabsId);
+    setIsRecording(true);
+    setError(null);
+    startTimer();
+    
+    // Create database record
+    createConversationMutation.mutate(elevenlabsId);
+  };
+
+  const handleConversationEnd = (elevenlabsId: string) => {
     setIsRecording(false);
-    elevenLabsService.endConversation();
+    setConversationId(null);
+    
     // Navigate to dashboard after a brief delay
     setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
       setLocation("/dashboard");
     }, 2000);
+  };
+
+  const handleError = (error: Error) => {
+    setError(error.message);
+    setIsRecording(false);
+    setConversationId(null);
   };
 
   const formatTime = (seconds: number) => {
@@ -132,20 +135,12 @@ export default function Conversation() {
                 </div>
 
                 <div className="space-y-4">
-                  <Button
-                    onClick={() => startConversationMutation.mutate()}
-                    disabled={startConversationMutation.isPending}
-                    className="bg-coral-500 hover:bg-coral-600 text-white px-8 py-4 text-lg rounded-full"
-                  >
-                    {startConversationMutation.isPending ? (
-                      "Starting..."
-                    ) : (
-                      <>
-                        <Mic className="w-5 h-5 mr-2" />
-                        Start Voice Conversation
-                      </>
-                    )}
-                  </Button>
+                  <ElevenLabsConversation
+                    agentId="agent_01jyfb9fh8f67agfzvv09tvg3t"
+                    onConversationStart={handleConversationStart}
+                    onConversationEnd={handleConversationEnd}
+                    onError={handleError}
+                  />
 
                   <div className="text-sm text-warm-brown-500 space-y-2">
                     <div className="flex items-center justify-center space-x-4">
@@ -198,27 +193,15 @@ export default function Conversation() {
                   </p>
                 </div>
 
-                {/* ElevenLabs Widget Placeholder */}
-                <div className="mt-8 p-6 bg-white border-2 border-dashed border-warm-brown-300 rounded-xl">
-                  <div className="space-y-3">
-                    <div className="w-12 h-12 bg-coral-100 rounded-full mx-auto flex items-center justify-center">
-                      <Mic className="w-6 h-6 text-coral-500" />
-                    </div>
-                    <p className="text-warm-brown-600 font-medium">ElevenLabs Voice Widget Active</p>
-                    <p className="text-sm text-warm-brown-500">
-                      Speaking with AI conversation coach...
-                    </p>
-                    
-                    <Button
-                      onClick={endConversation}
-                      variant="outline"
-                      size="sm"
-                      className="mt-4"
-                    >
-                      <MicOff className="w-4 h-4 mr-2" />
-                      End Early
-                    </Button>
-                  </div>
+                {/* Real ElevenLabs Widget */}
+                <div className="mt-8 p-6 bg-white border border-warm-brown-200 rounded-xl">
+                  <ElevenLabsConversation
+                    agentId="agent_01jyfb9fh8f67agfzvv09tvg3t"
+                    onConversationStart={handleConversationStart}
+                    onConversationEnd={handleConversationEnd}
+                    onError={handleError}
+                    disabled={true}
+                  />
                 </div>
               </div>
             )}
