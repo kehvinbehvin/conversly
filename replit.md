@@ -4,6 +4,8 @@
 
 Conversly is a conversational practice application designed to help users improve their interpersonal communication skills through AI-powered conversation practice and feedback. The application uses voice-based interactions with AI analysis to provide detailed conversation reviews and suggestions for improvement.
 
+**Current Status**: MVP fully functional with complete conversation flow from practice session to AI-generated feedback review.
+
 ## System Architecture
 
 ### Frontend Architecture
@@ -88,8 +90,16 @@ Conversly is a conversational practice application designed to help users improv
 - **Path Aliases**: @ for client, @shared for shared code
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
+## Recent Changes
+- June 24, 2025: Complete conversation flow implemented and tested
+  - ElevenLabs integration working with mock conversation simulation
+  - OpenAI analysis generating detailed feedback with highlights and suggestions
+  - Automatic redirect from conversation to review page working
+  - 15-second demo conversations for rapid testing
+  - Webhook endpoint receiving and processing conversation data correctly
+
 ## Changelog
-- June 24, 2025. Initial setup
+- June 24, 2025: Initial setup and core functionality completion
 
 ## User Preferences
 
