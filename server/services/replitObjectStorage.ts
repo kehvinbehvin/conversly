@@ -19,18 +19,10 @@ export class ReplitObjectStorage {
     const key = this.getKey(data.elevenlabsId);
     
     try {
-      // Try different authentication methods for Replit Object Storage
-      const replitToken = process.env.REPLIT_TOKEN;
-      
-      if (!replitToken) {
-        throw new Error('REPLIT_TOKEN not found - Replit Object Storage requires authentication');
-      }
-
-      // Use Replit's object storage API
-      const response = await fetch(`https://storage.googleapis.com/upload/storage/v1/b/${this.bucketId}/o?uploadType=media&name=${encodeURIComponent(key)}`, {
-        method: 'POST',
+      // Use Replit's built-in object storage without external authentication
+      const response = await fetch(`https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`, {
+        method: 'PUT',
         headers: {
-          'Authorization': `Bearer ${replitToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data, null, 2),
@@ -54,17 +46,7 @@ export class ReplitObjectStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const replitToken = process.env.REPLIT_TOKEN;
-      
-      if (!replitToken) {
-        return null;
-      }
-
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`, {
-        headers: {
-          'Authorization': `Bearer ${replitToken}`,
-        },
-      });
+      const response = await fetch(`https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`);
       
       if (response.status === 404) {
         return null;
@@ -84,17 +66,7 @@ export class ReplitObjectStorage {
 
   async listTranscripts(): Promise<string[]> {
     try {
-      const replitToken = process.env.REPLIT_TOKEN;
-      
-      if (!replitToken) {
-        return [];
-      }
-
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o?prefix=transcripts/`, {
-        headers: {
-          'Authorization': `Bearer ${replitToken}`,
-        },
-      });
+      const response = await fetch(`https://kv.replit.com/${this.bucketId}?prefix=transcripts/`);
       
       if (!response.ok) {
         throw new Error(`Failed to list from Replit Object Storage: ${response.status} ${response.statusText}`);
@@ -102,13 +74,12 @@ export class ReplitObjectStorage {
 
       const data = await response.json();
       
-      if (!data.items) {
+      if (!data.keys) {
         return [];
       }
 
-      return data.items
-        .filter((item: any) => item.name?.endsWith('.json'))
-        .map((item: any) => item.name)
+      return data.keys
+        .filter((key: string) => key.endsWith('.json'))
         .sort((a: string, b: string) => b.localeCompare(a)); // Sort by newest first
     } catch (error) {
       console.error('Failed to list transcripts from Replit Object Storage:', error);
@@ -120,17 +91,8 @@ export class ReplitObjectStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const replitToken = process.env.REPLIT_TOKEN;
-      
-      if (!replitToken) {
-        return false;
-      }
-
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}`, {
+      const response = await fetch(`https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`, {
         method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${replitToken}`,
-        },
       });
 
       if (response.status === 404) {
@@ -150,7 +112,7 @@ export class ReplitObjectStorage {
   }
 
   async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
-    // Return the Google Cloud Storage download URL
-    return `https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`;
+    // Return the Replit KV store URL
+    return `https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`;
   }
 }
