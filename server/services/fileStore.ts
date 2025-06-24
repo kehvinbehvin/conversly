@@ -28,7 +28,8 @@ export class FileStore {
   async saveTranscript(data: TranscriptData): Promise<string> {
     await this.ensureDirectory();
     
-    const filename = `transcript_${data.elevenlabsId}_${Date.now()}.json`;
+    // Use consistent filename without timestamp to prevent duplicates
+    const filename = `transcript_${data.elevenlabsId}.json`;
     const filePath = path.join(this.baseDir, filename);
     
     try {

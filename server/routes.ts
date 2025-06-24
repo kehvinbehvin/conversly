@@ -388,6 +388,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           timestamp: Date.now(),
         };
 
+        // Save transcript only once
         await fileStore.saveTranscript(transcriptFileData);
         console.log("💾 Transcript saved to file store for ElevenLabs ID:", conversation_id);
 
@@ -401,8 +402,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         if (!conversation) {
-          console.log(`🔍 No existing conversation found for ElevenLabs ID: ${conversation_id}, creating new one`);
-
+          console.log(`🔍 No existing conversation found for ElevenLabs ID: ${conversation_id}`);
+          console.log("⚠️ This shouldn't happen as conversations should be created on connect");
+          
           // Get demo user
           const user = await storage.getUserByEmail("demo@conversly.com");
           if (!user) {
@@ -410,24 +412,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
             return res.status(404).json({ message: "Demo user not found" });
           }
 
-          // Create new conversation record
+          // Create new conversation record only as fallback
           const conversationData = {
             userId: user.id,
             status: "completed" as const,
             elevenlabsConversationId: conversation_id,
-            metadata: { webhookReceived: true, ...callMetadata },
+            metadata: { webhookReceived: true, fallbackCreated: true, ...callMetadata },
           };
 
           try {
             conversation = await storage.createConversation(conversationData);
-            console.log("✅ Created new conversation:", conversation.id, "for ElevenLabs ID:", conversation_id);
+            console.log("⚠️ Created fallback conversation:", conversation.id, "for ElevenLabs ID:", conversation_id);
           } catch (createError) {
             console.error("❌ Failed to create conversation:", createError);
             return res.status(500).json({ message: "Failed to create conversation" });
           }
         }
 
-        // Update transcript file with conversation ID
+        // Update transcript file with conversation ID and save final version
         transcriptFileData.conversationId = conversation.id.toString();
         await fileStore.saveTranscript(transcriptFileData);
 
