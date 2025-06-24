@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: Microphone permission and WebSocket connection fix
+  - Added explicit microphone permission request before starting conversations
+  - Fixed immediate WebSocket disconnection issue caused by missing audio permissions
+  - Updated ElevenLabs callback signatures to match official SDK types
+  - Added user-friendly messaging about microphone access requirements
+  - Improved error handling for permission-related failures
 - June 24, 2025: ElevenLabs SDK integration and agent ID fix
   - Integrated official ElevenLabs JavaScript SDK for server-side operations
   - Fixed agent_id=undefined error in WebSocket connections

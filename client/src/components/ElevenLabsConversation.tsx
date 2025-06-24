@@ -32,10 +32,7 @@ export default function ElevenLabsConversation({
       console.log("Disconnected from ElevenLabs conversation:", details);
       setIsConnecting(false);
       setSignedUrl(null); // Clear signed URL on disconnect
-      // Only call onConversationEnd if there's a valid conversationId and it's not an immediate disconnect
-      if (details?.conversationId && details?.reason !== 'user') {
-        onConversationEnd?.(details.conversationId);
-      }
+      onConversationEnd?.(details.conversationId);
     },
     onError: (error: string) => {
       console.error("ElevenLabs conversation error:", error);
@@ -67,9 +64,11 @@ export default function ElevenLabsConversation({
       setSignedUrl(data.signedUrl);
 
       // Start session with the signed URL (agentId is embedded in the signed URL)
-      await conversation.startSession({
+      const convoId = await conversation.startSession({
         signedUrl: data.signedUrl,
       });
+
+      console.log("Conversation started with ID:", convoId);
     } catch (error) {
       console.error("Failed to start conversation:", error);
       setIsConnecting(false);
@@ -94,24 +93,30 @@ export default function ElevenLabsConversation({
   return (
     <div className="flex flex-col items-center space-y-6">
       {!isConnected ? (
-        <Button
-          onClick={startConversation}
-          disabled={disabled || isLoading}
-          size="lg"
-          className="bg-coral-500 hover:bg-coral-600 text-white min-w-[200px]"
-        >
-          {isLoading ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Connecting...
-            </>
-          ) : (
-            <>
-              <Mic className="mr-2 h-4 w-4" />
-              Start Voice Conversation
-            </>
-          )}
-        </Button>
+        <div className="text-center space-y-4">
+          <Button
+            onClick={startConversation}
+            disabled={disabled || isLoading}
+            size="lg"
+            className="bg-coral-500 hover:bg-coral-600 text-white min-w-[200px]"
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Connecting...
+              </>
+            ) : (
+              <>
+                <Mic className="mr-2 h-4 w-4" />
+                Start Voice Conversation
+              </>
+            )}
+          </Button>
+          
+          <p className="text-xs text-warm-brown-500 max-w-sm">
+            This will request microphone access to enable voice conversation with the AI coach.
+          </p>
+        </div>
       ) : (
         <div className="flex flex-col items-center space-y-6">
           <div className="text-center">
@@ -126,21 +131,6 @@ export default function ElevenLabsConversation({
             </p>
 
             {/* Show conversation status */}
-            <div className="mt-3 space-y-1">
-              <p className="text-xs text-sage-500">
-                Status: {conversation.status}
-              </p>
-              {conversation.getId() && (
-                <p className="text-xs text-sage-500">
-                  ID: {conversation.getId()}
-                </p>
-              )}
-              {conversation.isSpeaking && (
-                <p className="text-xs text-coral-600 font-medium">
-                  AI is speaking...
-                </p>
-              )}
-            </div>
           </div>
 
           <Button

@@ -22,8 +22,10 @@ export default function Conversation() {
     mutationFn: async (elevenlabsId: string) => {
       const response = await apiRequest("POST", "/api/conversations", {
         elevenlabsConversationId: elevenlabsId,
-        metadata: { topic: "How was your weekend?" }
+        metadata: { topic: "How was your weekend?" },
       });
+
+      console.log("Create conversation response:", response);
       return response.json();
     },
     onSuccess: (conversation) => {
@@ -33,13 +35,14 @@ export default function Conversation() {
     onError: (error) => {
       console.error("Failed to create conversation record:", error);
       setError("Failed to create conversation record. Please try again.");
-    }
+    },
   });
 
   const startTimer = () => {
     const interval = setInterval(() => {
-      setTimeElapsed(prev => {
-        if (prev >= 300) { // 5 minutes
+      setTimeElapsed((prev) => {
+        if (prev >= 300) {
+          // 5 minutes
           clearInterval(interval);
           // Don't auto-end conversation, let user control it
           return 300;
@@ -47,27 +50,27 @@ export default function Conversation() {
         return prev + 1;
       });
     }, 1000);
-    
+
     // Store interval ID to clear it later
     return interval;
   };
 
   const handleConversationStart = (elevenlabsId: string) => {
-    console.log('Starting conversation with ID:', elevenlabsId);
+    console.log("Starting conversation with ID:", elevenlabsId);
     setConversationId(elevenlabsId);
     setIsRecording(true);
     setError(null);
-    startTimer();
-    
+    // startTimer();
+
     // Create database record
     createConversationMutation.mutate(elevenlabsId);
   };
 
   const handleConversationEnd = (elevenlabsId: string) => {
-    console.log('Conversation ended with ID:', elevenlabsId);
+    console.log("Conversation ended with ID:", elevenlabsId);
     setIsRecording(false);
     setConversationId(null);
-    
+
     // Wait for analysis to complete, then navigate to review
     setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
@@ -88,7 +91,7 @@ export default function Conversation() {
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
 
   const timeRemaining = Math.max(0, 300 - timeElapsed);
@@ -101,7 +104,9 @@ export default function Conversation() {
         <Card className="shadow-2xl border-0">
           <CardHeader className="bg-warm-brown-700 text-white rounded-t-lg">
             <div className="flex items-center justify-between">
-              <CardTitle className="text-xl">Weekend Conversation Practice</CardTitle>
+              <CardTitle className="text-xl">
+                Weekend Conversation Practice
+              </CardTitle>
               <div className="flex items-center space-x-2">
                 {isRecording ? (
                   <>
@@ -109,7 +114,10 @@ export default function Conversation() {
                     <span className="text-sm">Recording</span>
                   </>
                 ) : (
-                  <Badge variant="secondary" className="bg-warm-brown-600 text-white">
+                  <Badge
+                    variant="secondary"
+                    className="bg-warm-brown-600 text-white"
+                  >
                     Ready to Start
                   </Badge>
                 )}
@@ -132,14 +140,15 @@ export default function Conversation() {
                   <div className="w-20 h-20 bg-coral-100 rounded-full mx-auto flex items-center justify-center">
                     <Mic className="w-10 h-10 text-coral-500" />
                   </div>
-                  
+
                   <h2 className="text-2xl font-bold text-warm-brown-800">
                     Ready to Practice?
                   </h2>
-                  
+
                   <p className="text-warm-brown-600 max-w-md mx-auto">
-                    You'll have a 5-minute conversation about "How was your weekend?" 
-                    Speak naturally and share details about what you did.
+                    You'll have a 5-minute conversation about "How was your
+                    weekend?" Speak naturally and share details about what you
+                    did.
                   </p>
                 </div>
 
@@ -174,13 +183,14 @@ export default function Conversation() {
                     <div className="absolute inset-0 rounded-full border-4 border-coral-500 animate-pulse"></div>
                     <Mic className="w-16 h-16 text-coral-500" />
                   </div>
-                  
+
                   <h2 className="text-2xl font-bold text-warm-brown-800">
                     Conversation in Progress
                   </h2>
-                  
+
                   <p className="text-warm-brown-600">
-                    The AI coach will ask about your weekend. Share details and speak naturally!
+                    The AI coach will ask about your weekend. Share details and
+                    speak naturally!
                   </p>
                 </div>
 
@@ -189,14 +199,14 @@ export default function Conversation() {
                   <div className="text-3xl font-mono font-bold text-warm-brown-800">
                     {formatTime(timeRemaining)}
                   </div>
-                  
+
                   <div className="w-full bg-warm-brown-200 rounded-full h-2">
-                    <div 
+                    <div
                       className="bg-coral-500 h-2 rounded-full transition-all duration-1000 ease-linear"
                       style={{ width: `${progress}%` }}
                     ></div>
                   </div>
-                  
+
                   <p className="text-sm text-warm-brown-500">
                     Time remaining • Conversation will end automatically
                   </p>
@@ -221,10 +231,14 @@ export default function Conversation() {
         {!isRecording && (
           <Card className="mt-6 bg-sage-50 border-sage-200">
             <CardContent className="p-6">
-              <h3 className="font-semibold text-warm-brown-800 mb-4">Conversation Tips</h3>
+              <h3 className="font-semibold text-warm-brown-800 mb-4">
+                Conversation Tips
+              </h3>
               <div className="grid md:grid-cols-2 gap-4 text-sm text-warm-brown-600">
                 <div className="space-y-2">
-                  <h4 className="font-medium text-warm-brown-700">Share Details</h4>
+                  <h4 className="font-medium text-warm-brown-700">
+                    Share Details
+                  </h4>
                   <ul className="space-y-1">
                     <li>• Mention specific activities</li>
                     <li>• Describe locations and people</li>
@@ -232,7 +246,9 @@ export default function Conversation() {
                   </ul>
                 </div>
                 <div className="space-y-2">
-                  <h4 className="font-medium text-warm-brown-700">Stay Engaged</h4>
+                  <h4 className="font-medium text-warm-brown-700">
+                    Stay Engaged
+                  </h4>
                   <ul className="space-y-1">
                     <li>• Listen to follow-up questions</li>
                     <li>• Build on what the AI says</li>
