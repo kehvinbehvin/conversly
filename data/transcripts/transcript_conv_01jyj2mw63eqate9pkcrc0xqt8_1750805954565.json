@@ -1,0 +1,204 @@
+{
+  "conversationId": "",
+  "elevenlabsId": "conv_01jyj2mw63eqate9pkcrc0xqt8",
+  "transcript": [
+    {
+      "role": "agent",
+      "message": "Hey, how have you been? How was your weekend?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 0,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    },
+    {
+      "role": "user",
+      "message": "That's pretty cool.",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 2,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": "audio"
+    },
+    {
+      "role": "agent",
+      "message": "Glad to hear that! Anything exciting or relaxing you did over the weekend?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 7,
+      "conversation_turn_metrics": {
+        "metrics": {
+          "convai_llm_service_ttf_sentence": {
+            "elapsed_time": 0.45648431700101355
+          },
+          "convai_llm_service_ttfb": {
+            "elapsed_time": 0.4180717109993566
+          }
+        }
+      },
+      "rag_retrieval_info": null,
+      "llm_usage": {
+        "model_usage": {
+          "gpt-4o": {
+            "input": {
+              "tokens": 1748,
+              "price": 0.00437
+            },
+            "input_cache_read": {
+              "tokens": 0,
+              "price": 0
+            },
+            "input_cache_write": {
+              "tokens": 0,
+              "price": 0
+            },
+            "output_total": {
+              "tokens": 16,
+              "price": 0.00016
+            }
+          }
+        }
+      },
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    },
+    {
+      "role": "user",
+      "message": "No. No, actually, I had a really good time with my friends.",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 11,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    }
+  ],
+  "metadata": {
+    "start_time_unix_secs": 1750805934,
+    "accepted_time_unix_secs": 1750805934,
+    "call_duration_secs": 17,
+    "cost": 233,
+    "deletion_settings": {
+      "deletion_time_unix_secs": null,
+      "deleted_logs_at_time_unix_secs": null,
+      "deleted_audio_at_time_unix_secs": null,
+      "deleted_transcript_at_time_unix_secs": null,
+      "delete_transcript_and_pii": false,
+      "delete_audio": false
+    },
+    "feedback": {
+      "overall_score": null,
+      "likes": 0,
+      "dislikes": 0
+    },
+    "authorization_method": "signed_url",
+    "charging": {
+      "dev_discount": false,
+      "is_burst": false,
+      "tier": "free",
+      "llm_usage": {
+        "irreversible_generation": {
+          "model_usage": {
+            "gpt-4o": {
+              "input": {
+                "tokens": 1748,
+                "price": 0.00437
+              },
+              "input_cache_read": {
+                "tokens": 0,
+                "price": 0
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0
+              },
+              "output_total": {
+                "tokens": 16,
+                "price": 0.00016
+              }
+            }
+          }
+        },
+        "initiated_generation": {
+          "model_usage": {
+            "gpt-4o": {
+              "input": {
+                "tokens": 1748,
+                "price": 0.00437
+              },
+              "input_cache_read": {
+                "tokens": 0,
+                "price": 0
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0
+              },
+              "output_total": {
+                "tokens": 16,
+                "price": 0.00016
+              }
+            }
+          }
+        }
+      },
+      "llm_price": 0.00453,
+      "llm_charge": 46,
+      "call_charge": 187
+    },
+    "phone_call": null,
+    "batch_call": null,
+    "termination_reason": "Client disconnected",
+    "error": null,
+    "main_language": "en",
+    "rag_usage": null,
+    "text_only": false,
+    "features_usage": {
+      "language_detection": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_agent": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_number": {
+        "enabled": false,
+        "used": false
+      },
+      "multivoice": {
+        "enabled": false,
+        "used": false
+      },
+      "pii_zrm_workspace": false,
+      "pii_zrm_agent": false
+    }
+  },
+  "analysis": {
+    "evaluation_criteria_results": {},
+    "data_collection_results": {},
+    "call_successful": "success",
+    "transcript_summary": "The agent initiated a casual conversation, inquiring about the user's well-being and weekend. The user initially responded neutrally but then shared they had a good time with friends.\n"
+  },
+  "timestamp": 1750805954565
+}

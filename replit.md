@@ -91,6 +91,11 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: Fixed microphone permission timing and dashboard refresh
+  - Microphone access now properly occurs before WebSocket connection attempts
+  - Dashboard now auto-refreshes every 5 seconds to show new conversations
+  - History page displays conversations with proper refresh mechanism
+  - Added debug information to verify conversation data loading
 - June 24, 2025: Object store implementation for transcript data
   - Created FileStore service to save transcript data as JSON files
   - Enhanced webhook handler to automatically create conversations when missing
