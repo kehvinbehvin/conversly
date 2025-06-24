@@ -1,0 +1,102 @@
+
+🔍 Looking for conversation with ElevenLabs ID: conv_01jyj4pe0yedwvpcvkhbtpx65t
+📝 Processed transcript: {
+  originalFormat: 'array',
+  turnsCount: 1,
+  validTurns: 1,
+  processedLength: 52,
+  hasAudioUrl: false
+}
+📊 Call metadata: {
+  webhookType: 'post_call_transcription',
+  eventTimestamp: 1750808086,
+  status: 'done',
+  duration: 3,
+  cost: 37,
+  terminationReason: 'Client disconnected',
+  language: 'en',
+  callSuccessful: 'success',
+  transcriptSummary: "The agent initiated the conversation with a casual greeting, inquiring about the user's well-being and weekend.\n",
+  startTime: 1750808082,
+  acceptedTime: 1750808082
+}
+Failed to save transcript to Replit Object Storage: Error: REPLIT_OBJECT_STORAGE_TOKEN not found
+    at ReplitObjectStorage.saveTranscript (/home/runner/workspace/server/services/replitObjectStorage.ts:26:15)
+    at ReplitStorageWithFallback.saveTranscript (/home/runner/workspace/server/services/cloudStorage.ts:42:41)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:394:28)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at verifyWebhookSignature (/home/runner/workspace/server/routes.ts:273:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at /home/runner/workspace/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at invokeCallback (/home/runner/workspace/node_modules/raw-body/index.js:238:16)
+    at done (/home/runner/workspace/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/home/runner/workspace/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:518:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+Replit Object Storage failed, falling back to local storage: Error: REPLIT_OBJECT_STORAGE_TOKEN not found
+    at ReplitObjectStorage.saveTranscript (/home/runner/workspace/server/services/replitObjectStorage.ts:26:15)
+    at ReplitStorageWithFallback.saveTranscript (/home/runner/workspace/server/services/cloudStorage.ts:42:41)
+    at <anonymous> (/home/runner/workspace/server/routes.ts:394:28)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at verifyWebhookSignature (/home/runner/workspace/server/routes.ts:273:5)
+    at Layer.handle [as handle_request] (/home/runner/workspace/node_modules/express/lib/router/layer.js:95:5)
+    at next (/home/runner/workspace/node_modules/express/lib/router/route.js:149:13)
+    at /home/runner/workspace/node_modules/body-parser/lib/read.js:137:5
+    at AsyncResource.runInAsyncScope (node:async_hooks:206:9)
+    at invokeCallback (/home/runner/workspace/node_modules/raw-body/index.js:238:16)
+    at done (/home/runner/workspace/node_modules/raw-body/index.js:227:7)
+    at IncomingMessage.onEnd (/home/runner/workspace/node_modules/raw-body/index.js:287:7)
+    at IncomingMessage.emit (node:events:518:28)
+    at endReadableNT (node:internal/streams/readable:1698:12)
+    at process.processTicksAndRejections (node:internal/process/task_queues:82:21)
+📁 Transcript saved to: data/transcripts/transcript_conv_01jyj4pe0yedwvpcvkhbtpx65t.json
+💾 Transcript saved to cloud storage for ElevenLabs ID: conv_01jyj4pe0yedwvpcvkhbtpx65t
+📁 Transcript saved to: data/transcripts/transcript_conv_01jyj4pe0yedwvpcvkhbtpx65t.json
+✅ Found conversation: { id: 1, status: 'pending', hasTranscript: false, hasAudioUrl: false }
+📝 Updating conversation with: {
+  hasTranscript: true,
+  transcriptLength: 52,
+  hasAudioUrl: false,
+  audioUrl: null,
+  metadata: {
+    webhookType: 'post_call_transcription',
+    eventTimestamp: 1750808086,
+    status: 'done',
+    duration: 3,
+    cost: 37,
+    terminationReason: 'Client disconnected',
+    language: 'en',
+    callSuccessful: 'success',
+    transcriptSummary: "The agent initiated the conversation with a casual greeting, inquiring about the user's well-being and weekend.\n",
+    startTime: 1750808082,
+    acceptedTime: 1750808082
+  }
+}
+✅ Conversation updated successfully
+🧠 Starting AI analysis for transcript (length: 52 chars)
+11:34:47 PM [express] GET /api/conversations 200 in 1ms :: [{"userId":1,"status":"completed","elevenl…
+11:34:49 PM [express] GET /api/conversations/1 200 in 1ms :: {"userId":1,"status":"completed","eleven…
+✅ AI analysis completed: {
+  highlightsCount: 1,
+  summaryLength: 252,
+  overallRating: 3,
+  suggestionsCount: 1,
+  strengthsCount: 1
+}
+✅ Review created successfully
+✅ Conversation status updated to 'analyzed'
+🎉 Analysis completed successfully for conversation 1
+✅ Webhook processed successfully in 4218ms
+11:34:51 PM [express] POST /api/webhook/elevenlabs 200 in 4222ms :: {"success":true,"processingTime":…
+11:34:52 PM [express] GET /api/conversations 200 in 1ms :: [{"userId":1,"status":"analyzed","elevenla…
+11:34:57 PM [express] GET /api/conversations 200 in 1ms :: [{"userId":1,"status":"analyzed","elevenla…
+11:35:02 PM [express] GET /api/conversations 304 in 1ms :: [{"userId":1,"status":"analyzed","elevenla…
+11:35:08 PM [express] GET /api/conversations 304 in 0ms :: [{"userId":1,"status":"analyzed","elevenla…
+11:35:13 PM [express] GET /api/conversations 304 in 1ms :: [{"userId":1,"status":"analyzed","elevenla…
+11:35:19 PM [express] GET /api/conversations 304 in 1ms :: [{"userId":1,"status":"analyzed","elevenla…
+11:35:24 PM [express] GET /api/conversations 304 in 1ms :: [{"userId":1,"status":"analyzed","elevenla…

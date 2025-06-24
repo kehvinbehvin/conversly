@@ -172,7 +172,7 @@ export default function Storage() {
             <Alert>
               <Cloud className="h-4 w-4" />
               <AlertDescription>
-                Replit Object Storage with local fallback ensures your transcript data is always saved reliably.
+                Hybrid storage system: Tries Replit Object Storage first, automatically falls back to local storage if needed.
               </AlertDescription>
             </Alert>
 
@@ -194,11 +194,15 @@ export default function Storage() {
                   <div className="space-y-1">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Provider:</span>
+                      <span className="font-mono">Hybrid (Cloud + Local)</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Primary:</span>
                       <span className="font-mono">Replit Object Storage</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Storage Type:</span>
-                      <span className="font-mono">Cloud Object Storage</span>
+                      <span className="text-muted-foreground">Fallback:</span>
+                      <span className="font-mono">Local File System</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Data Format:</span>

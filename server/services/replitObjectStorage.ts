@@ -19,17 +19,18 @@ export class ReplitObjectStorage {
     const key = this.getKey(data.elevenlabsId);
     
     try {
-      // Use the Replit Object Storage environment variable for authentication
-      const token = process.env.REPLIT_OBJECT_STORAGE_TOKEN;
+      // Try different authentication methods for Replit Object Storage
+      const replitToken = process.env.REPLIT_TOKEN;
       
-      if (!token) {
-        throw new Error('REPLIT_OBJECT_STORAGE_TOKEN not found');
+      if (!replitToken) {
+        throw new Error('REPLIT_TOKEN not found - Replit Object Storage requires authentication');
       }
 
-      const response = await fetch(`https://objectstorage.replit.com/upload/${this.bucketId}/${key}`, {
-        method: 'PUT',
+      // Use Replit's object storage API
+      const response = await fetch(`https://storage.googleapis.com/upload/storage/v1/b/${this.bucketId}/o?uploadType=media&name=${encodeURIComponent(key)}`, {
+        method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${replitToken}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data, null, 2),
@@ -53,15 +54,15 @@ export class ReplitObjectStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const token = process.env.REPLIT_OBJECT_STORAGE_TOKEN;
+      const replitToken = process.env.REPLIT_TOKEN;
       
-      if (!token) {
+      if (!replitToken) {
         return null;
       }
 
-      const response = await fetch(`https://objectstorage.replit.com/download/${this.bucketId}/${key}`, {
+      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${replitToken}`,
         },
       });
       
@@ -83,15 +84,15 @@ export class ReplitObjectStorage {
 
   async listTranscripts(): Promise<string[]> {
     try {
-      const token = process.env.REPLIT_OBJECT_STORAGE_TOKEN;
+      const replitToken = process.env.REPLIT_TOKEN;
       
-      if (!token) {
+      if (!replitToken) {
         return [];
       }
 
-      const response = await fetch(`https://objectstorage.replit.com/list/${this.bucketId}/transcripts/`, {
+      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o?prefix=transcripts/`, {
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${replitToken}`,
         },
       });
       
@@ -101,12 +102,13 @@ export class ReplitObjectStorage {
 
       const data = await response.json();
       
-      if (!data.files) {
+      if (!data.items) {
         return [];
       }
 
-      return data.files
-        .filter((file: string) => file.endsWith('.json'))
+      return data.items
+        .filter((item: any) => item.name?.endsWith('.json'))
+        .map((item: any) => item.name)
         .sort((a: string, b: string) => b.localeCompare(a)); // Sort by newest first
     } catch (error) {
       console.error('Failed to list transcripts from Replit Object Storage:', error);
@@ -118,16 +120,16 @@ export class ReplitObjectStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const token = process.env.REPLIT_OBJECT_STORAGE_TOKEN;
+      const replitToken = process.env.REPLIT_TOKEN;
       
-      if (!token) {
+      if (!replitToken) {
         return false;
       }
 
-      const response = await fetch(`https://objectstorage.replit.com/delete/${this.bucketId}/${key}`, {
+      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}`, {
         method: 'DELETE',
         headers: {
-          'Authorization': `Bearer ${token}`,
+          'Authorization': `Bearer ${replitToken}`,
         },
       });
 
@@ -148,8 +150,7 @@ export class ReplitObjectStorage {
   }
 
   async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
-    // For now, return a direct download URL
-    // In production, you would implement proper signed URLs
-    return `https://objectstorage.replit.com/download/${this.bucketId}/${key}`;
+    // Return the Google Cloud Storage download URL
+    return `https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`;
   }
 }
