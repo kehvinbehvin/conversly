@@ -25,7 +25,7 @@ export default function ElevenLabsConversation({
     <div className="flex flex-col items-center space-y-6">
       {!isConnected ? (
         <Button
-          onClick={startConversation}
+          onClick={handleStartConversation}
           disabled={isLoading || disabled}
           size="lg"
           className="h-16 w-16 rounded-full bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 shadow-lg hover:shadow-xl transition-all duration-200"

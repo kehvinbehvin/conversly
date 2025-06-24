@@ -91,12 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
-- June 24, 2025: React re-render isolation fix for WebSocket stability
-  - Replaced timeout-based workarounds with proper React patterns using useRef and useCallback
-  - Isolated ElevenLabs WebSocket callbacks from component re-renders using stable callback references
-  - Prevented callback recreation on every render that was causing connection instability
-  - Implemented proper cleanup and resource management for audio streams and context
-  - WebSocket connection now stable regardless of parent component state changes
+- June 24, 2025: Architectural separation of WebSocket state management
+  - Implemented ConversationProvider context to manage WebSocket connections globally
+  - Separated conversation session management from UI components that frequently re-render
+  - WebSocket instance now persists in context using useRef, isolated from component state changes
+  - ElevenLabsConversation component simplified to pure UI that consumes stable context
+  - Proper cleanup and resource management moved to provider level for better lifecycle control
 - June 24, 2025: Client-side WebSocket disconnection fix
   - Fixed callback parameter mismatch in onDisconnect handler
   - Prevented premature onConversationEnd calls for user-initiated disconnects

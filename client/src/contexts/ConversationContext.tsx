@@ -1,4 +1,5 @@
 import { createContext, useContext, useRef, useEffect, useState, ReactNode } from "react";
+import { useConversation as useElevenLabsConversation } from "@elevenlabs/react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface ConversationContextType {
@@ -36,11 +37,10 @@ export function ConversationProvider({
   onError,
 }: ConversationProviderProps) {
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isConnected, setIsConnected] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
   
   // Use refs to store stable references that persist across re-renders
-  const websocketRef = useRef<WebSocket | null>(null);
   const audioStreamRef = useRef<MediaStream | null>(null);
   const audioContextRef = useRef<AudioContext | null>(null);
   const callbacksRef = useRef({
@@ -58,73 +58,59 @@ export function ConversationProvider({
     };
   }, [onConversationStart, onConversationEnd, onError]);
 
-  // Cleanup function that doesn't depend on state
-  const cleanup = () => {
-    if (audioStreamRef.current) {
-      audioStreamRef.current.getTracks().forEach(track => track.stop());
-      audioStreamRef.current = null;
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    if (websocketRef.current) {
-      websocketRef.current.close();
-      websocketRef.current = null;
-    }
-    setIsConnected(false);
-    setIsConnecting(false);
-    setCurrentConversationId(null);
-  };
-
-  // WebSocket connection setup with stable references
-  const setupWebSocket = (signedUrl: string) => {
-    const ws = new WebSocket(signedUrl);
-    websocketRef.current = ws;
-
-    ws.onopen = () => {
-      console.log("✅ WebSocket connected");
-      setIsConnected(true);
+  // Use ElevenLabs SDK with stable callbacks
+  const conversation = useElevenLabsConversation({
+    onConnect: (props: { conversationId: string }) => {
+      console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const data = JSON.parse(event.data);
-        console.log("📝 WebSocket message:", data);
-        
-        if (data.type === "conversation_initiation_metadata") {
-          const conversationId = data.conversation_initiation_metadata?.conversation_id;
-          if (conversationId) {
-            console.log("✅ Connected to ElevenLabs conversation:", { conversationId });
-            setCurrentConversationId(conversationId);
-            callbacksRef.current.onConversationStart?.(conversationId);
-          }
-        }
-      } catch (error) {
-        console.error("Failed to parse WebSocket message:", error);
-      }
-    };
-
-    ws.onclose = (event) => {
-      console.log("❌ WebSocket disconnected:", { code: event.code, reason: event.reason });
-      const conversationId = currentConversationId;
-      cleanup();
+      setCurrentConversationId(props.conversationId);
+      callbacksRef.current.onConversationStart?.(props.conversationId);
+    },
+    onDisconnect: (details: any) => {
+      console.log("❌ Disconnected from ElevenLabs conversation:", details);
+      setIsConnecting(false);
+      setSignedUrl(null);
       
+      // Clean up audio resources when disconnected
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop());
+        audioStreamRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      
+      const conversationId = details?.conversationId || currentConversationId;
       if (conversationId) {
         callbacksRef.current.onConversationEnd?.(conversationId);
       }
-    };
-
-    ws.onerror = (error) => {
-      console.error("🔥 WebSocket error:", error);
-      cleanup();
-      callbacksRef.current.onError?.(new Error("WebSocket connection failed"));
-    };
-  };
+      setCurrentConversationId(null);
+    },
+    onError: (error: string) => {
+      console.error("🔥 ElevenLabs conversation error:", error);
+      setIsConnecting(false);
+      setSignedUrl(null);
+      
+      // Clean up audio resources on error
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop());
+        audioStreamRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      
+      callbacksRef.current.onError?.(new Error(error));
+    },
+    onMessage: (props: { message: string; source: string }) => {
+      console.log("📝 ElevenLabs message:", props);
+    },
+  });
 
   const startConversation = async (agentId: string) => {
-    if (isConnecting || isConnected) return;
+    if (isConnecting || conversation.status === "connected") return;
 
     try {
       setIsConnecting(true);
@@ -164,30 +150,48 @@ export function ConversationProvider({
       }
 
       console.log("📝 Received signed URL:", data.signedUrl);
-      console.log("🚀 Starting WebSocket connection...");
+      setSignedUrl(data.signedUrl);
       
-      setupWebSocket(data.signedUrl);
+      console.log("🚀 Starting conversation session...");
+      await conversation.startSession({
+        signedUrl: data.signedUrl,
+      });
 
     } catch (error) {
       console.error("❌ Failed to start conversation:", error);
-      cleanup();
+      setIsConnecting(false);
       callbacksRef.current.onError?.(error as Error);
     }
   };
 
-  const endConversation = () => {
-    console.log("🛑 Ending conversation...");
-    cleanup();
+  const endConversation = async () => {
+    try {
+      console.log("🛑 Ending conversation...");
+      if (conversation.status === "connected") {
+        await conversation.endSession();
+      }
+      
+      // Clean up audio resources
+      if (audioStreamRef.current) {
+        audioStreamRef.current.getTracks().forEach(track => track.stop());
+        audioStreamRef.current = null;
+      }
+      if (audioContextRef.current) {
+        audioContextRef.current.close();
+        audioContextRef.current = null;
+      }
+      
+      setSignedUrl(null);
+      setIsConnecting(false);
+      setCurrentConversationId(null);
+    } catch (error) {
+      console.error("❌ Failed to end conversation:", error);
+    }
   };
-
-  // Cleanup on unmount
-  useEffect(() => {
-    return cleanup;
-  }, []);
 
   const value: ConversationContextType = {
     isConnecting,
-    isConnected,
+    isConnected: conversation.status === "connected",
     currentConversationId,
     startConversation,
     endConversation,
