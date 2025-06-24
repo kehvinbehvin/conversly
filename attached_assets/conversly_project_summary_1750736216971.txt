@@ -1,0 +1,86 @@
+
+Project Name: Conversly (Placeholder)
+
+Overview:
+A digital conversational coach for socially self-aware individuals seeking to improve interpersonal connection through guided AI conversations.
+
+Target Users:
+- Young professionals, introverts, neurodiverse individuals
+- Mobile-first usage
+- Prefer safe, growth-oriented environments
+
+Core Value Proposition:
+Safe, friendly, Warm, voice-first practice with reflective AI-generated feedback.
+
+Core Experience - Conversational Flow:
+1. User starts a 5-minute voice chat via ElevenLabs widget (https://elevenlabs.io/docs/conversational-ai/customization/widget)
+2. ElevenLabs triggers webhook on completion (https://elevenlabs.io/docs/product-guides/administration/webhooks)
+3. System fetches audio/transcript
+4. Transcript sent to OpenAI for review (https://platform.openai.com/docs/guides/structured-outputs?api-mode=responses)
+5. Review with annotations returned and stored 
+6. User is notified and views annotated feedback
+
+UI/UX Pages:
+1. Landing Page
+2. Home/Dashboard
+3. Conversation Page
+4. Conversation History Page
+5. Conversation Review Page
+6. Account Settings
+
+Functional Requirements:
+- 5-minute voice conversations
+- LLM-generated inline review annotations
+- User authentication via Auth0
+- Stripe subscription integration
+- Braintrust for prompt versioning
+
+Data Model:
+Postgres
+- Users: id, email, auth_provider, stripe_customer_id, timestamps
+- Conversations: id, transcript_url, audio_url, metadata, created_at
+- User_Conversations: user_id, conversation_id
+- Reviews: id, conversation_id, highlights, summary, created_at
+
+Object Store (S3 or compatible):
+- Store transcript and audio files
+
+Tech Stack:
+- Frontend: React Native + TypeScript
+- Backend: Node.js (Express or Fastify)
+- DB: Postgres
+- Storage: S3-compatible
+- AI: ElevenLabs widget + OpenAI API
+- Prompt Management: Braintrust
+
+Development Roadmap:
+
+Phase 0 – Brand + Design
+- Define name, logo, color scheme
+- Design UI mocks
+- Write brand narrative
+
+Phase 1 – MVP Alpha
+- Auth0 login
+- ElevenLabs widget integration
+- Webhook → OpenAI LLM review
+- Basic review display
+- Hard-coded AI coach
+
+Phase 2 – MVP Beta
+- Stripe integration
+- Inline annotation UI
+- Conversation history + review
+- Coach customization
+
+Phase 3 – Post-MVP
+- Enhanced LLM feedback (tone, metrics)
+- Prompt versioning via Braintrust
+- Editable feedback
+- Coach marketplace
+
+Success Metrics:
+- Session Completion Rate
+- Review Engagement Rate
+- Improvement Over Time
+- Churn Rate
