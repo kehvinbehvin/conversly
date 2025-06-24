@@ -1,0 +1,58 @@
+ Looking for conversation with ElevenLabs ID: conv_01jyj21jpmfdatzpj3x0sgz88w
+📝 Processed transcript: {
+  originalFormat: 'array',
+  turnsCount: 3,
+  validTurns: 3,
+  processedLength: 166,
+  hasAudioUrl: false
+}
+📊 Call metadata: {
+  webhookType: 'post_call_transcription',
+  eventTimestamp: 1750805315,
+  status: 'done',
+  duration: 11,
+  cost: 156,
+  terminationReason: 'Client disconnected',
+  language: 'en',
+  callSuccessful: 'success',
+  transcriptSummary: "The agent initiated a casual conversation, inquiring about the user's well-being and weekend. The user responded positively. The agent then inquired about the user's coffee preference.\n",
+  startTime: 1750805301,
+  acceptedTime: 1750805302
+}
+📁 Transcript saved to: data/transcripts/transcript_conv_01jyj21jpmfdatzpj3x0sgz88w_1750805315268.json
+💾 Transcript saved to file store for ElevenLabs ID: conv_01jyj21jpmfdatzpj3x0sgz88w
+📁 Transcript saved to: data/transcripts/transcript_conv_01jyj21jpmfdatzpj3x0sgz88w_1750805315269.json
+✅ Found conversation: { id: 1, status: 'pending', hasTranscript: false, hasAudioUrl: false }
+📝 Updating conversation with: {
+  hasTranscript: true,
+  transcriptLength: 166,
+  hasAudioUrl: false,
+  audioUrl: null,
+  metadata: {
+    webhookType: 'post_call_transcription',
+    eventTimestamp: 1750805315,
+    status: 'done',
+    duration: 11,
+    cost: 156,
+    terminationReason: 'Client disconnected',
+    language: 'en',
+    callSuccessful: 'success',
+    transcriptSummary: "The agent initiated a casual conversation, inquiring about the user's well-being and weekend. The user responded positively. The agent then inquired about the user's coffee preference.\n",
+    startTime: 1750805301,
+    acceptedTime: 1750805302
+  }
+}
+✅ Conversation updated successfully
+🧠 Starting AI analysis for transcript (length: 166 chars)
+✅ AI analysis completed: {
+  highlightsCount: 3,
+  summaryLength: 211,
+  overallRating: 3,
+  suggestionsCount: 2,
+  strengthsCount: 2
+}
+✅ Review created successfully
+✅ Conversation status updated to 'analyzed'
+🎉 Analysis completed successfully for conversation 1
+✅ Webhook processed successfully in 4684ms
+10:48:39 PM [express] POST /api/webhook/elevenlabs 200 in 4688ms :: {"success":true,"processingTime":…

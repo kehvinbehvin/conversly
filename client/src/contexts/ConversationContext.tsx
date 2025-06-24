@@ -110,16 +110,25 @@ export function ConversationProvider({
     try {
       setIsConnecting(true);
 
-      // Request microphone permission
+      // Request microphone permission FIRST before any connection attempts
       console.log("🎤 Requesting microphone permission...");
-      await navigator.mediaDevices.getUserMedia({
-        audio: {
-          echoCancellation: true,
-          noiseSuppression: true,
-          sampleRate: 16000,
-        },
-      });
-      console.log("✅ Microphone permission granted");
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: true,
+            noiseSuppression: true,
+            sampleRate: 16000,
+          },
+        });
+        console.log("✅ Microphone permission granted");
+        // Stop the test stream immediately since ElevenLabs will handle audio
+        stream.getTracks().forEach(track => track.stop());
+      } catch (micError) {
+        console.error("❌ Microphone permission denied:", micError);
+        setIsConnecting(false);
+        callbacksRef.current.onError?.(new Error("Microphone permission required"));
+        return;
+      }
 
       // Initialize audio context
       console.log("🔊 Initializing audio context...");

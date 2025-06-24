@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -12,9 +12,15 @@ import type { ConversationWithReview } from "@shared/schema";
 export default function History() {
   const [searchTerm, setSearchTerm] = useState("");
   
-  const { data: conversations, isLoading } = useQuery<ConversationWithReview[]>({
+  const { data: conversations, isLoading, refetch } = useQuery<ConversationWithReview[]>({
     queryKey: ["/api/conversations"],
+    refetchInterval: 5000, // Refetch every 5 seconds to pick up new conversations
   });
+
+  // Force refetch when component mounts to ensure fresh data
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const filteredConversations = conversations?.filter(conversation => {
     if (!searchTerm) return true;
