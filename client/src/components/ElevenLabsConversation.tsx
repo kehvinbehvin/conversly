@@ -21,7 +21,9 @@ export default function ElevenLabsConversation({
 }: ElevenLabsConversationProps) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
-  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [currentConversationId, setCurrentConversationId] = useState<
+    string | null
+  >(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
@@ -29,52 +31,53 @@ export default function ElevenLabsConversation({
     debug: true, // Enable debug mode for more detailed logs
     onConnect: (props: { conversationId: string }) => {
       console.log("✅ Connected to ElevenLabs conversation:", props);
+      // Test 1: Only basic state updates
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
-      onConversationStart?.(props.conversationId);
+      // Don't call onConversationStart yet - test if this alone causes disconnect
     },
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);
-      console.log("Disconnect reason:", details.reason);
-      console.log("Disconnect code:", details.code);
-      console.log("Disconnect details:", JSON.stringify(details, null, 2));
-      
-      setIsConnecting(false);
-      setSignedUrl(null);
-      
+      // console.log("Disconnect reason:", details.reason);
+      // console.log("Disconnect code:", details.code);
+      // console.log("Disconnect details:", JSON.stringify(details, null, 2));
+
+      // setIsConnecting(false);
+      // setSignedUrl(null);
+
       // Clean up audio resources when disconnected
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      }
-      if (audioContext) {
-        audioContext.close();
-        setAudioContext(null);
-      }
-      
+      // if (audioStream) {
+      //   audioStream.getTracks().forEach(track => track.stop());
+      //   setAudioStream(null);
+      // }
+      // if (audioContext) {
+      //   audioContext.close();
+      //   setAudioContext(null);
+      // }
+
       // Always end the conversation when disconnected - UI should reflect reality
       // Use the stored conversationId since disconnect details might not include it
-      const conversationId = details?.conversationId || currentConversationId;
-      if (conversationId) {
-        onConversationEnd?.(conversationId);
-      }
-      setCurrentConversationId(null);
+      // const conversationId = details?.conversationId || currentConversationId;
+      // if (conversationId) {
+      //   onConversationEnd?.(conversationId);
+      // }
+      // setCurrentConversationId(null);
     },
     onError: (error: string) => {
       console.error("🔥 ElevenLabs conversation error:", error);
       setIsConnecting(false);
       setSignedUrl(null);
-      
+
       // Clean up audio resources on error
       if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
+        audioStream.getTracks().forEach((track) => track.stop());
         setAudioStream(null);
       }
       if (audioContext) {
         audioContext.close();
         setAudioContext(null);
       }
-      
+
       onError?.(new Error(error));
     },
     onMessage: (props: { message: string; source: string }) => {
@@ -185,20 +188,20 @@ export default function ElevenLabsConversation({
   const endConversation = async () => {
     try {
       console.log("🛑 Manually ending conversation...");
-      if (conversation.status === 'connected') {
+      if (conversation.status === "connected") {
         await conversation.endSession();
       }
-      
+
       // Clean up audio resources
       if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
+        audioStream.getTracks().forEach((track) => track.stop());
         setAudioStream(null);
       }
       if (audioContext) {
         audioContext.close();
         setAudioContext(null);
       }
-      
+
       setSignedUrl(null);
       setIsConnecting(false);
     } catch (error) {
