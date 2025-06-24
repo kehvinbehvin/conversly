@@ -45,11 +45,30 @@ export default function ElevenLabsConversation({
     },
   });
 
+  const requestMicrophonePermission = async (): Promise<boolean> => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      stream.getTracks().forEach(track => track.stop()); // Clean up
+      console.log('Microphone permission granted');
+      return true;
+    } catch (error) {
+      console.error('Microphone permission denied:', error);
+      return false;
+    }
+  };
+
   const startConversation = async () => {
     if (disabled || isConnecting) return;
 
     setIsConnecting(true);
     try {
+      // Request microphone permission first
+      console.log('Requesting microphone permission...');
+      const hasPermission = await requestMicrophonePermission();
+      if (!hasPermission) {
+        throw new Error('Microphone permission is required for voice conversations. Please allow microphone access and try again.');
+      }
+
       // Generate signed URL from backend with agent ID
       const response = await apiRequest("POST", "/api/elevenlabs/signed-url", {
         agentId: agentId,
