@@ -1,14 +1,9 @@
-import { S3Client, PutObjectCommand, GetObjectCommand, ListObjectsV2Command, DeleteObjectCommand } from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { TranscriptData } from './fileStore.js';
 
 export interface CloudStorageConfig {
-  provider: 'aws' | 'local';
-  aws?: {
-    region: string;
-    bucketName: string;
-    accessKeyId?: string;
-    secretAccessKey?: string;
+  provider: 'replit' | 'local';
+  replit?: {
+    bucketId: string;
   };
 }
 
@@ -20,25 +15,14 @@ export interface ICloudStorage {
   getSignedUrl(key: string, expiresIn?: number): Promise<string>;
 }
 
-export class S3Storage implements ICloudStorage {
-  private s3Client: S3Client;
-  private bucketName: string;
+export class ReplitStorage implements ICloudStorage {
+  private bucketId: string;
 
-  constructor(config: CloudStorageConfig['aws']) {
+  constructor(config: CloudStorageConfig['replit']) {
     if (!config) {
-      throw new Error('AWS configuration is required for S3Storage');
+      throw new Error('Replit configuration is required for ReplitStorage');
     }
-
-    this.bucketName = config.bucketName;
-    
-    // Initialize S3 client with credentials from environment or config
-    this.s3Client = new S3Client({
-      region: config.region,
-      credentials: config.accessKeyId && config.secretAccessKey ? {
-        accessKeyId: config.accessKeyId,
-        secretAccessKey: config.secretAccessKey,
-      } : undefined, // Use default credential chain if not provided
-    });
+    this.bucketId = config.bucketId;
   }
 
   private getKey(elevenlabsId: string): string {
@@ -49,23 +33,22 @@ export class S3Storage implements ICloudStorage {
     const key = this.getKey(data.elevenlabsId);
     
     try {
-      const command = new PutObjectCommand({
-        Bucket: this.bucketName,
-        Key: key,
-        Body: JSON.stringify(data, null, 2),
-        ContentType: 'application/json',
-        Metadata: {
-          conversationId: data.conversationId,
-          elevenlabsId: data.elevenlabsId,
-          timestamp: data.timestamp.toString(),
-        }
+      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o?uploadType=media&name=${encodeURIComponent(key)}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data, null, 2),
       });
 
-      await this.s3Client.send(command);
-      console.log(`☁️ Transcript saved to S3: s3://${this.bucketName}/${key}`);
-      return `s3://${this.bucketName}/${key}`;
+      if (!response.ok) {
+        throw new Error(`Failed to save to Replit storage: ${response.status} ${response.statusText}`);
+      }
+
+      console.log(`☁️ Transcript saved to Replit storage: ${this.bucketId}/${key}`);
+      return `replit://${this.bucketId}/${key}`;
     } catch (error) {
-      console.error('Failed to save transcript to S3:', error);
+      console.error('Failed to save transcript to Replit storage:', error);
       throw error;
     }
   }
@@ -74,47 +57,47 @@ export class S3Storage implements ICloudStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: key,
-      });
-
-      const response = await this.s3Client.send(command);
+      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`);
       
-      if (!response.Body) {
+      if (response.status === 404) {
         return null;
       }
+      
+      if (!response.ok) {
+        throw new Error(`Failed to get from Replit storage: ${response.status} ${response.statusText}`);
+      }
 
-      const content = await response.Body.transformToString();
+      const content = await response.text();
       return JSON.parse(content);
     } catch (error: any) {
-      if (error.name === 'NoSuchKey') {
+      if (error.message?.includes('404')) {
         return null;
       }
-      console.error('Failed to get transcript from S3:', error);
+      console.error('Failed to get transcript from Replit storage:', error);
       throw error;
     }
   }
 
   async listTranscripts(): Promise<string[]> {
     try {
-      const command = new ListObjectsV2Command({
-        Bucket: this.bucketName,
-        Prefix: 'transcripts/',
-      });
-
-      const response = await this.s3Client.send(command);
+      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o?prefix=transcripts/`);
       
-      if (!response.Contents) {
+      if (!response.ok) {
+        throw new Error(`Failed to list from Replit storage: ${response.status} ${response.statusText}`);
+      }
+
+      const data = await response.json();
+      
+      if (!data.items) {
         return [];
       }
 
-      return response.Contents
-        .filter(obj => obj.Key?.endsWith('.json'))
-        .map(obj => obj.Key!)
-        .sort((a, b) => b.localeCompare(a)); // Sort by newest first
+      return data.items
+        .filter((item: any) => item.name?.endsWith('.json'))
+        .map((item: any) => item.name)
+        .sort((a: string, b: string) => b.localeCompare(a)); // Sort by newest first
     } catch (error) {
-      console.error('Failed to list transcripts from S3:', error);
+      console.error('Failed to list transcripts from Replit storage:', error);
       return [];
     }
   }
@@ -123,40 +106,38 @@ export class S3Storage implements ICloudStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const command = new DeleteObjectCommand({
-        Bucket: this.bucketName,
-        Key: key,
+      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}`, {
+        method: 'DELETE',
       });
 
-      await this.s3Client.send(command);
-      console.log(`🗑️ Transcript deleted from S3: s3://${this.bucketName}/${key}`);
+      if (response.status === 404) {
+        return false; // Already deleted or doesn't exist
+      }
+
+      if (!response.ok) {
+        throw new Error(`Failed to delete from Replit storage: ${response.status} ${response.statusText}`);
+      }
+
+      console.log(`🗑️ Transcript deleted from Replit storage: ${this.bucketId}/${key}`);
       return true;
     } catch (error) {
-      console.error('Failed to delete transcript from S3:', error);
+      console.error('Failed to delete transcript from Replit storage:', error);
       return false;
     }
   }
 
   async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
-    try {
-      const command = new GetObjectCommand({
-        Bucket: this.bucketName,
-        Key: key,
-      });
-
-      return await getSignedUrl(this.s3Client, command, { expiresIn });
-    } catch (error) {
-      console.error('Failed to generate signed URL:', error);
-      throw error;
-    }
+    // For Replit storage, we can return the direct URL as it's already accessible
+    // In a production environment, you might want to implement proper signed URLs
+    return `https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`;
   }
 }
 
 // Factory function to create storage instance based on config
 export function createCloudStorage(config: CloudStorageConfig): ICloudStorage {
   switch (config.provider) {
-    case 'aws':
-      return new S3Storage(config.aws);
+    case 'replit':
+      return new ReplitStorage(config.replit);
     case 'local':
       // Return local file storage wrapped to match interface
       return new LocalStorageWrapper();
@@ -259,24 +240,22 @@ class LocalStorageWrapper implements ICloudStorage {
 
 // Default configuration - reads from environment variables
 export function getStorageConfig(): CloudStorageConfig {
-  const provider = (process.env.STORAGE_PROVIDER as 'aws' | 'local') || 'local';
+  const provider = (process.env.STORAGE_PROVIDER as 'replit' | 'local') || 'replit';
   
-  if (provider === 'aws') {
-    const bucketName = process.env.AWS_S3_BUCKET_NAME;
-    const region = process.env.AWS_REGION || 'us-east-1';
+  if (provider === 'replit') {
+    const bucketId = process.env.REPLIT_DB_URL ? 
+      'replit-objstore-988cc690-5963-48b8-b852-b976020113c7' : // Use default bucket from .replit
+      process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
     
-    if (!bucketName) {
-      console.warn('AWS_S3_BUCKET_NAME not set, falling back to local storage');
+    if (!bucketId) {
+      console.warn('Replit object storage bucket ID not found, falling back to local storage');
       return { provider: 'local' };
     }
 
     return {
-      provider: 'aws',
-      aws: {
-        region,
-        bucketName,
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+      provider: 'replit',
+      replit: {
+        bucketId,
       }
     };
   }

@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: Implemented Replit Object Storage for transcript data
+  - Replaced AWS S3 implementation with Replit's built-in object storage
+  - Configured automatic storage using default bucket from .replit configuration
+  - Updated storage interface to use Replit Storage API endpoints
+  - Simplified setup with no external credentials required
+  - Updated storage management UI to show Replit storage status
 - June 24, 2025: Fixed duplicate conversation creation issue
   - Root cause identified: Two separate conversation creation points in App.tsx and ConversationContext
   - Removed duplicate conversation creation from App.tsx onConversationStart callback

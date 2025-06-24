@@ -658,10 +658,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           provider: config.provider,
           isWorking: true,
           fileCount: files.length,
-          config: config.provider === 'aws' ? {
-            region: config.aws?.region,
-            bucketName: config.aws?.bucketName,
-            hasCredentials: !!(config.aws?.accessKeyId && config.aws?.secretAccessKey)
+          config: config.provider === 'replit' ? {
+            bucketId: config.replit?.bucketId,
           } : null
         });
       } catch (error) {

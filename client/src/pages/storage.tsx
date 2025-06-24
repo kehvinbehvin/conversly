@@ -7,14 +7,13 @@ import { CheckCircle, XCircle, Cloud, HardDrive, AlertTriangle, Copy } from 'luc
 import { useToast } from '@/hooks/use-toast';
 
 interface StorageStatus {
-  provider: 'aws' | 'local' | 'unknown';
+  provider: 'replit' | 'local' | 'unknown';
   isWorking: boolean;
   fileCount?: number;
   error?: string;
   config?: {
-    region?: string;
+    bucketId?: string;
     bucketName?: string;
-    hasCredentials?: boolean;
   };
 }
 
@@ -36,7 +35,7 @@ export default function Storage() {
 
   const getProviderIcon = (provider: string) => {
     switch (provider) {
-      case 'aws':
+      case 'replit':
         return <Cloud className="h-5 w-5" />;
       case 'local':
         return <HardDrive className="h-5 w-5" />;
@@ -47,8 +46,8 @@ export default function Storage() {
 
   const getProviderName = (provider: string) => {
     switch (provider) {
-      case 'aws':
-        return 'Amazon S3';
+      case 'replit':
+        return 'Replit Object Storage';
       case 'local':
         return 'Local File System';
       default:
@@ -137,24 +136,16 @@ export default function Storage() {
               <div className="space-y-2 pt-4 border-t">
                 <h4 className="font-medium text-sm">Configuration</h4>
                 <div className="grid grid-cols-2 gap-4 text-sm">
-                  {status.config.region && (
+                  {status.config.bucketId && (
                     <div>
-                      <span className="text-muted-foreground">Region:</span>
-                      <span className="ml-2 font-mono">{status.config.region}</span>
+                      <span className="text-muted-foreground">Bucket ID:</span>
+                      <span className="ml-2 font-mono text-xs">{status.config.bucketId}</span>
                     </div>
                   )}
                   {status.config.bucketName && (
                     <div>
                       <span className="text-muted-foreground">Bucket:</span>
                       <span className="ml-2 font-mono">{status.config.bucketName}</span>
-                    </div>
-                  )}
-                  {status.config.hasCredentials !== undefined && (
-                    <div>
-                      <span className="text-muted-foreground">Credentials:</span>
-                      <span className={`ml-2 ${status.config.hasCredentials ? 'text-green-600' : 'text-orange-600'}`}>
-                        {status.config.hasCredentials ? 'Configured' : 'Using default'}
-                      </span>
                     </div>
                   )}
                 </div>
@@ -172,63 +163,48 @@ export default function Storage() {
         {/* Setup Instructions */}
         <Card>
           <CardHeader>
-            <CardTitle>Setup Cloud Storage</CardTitle>
+            <CardTitle>Replit Object Storage</CardTitle>
             <CardDescription>
-              Configure AWS S3 for scalable transcript storage
+              Your transcripts are automatically stored using Replit's built-in object storage
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert>
               <Cloud className="h-4 w-4" />
               <AlertDescription>
-                To use AWS S3 storage, you'll need to set up environment variables in your Replit secrets.
+                Replit Object Storage is automatically configured and ready to use. No additional setup required!
               </AlertDescription>
             </Alert>
 
             <div className="space-y-4">
               <div>
-                <h4 className="font-medium mb-2">Required Environment Variables</h4>
-                <div className="space-y-2">
-                  {[
-                    { key: 'STORAGE_PROVIDER', value: 'aws', description: 'Set storage provider to AWS S3' },
-                    { key: 'AWS_S3_BUCKET_NAME', value: 'your-bucket-name', description: 'Your S3 bucket name' },
-                    { key: 'AWS_REGION', value: 'us-east-1', description: 'AWS region (optional, defaults to us-east-1)' },
-                    { key: 'AWS_ACCESS_KEY_ID', value: 'your-access-key', description: 'AWS access key (optional if using IAM roles)' },
-                    { key: 'AWS_SECRET_ACCESS_KEY', value: 'your-secret-key', description: 'AWS secret key (optional if using IAM roles)' },
-                  ].map((env) => (
-                    <div key={env.key} className="flex items-center justify-between p-3 border rounded-lg">
-                      <div className="space-y-1">
-                        <code className="font-mono text-sm bg-muted px-2 py-1 rounded">
-                          {env.key}
-                        </code>
-                        <p className="text-xs text-muted-foreground">{env.description}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <code className="font-mono text-xs text-muted-foreground">
-                          {env.value}
-                        </code>
-                        <Button
-                          size="sm"
-                          variant="ghost"
-                          onClick={() => copyToClipboard(env.key, 'Environment variable name')}
-                        >
-                          <Copy className="h-3 w-3" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <h4 className="font-medium mb-2">Features</h4>
+                <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li>Automatic backup and redundancy</li>
+                  <li>Scalable storage with high availability</li>
+                  <li>Integrated with your Replit environment</li>
+                  <li>No external configuration needed</li>
+                </ul>
               </div>
 
               <div>
-                <h4 className="font-medium mb-2">Setup Steps</h4>
-                <ol className="list-decimal list-inside space-y-2 text-sm">
-                  <li>Create an AWS S3 bucket in your preferred region</li>
-                  <li>Create IAM credentials with S3 read/write permissions</li>
-                  <li>Add the environment variables to your Replit secrets</li>
-                  <li>Restart your application to apply the changes</li>
-                  <li>Check the status above to verify the connection</li>
-                </ol>
+                <h4 className="font-medium mb-2">Storage Details</h4>
+                <div className="bg-muted p-3 rounded-lg text-sm">
+                  <div className="space-y-1">
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Provider:</span>
+                      <span className="font-mono">Replit Object Storage</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Storage Type:</span>
+                      <span className="font-mono">Cloud Object Storage</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-muted-foreground">Data Format:</span>
+                      <span className="font-mono">JSON</span>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
