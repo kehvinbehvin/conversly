@@ -120,7 +120,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
       }
       
-      console.log("ElevenLabs webhook received:", req.body);
+      console.log("ElevenLabs webhook received:", JSON.stringify(req.body, null, 2));
       
       const { conversation_id, transcript, audio_url } = req.body;
       
