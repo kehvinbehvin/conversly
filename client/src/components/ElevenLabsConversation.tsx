@@ -1,8 +1,8 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { useConversation } from "@elevenlabs/react";
-import { useQuery } from "@tanstack/react-query";
+import { apiRequest } from "@/lib/queryClient";
 
 interface ElevenLabsConversationProps {
   agentId: string;
@@ -20,15 +20,10 @@ export default function ElevenLabsConversation({
   disabled = false
 }: ElevenLabsConversationProps) {
   const [isConnecting, setIsConnecting] = useState(false);
-
-  // Get ElevenLabs config from backend
-  const { data: config } = useQuery({
-    queryKey: ["/api/elevenlabs/config"],
-  });
+  const [signedUrl, setSignedUrl] = useState<string | null>(null);
 
   const conversation = useConversation({
-    agentId,
-    apiKey: config?.apiKey,
+    signedUrl: signedUrl || undefined,
     onConnect: (conversationId: string) => {
       console.log('Connected to ElevenLabs conversation:', conversationId);
       setIsConnecting(false);
@@ -37,11 +32,13 @@ export default function ElevenLabsConversation({
     onDisconnect: (conversationId: string) => {
       console.log('Disconnected from ElevenLabs conversation:', conversationId);
       setIsConnecting(false);
+      setSignedUrl(null); // Clear signed URL on disconnect
       onConversationEnd?.(conversationId);
     },
     onError: (error: string) => {
       console.error('ElevenLabs conversation error:', error);
       setIsConnecting(false);
+      setSignedUrl(null); // Clear signed URL on error
       onError?.(new Error(error));
     },
     onMessage: (message: any) => {
@@ -50,14 +47,26 @@ export default function ElevenLabsConversation({
   });
 
   const startConversation = async () => {
-    if (disabled || isConnecting || !config?.apiKey) return;
+    if (disabled || isConnecting) return;
     
     setIsConnecting(true);
     try {
+      // Generate signed URL from backend
+      const response = await apiRequest("POST", "/api/elevenlabs/signed-url", {});
+      const data = await response.json();
+      
+      if (!data.signedUrl) {
+        throw new Error("Failed to get signed URL");
+      }
+      
+      setSignedUrl(data.signedUrl);
+      
+      // Start session with signed URL
       await conversation.startSession();
     } catch (error) {
       console.error('Failed to start conversation:', error);
       setIsConnecting(false);
+      setSignedUrl(null);
       onError?.(error as Error);
     }
   };
@@ -65,13 +74,14 @@ export default function ElevenLabsConversation({
   const endConversation = async () => {
     try {
       await conversation.endSession();
+      setSignedUrl(null); // Clear signed URL
     } catch (error) {
       console.error('Failed to end conversation:', error);
     }
   };
 
   const isConnected = conversation.status === 'connected';
-  const isLoading = isConnecting || conversation.status === 'connecting' || !config?.apiKey;
+  const isLoading = isConnecting || conversation.status === 'connecting';
 
   return (
     <div className="flex flex-col items-center space-y-6">

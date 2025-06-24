@@ -20,12 +20,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get ElevenLabs config
-  app.get("/api/elevenlabs/config", (req, res) => {
-    res.json({
-      apiKey: process.env.ELEVENLABS_API_KEY,
-      agentId: "agent_01jyfb9fh8f67agfzvv09tvg3t"
-    });
+  // Generate signed URL for ElevenLabs conversation
+  app.post("/api/elevenlabs/signed-url", async (req, res) => {
+    try {
+      const agentId = "agent_01jyfb9fh8f67agfzvv09tvg3t";
+      const apiKey = process.env.ELEVENLABS_API_KEY;
+      
+      if (!apiKey) {
+        return res.status(500).json({ message: "ElevenLabs API key not configured" });
+      }
+
+      // Create signed URL using ElevenLabs API
+      const signedUrlResponse = await fetch("https://api.elevenlabs.io/v1/convai/conversation/get_signed_url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "xi-api-key": apiKey
+        },
+        body: JSON.stringify({
+          agent_id: agentId,
+          expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString() // 30 minutes from now
+        })
+      });
+
+      if (!signedUrlResponse.ok) {
+        const errorText = await signedUrlResponse.text();
+        console.error("Failed to generate signed URL:", errorText);
+        return res.status(500).json({ message: "Failed to generate signed URL" });
+      }
+
+      const signedUrlData = await signedUrlResponse.json();
+      res.json({ signedUrl: signedUrlData.signed_url });
+    } catch (error) {
+      console.error("Error generating signed URL:", error);
+      res.status(500).json({ message: "Failed to generate signed URL" });
+    }
   });
 
   // Get user conversations with reviews
