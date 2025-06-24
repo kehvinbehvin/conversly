@@ -92,11 +92,11 @@ Conversly is a conversational practice application designed to help users improv
 
 ## Recent Changes
 - June 24, 2025: Complete conversation flow implemented and tested
-  - ElevenLabs integration working with mock conversation simulation
+  - Real ElevenLabs integration with secure signed URL authentication
   - OpenAI analysis generating detailed feedback with highlights and suggestions
   - Automatic redirect from conversation to review page working
-  - 15-second demo conversations for rapid testing
   - Webhook endpoint receiving and processing conversation data correctly
+  - API key security implemented - no sensitive credentials exposed to frontend
 
 ## Changelog
 - June 24, 2025: Initial setup and core functionality completion
