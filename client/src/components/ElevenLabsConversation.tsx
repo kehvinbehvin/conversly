@@ -23,36 +23,82 @@ export default function ElevenLabsConversation({
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
 
   const conversation = useConversation({
+    debug: true, // Enable debug mode for more detailed logs
     onConnect: (props: { conversationId: string }) => {
-      console.log("Connected to ElevenLabs conversation:", props);
+      console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
       onConversationStart?.(props.conversationId);
     },
     onDisconnect: (details: any) => {
-      console.log("Disconnected from ElevenLabs conversation:", details);
+      console.log("❌ Disconnected from ElevenLabs conversation:", details);
+      console.log("Disconnect reason:", details.reason);
+      console.log("Disconnect code:", details.code);
+      console.log("Disconnect details:", JSON.stringify(details, null, 2));
       setIsConnecting(false);
-      setSignedUrl(null); // Clear signed URL on disconnect
-      onConversationEnd?.(details.conversationId);
+      setSignedUrl(null);
+      
+      // Only call onConversationEnd for natural conversation endings, not user-initiated disconnects
+      if (details?.reason !== 'user' && details?.conversationId) {
+        onConversationEnd?.(details.conversationId);
+      }
     },
     onError: (error: string) => {
-      console.error("ElevenLabs conversation error:", error);
+      console.error("🔥 ElevenLabs conversation error:", error);
       setIsConnecting(false);
-      setSignedUrl(null); // Clear signed URL on error
+      setSignedUrl(null);
       onError?.(new Error(error));
     },
     onMessage: (props: { message: string; source: string }) => {
-      console.log("ElevenLabs message:", props);
+      console.log("📝 ElevenLabs message:", props);
+    },
+    onModeChange: (mode: any) => {
+      console.log("🔄 Mode changed:", mode);
+    },
+    onStatusChange: (status: any) => {
+      console.log("📊 Status changed:", status);
     },
   });
 
-  const requestMicrophonePermission = async (): Promise<boolean> => {
+  const initializeAudioContext = async (): Promise<boolean> => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      stream.getTracks().forEach(track => track.stop()); // Clean up
-      console.log('Microphone permission granted');
+      // Create and resume audio context
+      const AudioContext =
+        window.AudioContext || (window as any).webkitAudioContext;
+      if (AudioContext) {
+        const audioContext = new AudioContext();
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+          console.log("Audio context resumed");
+        }
+        console.log("Audio context state:", audioContext.state);
+        audioContext.close(); // Clean up test context
+      }
       return true;
     } catch (error) {
-      console.error('Microphone permission denied:', error);
+      console.error("Failed to initialize audio context:", error);
+      return false;
+    }
+  };
+
+  const requestMicrophonePermission = async (): Promise<boolean> => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: true,
+          noiseSuppression: true,
+          autoGainControl: true,
+        },
+      });
+
+      // Keep the stream alive for a moment to ensure proper initialization
+      setTimeout(() => {
+        stream.getTracks().forEach((track) => track.stop());
+      }, 100);
+
+      console.log("✅ Microphone permission granted");
+      return true;
+    } catch (error) {
+      console.error("❌ Microphone permission denied:", error);
       return false;
     }
   };
@@ -62,14 +108,26 @@ export default function ElevenLabsConversation({
 
     setIsConnecting(true);
     try {
-      // Request microphone permission first
-      console.log('Requesting microphone permission...');
+      console.log("🎤 Requesting microphone permission...");
       const hasPermission = await requestMicrophonePermission();
       if (!hasPermission) {
-        throw new Error('Microphone permission is required for voice conversations. Please allow microphone access and try again.');
+        throw new Error(
+          "Microphone permission is required for voice conversations. Please allow microphone access and try again.",
+        );
       }
 
-      // Generate signed URL from backend with agent ID
+      console.log("🔊 Initializing audio context...");
+      const audioInitialized = await initializeAudioContext();
+      if (!audioInitialized) {
+        console.warn(
+          "⚠️ Audio context initialization failed, but continuing...",
+        );
+      }
+
+      // Small delay to ensure everything is properly initialized
+      await new Promise((resolve) => setTimeout(resolve, 500));
+
+      console.log("🌐 Generating signed URL...");
       const response = await apiRequest("POST", "/api/elevenlabs/signed-url", {
         agentId: agentId,
       });
@@ -79,17 +137,22 @@ export default function ElevenLabsConversation({
         throw new Error("Failed to get signed URL");
       }
 
-      console.log("Received signed URL:", data.signedUrl);
+      console.log("📝 Received signed URL:", data.signedUrl);
+      console.log("📊 Signed URL analysis:");
+      console.log("- Length:", data.signedUrl.length);
+      console.log("- Contains agent ID:", data.signedUrl.includes(agentId));
+      console.log("- URL domain:", new URL(data.signedUrl).hostname);
+
       setSignedUrl(data.signedUrl);
 
-      // Start session with the signed URL (agentId is embedded in the signed URL)
+      console.log("🚀 Starting conversation session...");
       const convoId = await conversation.startSession({
         signedUrl: data.signedUrl,
       });
 
-      console.log("Conversation started with ID:", convoId);
+      console.log("✅ Conversation started with ID:", convoId);
     } catch (error) {
-      console.error("Failed to start conversation:", error);
+      console.error("❌ Failed to start conversation:", error);
       setIsConnecting(false);
       setSignedUrl(null);
       onError?.(error as Error);
@@ -98,16 +161,21 @@ export default function ElevenLabsConversation({
 
   const endConversation = async () => {
     try {
-      console.log("Manually ending conversation...");
+      console.log("🛑 Manually ending conversation...");
       await conversation.endSession();
-      setSignedUrl(null); // Clear signed URL
+      setSignedUrl(null);
     } catch (error) {
-      console.error("Failed to end conversation:", error);
+      console.error("❌ Failed to end conversation:", error);
     }
   };
 
   const isConnected = conversation.status === "connected";
   const isLoading = isConnecting || conversation.status === "connecting";
+
+  // Log status changes for debugging
+  useEffect(() => {
+    console.log("📊 Conversation status:", conversation.status);
+  }, [conversation.status]);
 
   return (
     <div className="flex flex-col items-center space-y-6">
@@ -131,10 +199,16 @@ export default function ElevenLabsConversation({
               </>
             )}
           </Button>
-          
+
           <p className="text-xs text-warm-brown-500 max-w-sm">
-            This will request microphone access to enable voice conversation with the AI coach.
+            This will request microphone access to enable voice conversation
+            with the AI coach.
           </p>
+
+          {/* Debug info */}
+          <div className="text-xs text-gray-400 mt-2">
+            Status: {conversation.status}
+          </div>
         </div>
       ) : (
         <div className="flex flex-col items-center space-y-6">
@@ -148,8 +222,6 @@ export default function ElevenLabsConversation({
             <p className="text-sage-600 text-sm">
               Practice discussing your weekend plans
             </p>
-
-            {/* Show conversation status */}
           </div>
 
           <Button

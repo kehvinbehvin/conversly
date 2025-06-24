@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: Client-side WebSocket disconnection fix
+  - Fixed callback parameter mismatch in onDisconnect handler
+  - Prevented premature onConversationEnd calls for user-initiated disconnects
+  - Added proper conversation state validation before ending sessions
+  - Implemented small delay to prevent race conditions during session start
+  - Fixed React state management issues causing immediate disconnections
 - June 24, 2025: Microphone permission and WebSocket connection fix
   - Added explicit microphone permission request before starting conversations
   - Fixed immediate WebSocket disconnection issue caused by missing audio permissions

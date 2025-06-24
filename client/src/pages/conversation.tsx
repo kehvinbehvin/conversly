@@ -71,15 +71,14 @@ export default function Conversation() {
     setIsRecording(false);
     setConversationId(null);
 
-    // Wait for analysis to complete, then navigate to review
-    setTimeout(() => {
-      queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
-      if (dbConversationId) {
+    // Only navigate if we have a valid conversation ID
+    if (elevenlabsId && dbConversationId) {
+      // Wait for analysis to complete, then navigate to review
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
         setLocation(`/review/${dbConversationId}`);
-      } else {
-        setLocation("/dashboard");
-      }
-    }, 3000); // Give a bit more time for analysis to complete
+      }, 3000);
+    }
   };
 
   const handleError = (error: Error) => {
