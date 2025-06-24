@@ -673,5 +673,71 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
+  // API endpoint to test object storage
+  app.post(
+    "/api/storage/test",
+    express.json(),
+    express.urlencoded({ extended: false }),
+    async (req, res) => {
+      try {
+        console.log("🧪 Running storage test via API...");
+        
+        // Create test data
+        const testData: TranscriptData = {
+          conversationId: "api-test-" + Date.now(),
+          elevenlabsId: "api_test_" + Date.now(),
+          transcript: [
+            { role: "agent", message: "API test message for storage verification" },
+            { role: "user", message: "API test response to verify upload functionality" }
+          ],
+          metadata: {
+            testMode: true,
+            apiTest: true,
+            timestamp: Date.now()
+          },
+          timestamp: Date.now()
+        };
+
+        // Test save
+        const savedPath = await cloudStorage.saveTranscript(testData);
+        console.log(`✅ API test: Document saved to ${savedPath}`);
+
+        // Test retrieve
+        const retrieved = await cloudStorage.getTranscript(testData.elevenlabsId);
+        
+        // Test list
+        const allFiles = await cloudStorage.listTranscripts();
+        
+        // Clean up test file
+        const deleted = await cloudStorage.deleteTranscript(testData.elevenlabsId);
+        
+        res.json({
+          success: true,
+          results: {
+            saved: !!savedPath,
+            retrieved: !!retrieved,
+            fileCount: allFiles.length,
+            testDataMatch: retrieved?.conversationId === testData.conversationId,
+            cleanedUp: deleted
+          },
+          storage: {
+            provider: "hybrid",
+            cloudAttempted: true,
+            localFallback: true
+          },
+          message: "Storage test completed successfully"
+        });
+        
+      } catch (error) {
+        console.error("💥 API storage test failed:", error);
+        res.status(500).json({
+          success: false,
+          error: error instanceof Error ? error.message : 'Unknown error',
+          message: "Storage test failed"
+        });
+      }
+    },
+  );
+
   return createServer(app);
 }

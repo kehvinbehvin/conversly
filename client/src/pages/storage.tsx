@@ -156,6 +156,9 @@ export default function Storage() {
               <Button onClick={() => refetch()} variant="outline" size="sm">
                 Refresh Status
               </Button>
+              <Button asChild variant="outline" size="sm">
+                <a href="/storage/test">Test Storage</a>
+              </Button>
             </div>
           </CardContent>
         </Card>

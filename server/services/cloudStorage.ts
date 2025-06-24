@@ -141,9 +141,9 @@ class LocalStorageWrapper implements ICloudStorage {
 
   private getFileStore() {
     if (!this.fileStore) {
-      // Fallback synchronous creation
-      const fs = require('fs');
-      const path = require('path');
+      // Fallback synchronous creation using dynamic import
+      const fs = eval('require')('fs');
+      const path = eval('require')('path');
       
       return {
         async saveTranscript(data: TranscriptData): Promise<string> {
