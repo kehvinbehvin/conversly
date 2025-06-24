@@ -22,6 +22,8 @@ export default function ElevenLabsConversation({
   const [isConnecting, setIsConnecting] = useState(false);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
+  const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
 
   const conversation = useConversation({
     debug: true, // Enable debug mode for more detailed logs
@@ -40,6 +42,16 @@ export default function ElevenLabsConversation({
       setIsConnecting(false);
       setSignedUrl(null);
       
+      // Clean up audio resources when disconnected
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        setAudioStream(null);
+      }
+      if (audioContext) {
+        audioContext.close();
+        setAudioContext(null);
+      }
+      
       // Always end the conversation when disconnected - UI should reflect reality
       // Use the stored conversationId since disconnect details might not include it
       const conversationId = details?.conversationId || currentConversationId;
@@ -52,6 +64,17 @@ export default function ElevenLabsConversation({
       console.error("🔥 ElevenLabs conversation error:", error);
       setIsConnecting(false);
       setSignedUrl(null);
+      
+      // Clean up audio resources on error
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        setAudioStream(null);
+      }
+      if (audioContext) {
+        audioContext.close();
+        setAudioContext(null);
+      }
+      
       onError?.(new Error(error));
     },
     onMessage: (props: { message: string; source: string }) => {
@@ -67,17 +90,17 @@ export default function ElevenLabsConversation({
 
   const initializeAudioContext = async (): Promise<boolean> => {
     try {
-      // Create and resume audio context
+      // Create and resume audio context - keep it alive for the conversation
       const AudioContext =
         window.AudioContext || (window as any).webkitAudioContext;
       if (AudioContext) {
-        const audioContext = new AudioContext();
-        if (audioContext.state === "suspended") {
-          await audioContext.resume();
+        const ctx = new AudioContext();
+        if (ctx.state === "suspended") {
+          await ctx.resume();
           console.log("Audio context resumed");
         }
-        console.log("Audio context state:", audioContext.state);
-        audioContext.close(); // Clean up test context
+        console.log("Audio context state:", ctx.state);
+        setAudioContext(ctx); // Store instead of closing immediately
       }
       return true;
     } catch (error) {
@@ -96,12 +119,9 @@ export default function ElevenLabsConversation({
         },
       });
 
-      // Keep the stream alive for a moment to ensure proper initialization
-      setTimeout(() => {
-        stream.getTracks().forEach((track) => track.stop());
-      }, 100);
-
-      console.log("✅ Microphone permission granted");
+      // Keep the stream alive for the entire conversation duration
+      setAudioStream(stream);
+      console.log("✅ Microphone permission granted and stream active");
       return true;
     } catch (error) {
       console.error("❌ Microphone permission denied:", error);
@@ -129,9 +149,6 @@ export default function ElevenLabsConversation({
           "⚠️ Audio context initialization failed, but continuing...",
         );
       }
-
-      // Small delay to ensure everything is properly initialized
-      await new Promise((resolve) => setTimeout(resolve, 500));
 
       console.log("🌐 Generating signed URL...");
       const response = await apiRequest("POST", "/api/elevenlabs/signed-url", {
@@ -168,8 +185,22 @@ export default function ElevenLabsConversation({
   const endConversation = async () => {
     try {
       console.log("🛑 Manually ending conversation...");
-      await conversation.endSession();
+      if (conversation.status === 'connected') {
+        await conversation.endSession();
+      }
+      
+      // Clean up audio resources
+      if (audioStream) {
+        audioStream.getTracks().forEach(track => track.stop());
+        setAudioStream(null);
+      }
+      if (audioContext) {
+        audioContext.close();
+        setAudioContext(null);
+      }
+      
       setSignedUrl(null);
+      setIsConnecting(false);
     } catch (error) {
       console.error("❌ Failed to end conversation:", error);
     }

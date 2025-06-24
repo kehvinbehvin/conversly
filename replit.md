@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: Audio resource management fix
+  - Fixed immediate WebSocket disconnection by keeping audio resources alive during conversations
+  - Prevented premature cleanup of microphone streams and audio context
+  - Audio context and microphone stream now persist for entire conversation duration
+  - Proper cleanup only occurs when conversation actually ends or errors
+  - Resolved ElevenLabs SDK audio validation issues causing "user" disconnections
 - June 24, 2025: Client-side WebSocket disconnection fix
   - Fixed callback parameter mismatch in onDisconnect handler
   - Prevented premature onConversationEnd calls for user-initiated disconnects
