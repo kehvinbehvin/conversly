@@ -63,11 +63,15 @@ export default function Conversation() {
     setIsRecording(false);
     setConversationId(null);
     
-    // Navigate to dashboard after a brief delay
+    // Wait for analysis to complete, then navigate to review
     setTimeout(() => {
       queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
-      setLocation("/dashboard");
-    }, 2000);
+      if (dbConversationId) {
+        setLocation(`/review/${dbConversationId}`);
+      } else {
+        setLocation("/dashboard");
+      }
+    }, 3000); // Give a bit more time for analysis to complete
   };
 
   const handleError = (error: Error) => {

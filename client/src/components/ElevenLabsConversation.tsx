@@ -39,7 +39,7 @@ export default function ElevenLabsConversation({
         
         setTimeout(() => {
           simulateConversationEnd(conversationId);
-        }, 10000);
+        }, 15000); // Extended to 15 seconds for better demo experience
       }, 2000);
       
     } catch (error) {
@@ -78,7 +78,7 @@ User: Sunday was more low-key. I caught up on some reading and did meal prep for
 
 AI Coach: It sounds like you had a perfect balance of adventure and relaxation. Thank you for sharing - your enthusiasm really came through!`,
         audio_url: "https://example.com/demo-audio.mp3",
-        duration: 10,
+        duration: 15,
         agent_id: agentId
       })
     }).then(() => {
