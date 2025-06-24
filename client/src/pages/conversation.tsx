@@ -41,15 +41,19 @@ export default function Conversation() {
       setTimeElapsed(prev => {
         if (prev >= 300) { // 5 minutes
           clearInterval(interval);
-          endConversation();
+          // Don't auto-end conversation, let user control it
           return 300;
         }
         return prev + 1;
       });
     }, 1000);
+    
+    // Store interval ID to clear it later
+    return interval;
   };
 
   const handleConversationStart = (elevenlabsId: string) => {
+    console.log('Starting conversation with ID:', elevenlabsId);
     setConversationId(elevenlabsId);
     setIsRecording(true);
     setError(null);
@@ -60,6 +64,7 @@ export default function Conversation() {
   };
 
   const handleConversationEnd = (elevenlabsId: string) => {
+    console.log('Conversation ended with ID:', elevenlabsId);
     setIsRecording(false);
     setConversationId(null);
     
