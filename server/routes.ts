@@ -303,12 +303,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           JSON.stringify(webhookData, null, 2),
         );
 
-        const { conversation_id, transcript, audio_url } = webhookData.data;
+        // Extract data from the nested structure
+        const { conversation_id, transcript: transcriptArray, metadata, analysis } = webhookData.data;
 
         // Validate required fields
         if (!conversation_id) {
           console.error("❌ Missing conversation_id in webhook payload");
-          console.error("📋 Available fields:", Object.keys(webhookData));
+          console.error("📋 Available data fields:", Object.keys(webhookData.data || {}));
           return res.status(400).json({ message: "Missing conversation_id" });
         }
 
@@ -316,6 +317,36 @@ export async function registerRoutes(app: Express): Promise<Server> {
           "🔍 Looking for conversation with ElevenLabs ID:",
           conversation_id,
         );
+
+        // Convert transcript array to readable string
+        let transcriptText = "";
+        if (transcriptArray && Array.isArray(transcriptArray)) {
+          transcriptText = transcriptArray
+            .map((turn) => `${turn.role}: ${turn.message}`)
+            .join("\n");
+        }
+
+        // Extract audio URL from metadata if available
+        const audio_url = null; // Audio URL not present in this payload structure
+
+        console.log("📝 Processed transcript:", {
+          originalFormat: "array",
+          turnsCount: transcriptArray?.length || 0,
+          processedLength: transcriptText.length,
+          hasAudioUrl: !!audio_url,
+        });
+
+        // Extract additional metadata
+        const callMetadata = {
+          duration: metadata?.call_duration_secs,
+          cost: metadata?.cost,
+          terminationReason: metadata?.termination_reason,
+          language: metadata?.main_language,
+          callSuccessful: analysis?.call_successful,
+          transcriptSummary: analysis?.transcript_summary,
+        };
+
+        console.log("📊 Call metadata:", callMetadata);
 
         // Find conversation by ElevenLabs ID
         let conversation;
@@ -367,18 +398,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Log what we're updating
         console.log("📝 Updating conversation with:", {
-          hasTranscript: !!(transcript && transcript.trim()),
-          transcriptLength: transcript ? transcript.length : 0,
+          hasTranscript: !!(transcriptText && transcriptText.trim()),
+          transcriptLength: transcriptText.length,
           hasAudioUrl: !!audio_url,
           audioUrl: audio_url ? audio_url.substring(0, 50) + "..." : null,
+          metadata: callMetadata,
         });
 
-        // Update conversation with transcript and audio
+        // Update conversation with transcript, audio, and metadata
         try {
           await storage.updateConversation(conversation.id, {
-            transcript: transcript || "",
+            transcript: transcriptText || "",
             audioUrl: audio_url,
             status: "completed",
+            metadata: {
+              ...conversation.metadata,
+              elevenlabs: callMetadata,
+            },
           });
           console.log("✅ Conversation updated successfully");
         } catch (updateError) {
@@ -389,15 +425,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Analyze conversation with OpenAI if transcript is available
-        if (transcript && transcript.trim()) {
+        if (transcriptText && transcriptText.trim()) {
           console.log(
             "🧠 Starting AI analysis for transcript (length:",
-            transcript.length,
+            transcriptText.length,
             "chars)",
           );
 
           try {
-            const analysis = await analyzeConversation(transcript);
+            const analysis = await analyzeConversation(transcriptText);
             console.log("✅ AI analysis completed:", {
               highlightsCount: analysis.highlights?.length || 0,
               summaryLength: analysis.summary?.length || 0,
@@ -448,7 +484,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   ? analysisError.stack
                   : undefined,
               conversationId: conversation.id,
-              transcriptLength: transcript.length,
+              transcriptLength: transcriptText.length,
             });
 
             // Try to update status to indicate analysis failed
@@ -473,9 +509,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         } else {
           console.log("⚠️ No transcript available for analysis:", {
-            transcriptExists: !!transcript,
-            transcriptLength: transcript ? transcript.length : 0,
-            transcriptTrimmed: transcript ? transcript.trim().length : 0,
+            transcriptExists: !!transcriptText,
+            transcriptLength: transcriptText.length,
+            transcriptTrimmed: transcriptText.trim().length,
+            originalArrayLength: transcriptArray?.length || 0,
           });
         }
 
@@ -486,7 +523,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           success: true,
           processingTime: processingTime,
           conversationId: conversation.id,
-          analysisPerformed: !!(transcript && transcript.trim()),
+          analysisPerformed: !!(transcriptText && transcriptText.trim()),
+          transcriptTurns: transcriptArray?.length || 0,
+          callDuration: callMetadata.duration,
         });
       } catch (error) {
         const processingTime = Date.now() - startTime;
