@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { useConversation } from "@elevenlabs/react";
@@ -23,7 +23,6 @@ export default function ElevenLabsConversation({
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
 
   const conversation = useConversation({
-    signedUrl: signedUrl || undefined,
     onConnect: (conversationId: string) => {
       console.log('Connected to ElevenLabs conversation:', conversationId);
       setIsConnecting(false);
@@ -61,10 +60,13 @@ export default function ElevenLabsConversation({
         throw new Error("Failed to get signed URL");
       }
       
+      console.log('Received signed URL:', data.signedUrl);
       setSignedUrl(data.signedUrl);
       
-      // Start session with signed URL
-      await conversation.startSession();
+      // Start session with the signed URL (agentId is embedded in the signed URL)
+      await conversation.startSession({
+        signedUrl: data.signedUrl
+      });
     } catch (error) {
       console.error('Failed to start conversation:', error);
       setIsConnecting(false);

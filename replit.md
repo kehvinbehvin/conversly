@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: ElevenLabs SDK integration and agent ID fix
+  - Integrated official ElevenLabs JavaScript SDK for server-side operations
+  - Fixed agent_id=undefined error in WebSocket connections
+  - Replaced manual fetch calls with SDK methods for better reliability
+  - Improved error handling and logging throughout conversation flow
+  - Cleaned up legacy code files and improved component architecture
 - June 24, 2025: Complete conversation flow implemented and tested
   - Real ElevenLabs integration with secure signed URL authentication
   - OpenAI analysis generating detailed feedback with highlights and suggestions
