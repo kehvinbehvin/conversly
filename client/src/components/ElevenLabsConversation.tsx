@@ -1,7 +1,6 @@
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
-import { useConversation } from "@elevenlabs/react";
 import { apiRequest } from "@/lib/queryClient";
 
 interface ElevenLabsConversationProps {
@@ -20,40 +19,26 @@ export default function ElevenLabsConversation({
   disabled = false,
 }: ElevenLabsConversationProps) {
   const [isConnecting, setIsConnecting] = useState(false);
-  const [signedUrl, setSignedUrl] = useState<string | null>(null);
-  const [currentConversationId, setCurrentConversationId] = useState<
-    string | null
-  >(null);
+  const [isConnected, setIsConnected] = useState(false);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [audioStream, setAudioStream] = useState<MediaStream | null>(null);
   const [audioContext, setAudioContext] = useState<AudioContext | null>(null);
   
-  // Use refs to prevent re-renders from affecting callbacks
+  // Use refs to store stable references
+  const websocketRef = useRef<WebSocket | null>(null);
   const onConversationStartRef = useRef(onConversationStart);
   const onConversationEndRef = useRef(onConversationEnd);
   const onErrorRef = useRef(onError);
   
-  // Update refs when props change without causing re-render
+  // Update callback refs without causing re-renders
   useEffect(() => {
     onConversationStartRef.current = onConversationStart;
     onConversationEndRef.current = onConversationEnd;
     onErrorRef.current = onError;
   }, [onConversationStart, onConversationEnd, onError]);
 
-  // Stable callback functions that won't change on re-renders
-  const handleConnect = useCallback((props: { conversationId: string }) => {
-    console.log("✅ Connected to ElevenLabs conversation:", props);
-    setIsConnecting(false);
-    setCurrentConversationId(props.conversationId);
-    onConversationStartRef.current?.(props.conversationId);
-  }, []);
-
-  const handleDisconnect = useCallback((details: any) => {
-    console.log("❌ Disconnected from ElevenLabs conversation:", details);
-    
-    setIsConnecting(false);
-    setSignedUrl(null);
-    
-    // Clean up audio resources when disconnected
+  // Cleanup function
+  const cleanup = () => {
     if (audioStream) {
       audioStream.getTracks().forEach(track => track.stop());
       setAudioStream(null);
@@ -62,159 +47,126 @@ export default function ElevenLabsConversation({
       audioContext.close();
       setAudioContext(null);
     }
-    
-    // Always end the conversation when disconnected - UI should reflect reality
-    const conversationId = details?.conversationId || currentConversationId;
-    if (conversationId) {
-      onConversationEndRef.current?.(conversationId);
+    if (websocketRef.current) {
+      websocketRef.current.close();
+      websocketRef.current = null;
     }
+    setIsConnected(false);
+    setIsConnecting(false);
     setCurrentConversationId(null);
-  }, [audioStream, audioContext, currentConversationId]);
+  };
 
-  const handleError = useCallback((error: string) => {
-    console.error("🔥 ElevenLabs conversation error:", error);
-    setIsConnecting(false);
-    setSignedUrl(null);
-    
-    // Clean up audio resources on error
-    if (audioStream) {
-      audioStream.getTracks().forEach(track => track.stop());
-      setAudioStream(null);
-    }
-    if (audioContext) {
-      audioContext.close();
-      setAudioContext(null);
-    }
-    
-    onErrorRef.current?.(new Error(error));
-  }, [audioStream, audioContext]);
-
-  const conversation = useConversation({
-    debug: true, // Enable debug mode for more detailed logs
-    onConnect: (props: { conversationId: string }) => {
-      console.log("✅ Connected to ElevenLabs conversation:", props);
-      setIsConnecting(false);
-      setCurrentConversationId(props.conversationId);
-      // Call parent callback immediately since connection is stable
-      onConversationStart?.(props.conversationId);
-    },
-    onDisconnect: (details: any) => {
-      console.log("❌ Disconnected from ElevenLabs conversation:", details);
-      
-      setIsConnecting(false);
-      setSignedUrl(null);
-      
-      // Clean up audio resources when disconnected
-      if (audioStream) {
-        audioStream.getTracks().forEach(track => track.stop());
-        setAudioStream(null);
-      }
-      if (audioContext) {
-        audioContext.close();
-        setAudioContext(null);
-      }
-      
-      // Always end the conversation when disconnected - UI should reflect reality
-      const conversationId = details?.conversationId || currentConversationId;
-      if (conversationId) {
-        onConversationEnd?.(conversationId);
-      }
-      setCurrentConversationId(null);
-    },
-    onError: (error: string) => {
-      console.error("🔥 ElevenLabs conversation error:", error);
-      setIsConnecting(false);
-      setSignedUrl(null);
-
-      // Clean up audio resources on error
-      if (audioStream) {
-        audioStream.getTracks().forEach((track) => track.stop());
-        setAudioStream(null);
-      }
-      if (audioContext) {
-        audioContext.close();
-        setAudioContext(null);
-      }
-
-      onError?.(new Error(error));
-    },
-    onMessage: (props: { message: string; source: string }) => {
-      console.log("📝 ElevenLabs message:", props);
-    },
-    onModeChange: (mode: any) => {
-      console.log("🔄 Mode changed:", mode);
-    },
-    onStatusChange: (status: any) => {
-      console.log("📊 Status changed:", status);
-    },
-  });
-
-  const initializeAudioContext = async (): Promise<boolean> => {
+  // Start WebSocket connection
+  const startConnection = async (signedUrl: string) => {
     try {
-      // Create and resume audio context - keep it alive for the conversation
-      const AudioContext =
-        window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioContext) {
-        const ctx = new AudioContext();
-        if (ctx.state === "suspended") {
-          await ctx.resume();
-          console.log("Audio context resumed");
+      const ws = new WebSocket(signedUrl);
+      websocketRef.current = ws;
+
+      ws.onopen = () => {
+        console.log("✅ WebSocket connected");
+        setIsConnected(true);
+        setIsConnecting(false);
+      };
+
+      ws.onmessage = (event) => {
+        try {
+          const data = JSON.parse(event.data);
+          console.log("📝 WebSocket message:", data);
+          
+          if (data.type === "conversation_initiation_metadata") {
+            const conversationId = data.conversation_initiation_metadata?.conversation_id;
+            if (conversationId) {
+              console.log("✅ Connected to ElevenLabs conversation:", { conversationId });
+              setCurrentConversationId(conversationId);
+              onConversationStartRef.current?.(conversationId);
+            }
+          }
+        } catch (error) {
+          console.error("Failed to parse WebSocket message:", error);
         }
-        console.log("Audio context state:", ctx.state);
-        setAudioContext(ctx); // Store instead of closing immediately
-      }
-      return true;
+      };
+
+      ws.onclose = (event) => {
+        console.log("❌ WebSocket disconnected:", { code: event.code, reason: event.reason });
+        setIsConnected(false);
+        setIsConnecting(false);
+        
+        if (currentConversationId) {
+          onConversationEndRef.current?.(currentConversationId);
+        }
+        cleanup();
+      };
+
+      ws.onerror = (error) => {
+        console.error("🔥 WebSocket error:", error);
+        setIsConnecting(false);
+        onErrorRef.current?.(new Error("WebSocket connection failed"));
+        cleanup();
+      };
+
     } catch (error) {
-      console.error("Failed to initialize audio context:", error);
-      return false;
+      console.error("Failed to create WebSocket:", error);
+      setIsConnecting(false);
+      onErrorRef.current?.(error as Error);
     }
   };
 
-  const requestMicrophonePermission = async (): Promise<boolean> => {
+  // Cleanup on unmount
+  useEffect(() => {
+    return cleanup;
+  }, []);
+
+  const requestMicrophonePermission = async (): Promise<MediaStream> => {
+    console.log("🎤 Requesting microphone permission...");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: {
           echoCancellation: true,
           noiseSuppression: true,
-          autoGainControl: true,
+          sampleRate: 16000,
         },
       });
-
-      // Keep the stream alive for the entire conversation duration
-      setAudioStream(stream);
       console.log("✅ Microphone permission granted and stream active");
-      return true;
+      return stream;
     } catch (error) {
       console.error("❌ Microphone permission denied:", error);
-      return false;
+      throw new Error("Microphone access is required for conversation");
     }
   };
 
+  const initializeAudioContext = async (): Promise<AudioContext> => {
+    console.log("🔊 Initializing audio context...");
+    const context = new (window.AudioContext || (window as any).webkitAudioContext)();
+    
+    if (context.state === "suspended") {
+      await context.resume();
+    }
+    
+    console.log("Audio context state:", context.state);
+    return context;
+  };
+
   const startConversation = async () => {
-    if (disabled || isConnecting) return;
+    if (isConnecting || disabled) return;
 
-    setIsConnecting(true);
     try {
-      console.log("🎤 Requesting microphone permission...");
-      const hasPermission = await requestMicrophonePermission();
-      if (!hasPermission) {
-        throw new Error(
-          "Microphone permission is required for voice conversations. Please allow microphone access and try again.",
-        );
-      }
+      setIsConnecting(true);
 
-      console.log("🔊 Initializing audio context...");
-      const audioInitialized = await initializeAudioContext();
-      if (!audioInitialized) {
-        console.warn(
-          "⚠️ Audio context initialization failed, but continuing...",
-        );
-      }
+      // Request microphone permission and initialize audio context
+      const stream = await requestMicrophonePermission();
+      setAudioStream(stream);
 
+      const context = await initializeAudioContext();
+      setAudioContext(context);
+
+      // Get signed URL from server
       console.log("🌐 Generating signed URL...");
-      const response = await apiRequest("POST", "/api/elevenlabs/signed-url", {
-        agentId: agentId,
+      const response = await apiRequest("/api/elevenlabs/signed-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ agentId }),
       });
+
       const data = await response.json();
 
       if (!data.signedUrl) {
@@ -227,112 +179,63 @@ export default function ElevenLabsConversation({
       console.log("- Contains agent ID:", data.signedUrl.includes(agentId));
       console.log("- URL domain:", new URL(data.signedUrl).hostname);
 
-      setSignedUrl(data.signedUrl);
-
-      console.log("🚀 Starting conversation session...");
-      const convoId = await conversation.startSession({
-        signedUrl: data.signedUrl,
-      });
-
-      console.log("✅ Conversation started with ID:", convoId);
+      console.log("🚀 Starting WebSocket connection...");
+      await startConnection(data.signedUrl);
     } catch (error) {
       console.error("❌ Failed to start conversation:", error);
       setIsConnecting(false);
-      setSignedUrl(null);
-      onError?.(error as Error);
+      onErrorRef.current?.(error as Error);
     }
   };
 
-  const endConversation = async () => {
-    try {
-      console.log("🛑 Manually ending conversation...");
-      if (conversation.status === "connected") {
-        await conversation.endSession();
-      }
-
-      // Clean up audio resources
-      if (audioStream) {
-        audioStream.getTracks().forEach((track) => track.stop());
-        setAudioStream(null);
-      }
-      if (audioContext) {
-        audioContext.close();
-        setAudioContext(null);
-      }
-
-      setSignedUrl(null);
-      setIsConnecting(false);
-    } catch (error) {
-      console.error("❌ Failed to end conversation:", error);
-    }
+  const endConversation = () => {
+    console.log("🛑 Manually ending conversation...");
+    cleanup();
   };
 
-  const isConnected = conversation.status === "connected";
-  const isLoading = isConnecting || conversation.status === "connecting";
-
-  // Log status changes for debugging
-  useEffect(() => {
-    console.log("📊 Conversation status:", conversation.status);
-  }, [conversation.status]);
+  const isLoading = isConnecting;
 
   return (
     <div className="flex flex-col items-center space-y-6">
       {!isConnected ? (
-        <div className="text-center space-y-4">
-          <Button
-            onClick={startConversation}
-            disabled={disabled || isLoading}
-            size="lg"
-            className="bg-coral-500 hover:bg-coral-600 text-white min-w-[200px]"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Connecting...
-              </>
-            ) : (
-              <>
-                <Mic className="mr-2 h-4 w-4" />
-                Start Voice Conversation
-              </>
-            )}
-          </Button>
-
-          <p className="text-xs text-warm-brown-500 max-w-sm">
-            This will request microphone access to enable voice conversation
-            with the AI coach.
-          </p>
-
-          {/* Debug info */}
-          <div className="text-xs text-gray-400 mt-2">
-            Status: {conversation.status}
-          </div>
-        </div>
+        <Button
+          onClick={startConversation}
+          disabled={isLoading || disabled}
+          size="lg"
+          className="h-16 w-16 rounded-full bg-gradient-to-r from-coral-500 to-coral-600 hover:from-coral-600 hover:to-coral-700 shadow-lg hover:shadow-xl transition-all duration-200"
+        >
+          {isLoading ? (
+            <Loader2 className="h-8 w-8 animate-spin text-white" />
+          ) : (
+            <Mic className="h-8 w-8 text-white" />
+          )}
+        </Button>
       ) : (
-        <div className="flex flex-col items-center space-y-6">
-          <div className="text-center">
-            <div className="w-16 h-16 bg-coral-500 rounded-full flex items-center justify-center mb-3 animate-pulse">
-              <Mic className="h-8 w-8 text-white" />
-            </div>
-            <p className="text-sage-700 font-medium text-lg">
-              Voice conversation active
-            </p>
-            <p className="text-sage-600 text-sm">
-              Practice discussing your weekend plans
-            </p>
-          </div>
-
-          <Button
-            onClick={endConversation}
-            variant="outline"
-            size="lg"
-            className="border-coral-300 text-coral-600 hover:bg-coral-50"
-          >
-            <MicOff className="mr-2 h-4 w-4" />
-            End Conversation
-          </Button>
-        </div>
+        <Button
+          onClick={endConversation}
+          size="lg"
+          variant="destructive"
+          className="h-16 w-16 rounded-full shadow-lg hover:shadow-xl transition-all duration-200"
+        >
+          <MicOff className="h-8 w-8" />
+        </Button>
       )}
+
+      <div className="text-center space-y-2">
+        {isLoading && (
+          <p className="text-sm text-muted-foreground">Connecting...</p>
+        )}
+        {isConnected && (
+          <p className="text-sm text-green-600 font-medium">
+            Connected - Conversation active
+          </p>
+        )}
+        {!isConnected && !isLoading && (
+          <p className="text-sm text-muted-foreground">
+            Tap to start conversation
+          </p>
+        )}
+      </div>
     </div>
   );
 }
