@@ -82,47 +82,18 @@ export class ReplitObjectStorage {
         prefix: 'transcripts/',
       });
       
-      // Handle the actual response format from Replit Object Storage
-      if (result && typeof result === 'object') {
-        // Check if it has a 'value' property (actual format)
-        if (result.value && Array.isArray(result.value)) {
-          // Filter for objects that contain transcript files
-          const transcriptKeys: string[] = [];
-          for (const item of result.value) {
-            if (item.name && item.name.includes('transcript_')) {
-              // Try to list files within this bucket/folder
-              try {
-                const innerResult = await this.client.list(item.name, {
-                  prefix: 'transcripts/',
-                });
-                if (innerResult && innerResult.value && Array.isArray(innerResult.value)) {
-                  for (const file of innerResult.value) {
-                    if (file.name && file.name.endsWith('.json')) {
-                      transcriptKeys.push(file.name);
-                    }
-                  }
-                }
-              } catch (innerError) {
-                console.log('Could not list inner files for:', item.name);
-              }
-            }
-          }
-          return transcriptKeys.sort((a: string, b: string) => b.localeCompare(a));
-        }
-        
-        // Handle if it's a direct array of objects
-        if (Array.isArray(result.objects)) {
-          return result.objects
-            .filter((obj: any) => obj.key?.endsWith('.json') && obj.key?.includes('transcript_'))
-            .map((obj: any) => obj.key)
-            .sort((a: string, b: string) => b.localeCompare(a));
-        }
-      }
-      
-      // Handle if result is directly an array
+      // The Replit Object Storage client should return an array of objects
       if (Array.isArray(result)) {
         return result
-          .filter((obj: any) => obj.key?.endsWith('.json') && obj.key?.includes('transcript_'))
+          .filter((obj: any) => obj.key?.endsWith('.json'))
+          .map((obj: any) => obj.key)
+          .sort((a: string, b: string) => b.localeCompare(a));
+      }
+      
+      // Handle if it's wrapped in an object
+      if (result && typeof result === 'object' && Array.isArray(result.objects)) {
+        return result.objects
+          .filter((obj: any) => obj.key?.endsWith('.json'))
           .map((obj: any) => obj.key)
           .sort((a: string, b: string) => b.localeCompare(a));
       }
