@@ -83,57 +83,13 @@ export class MemStorage implements IStorage {
   }
 
   async getConversationsByUserId(userId: number): Promise<ConversationWithReview[]> {
-    console.log("🔍 Getting conversations for user:", userId);
-    
-    const allConversations = Array.from(this.conversations.values());
-    console.log("📋 All conversations in storage:", allConversations.map(c => ({ 
-      id: c.id, 
-      userId: c.userId, 
-      status: c.status, 
-      elevenlabsId: c.elevenlabsConversationId,
-      createdAt: c.createdAt 
-    })));
-    
-    // Filter and deduplicate conversations
-    const userConversations = allConversations.filter(conv => conv.userId === userId);
-    
-    // Group by ElevenLabs ID and remove duplicates
-    const conversationMap = new Map<string, Conversation>();
-    const orphanedConversations: Conversation[] = [];
-    
-    for (const conv of userConversations) {
-      if (conv.elevenlabsConversationId) {
-        const existing = conversationMap.get(conv.elevenlabsConversationId);
-        if (existing) {
-          // Keep the one with more complete data (analyzed over pending, or newer one)
-          if (conv.status === "analyzed" || (existing.status === "pending" && conv.status !== "pending")) {
-            console.log("🔄 Replacing duplicate conversation:", existing.id, "with:", conv.id);
-            conversationMap.set(conv.elevenlabsConversationId, conv);
-            // Remove the duplicate from storage
-            this.conversations.delete(existing.id);
-          } else {
-            console.log("🗑️ Removing duplicate conversation:", conv.id, "keeping:", existing.id);
-            this.conversations.delete(conv.id);
-          }
-        } else {
-          conversationMap.set(conv.elevenlabsConversationId, conv);
-        }
-      } else {
-        // Keep conversations without ElevenLabs ID (orphaned)
-        orphanedConversations.push(conv);
-      }
-    }
-    
-    const deduplicatedConversations = [
-      ...Array.from(conversationMap.values()),
-      ...orphanedConversations
-    ].sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-    console.log("📋 Deduplicated conversations found:", deduplicatedConversations.length);
+    const userConversations = Array.from(this.conversations.values())
+      .filter(conv => conv.userId === userId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
     const conversationsWithReviews: ConversationWithReview[] = [];
     
-    for (const conversation of deduplicatedConversations) {
+    for (const conversation of userConversations) {
       const review = await this.getReviewByConversationId(conversation.id);
       conversationsWithReviews.push({
         ...conversation,

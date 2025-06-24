@@ -54,6 +54,9 @@ export function ConversationProvider({
     };
   }, [onConversationStart, onConversationEnd, onError]);
 
+  // Track conversation creation to prevent duplicates
+  const createdConversationsRef = useRef<Set<string>>(new Set());
+
   // Use ElevenLabs SDK with stable callbacks
   const conversation = useElevenLabsConversation({
     onConnect: async (props: { conversationId: string }) => {
@@ -61,8 +64,19 @@ export function ConversationProvider({
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
       
+      // Prevent duplicate conversation creation
+      if (createdConversationsRef.current.has(props.conversationId)) {
+        console.log("🚫 Conversation already created for ID:", props.conversationId);
+        callbacksRef.current.onConversationStart?.(props.conversationId);
+        return;
+      }
+      
+      // Mark as being created to prevent duplicates
+      createdConversationsRef.current.add(props.conversationId);
+      
       // Create database conversation record with the correct ElevenLabs ID
       try {
+        console.log("🔄 Creating database conversation for ID:", props.conversationId);
         const response = await fetch("/api/conversations", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -78,9 +92,13 @@ export function ConversationProvider({
         } else {
           const errorText = await response.text();
           console.log("Database conversation creation response:", response.status, errorText);
+          // Remove from tracking if creation failed
+          createdConversationsRef.current.delete(props.conversationId);
         }
       } catch (error) {
         console.error("Error creating database conversation:", error);
+        // Remove from tracking if creation failed
+        createdConversationsRef.current.delete(props.conversationId);
       }
       
       callbacksRef.current.onConversationStart?.(props.conversationId);
@@ -88,6 +106,11 @@ export function ConversationProvider({
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);
       setIsConnecting(false);
+      
+      // Clear tracking when conversation ends
+      if (currentConversationId) {
+        createdConversationsRef.current.delete(currentConversationId);
+      }
       
       const conversationId = details?.conversationId || currentConversationId;
       if (conversationId) {

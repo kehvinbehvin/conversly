@@ -91,11 +91,11 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
-- June 24, 2025: Comprehensive duplicate conversation prevention
-  - Implemented aggressive deduplication in conversation retrieval logic
-  - Added orphaned conversation detection and merging with ElevenLabs IDs
-  - Enhanced conversation creation to update existing pending records
-  - Fixed storage-level duplicate removal with proper cleanup
+- June 24, 2025: Fixed duplicate conversation creation issue
+  - Root cause identified: Two separate conversation creation points in App.tsx and ConversationContext
+  - Removed duplicate conversation creation from App.tsx onConversationStart callback
+  - Added deduplication tracking in ConversationContext to prevent multiple API calls
+  - Conversation now created only once when ElevenLabs connection establishes
 - June 24, 2025: Fixed microphone permission timing and dashboard refresh
   - Microphone access now properly occurs before WebSocket connection attempts
   - Dashboard now auto-refreshes every 5 seconds to show new conversations

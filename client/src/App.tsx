@@ -29,16 +29,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ConversationProvider
-        onConversationStart={(conversationId) => {
-          // Create conversation in database
-          fetch('/api/conversations', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ elevenlabsId: conversationId })
-          }).then(() => {
-            console.log("Database conversation created:", conversationId);
-          }).catch(console.error);
-        }}
         onConversationEnd={(conversationId) => {
           // Navigate to review page
           window.location.href = `/review/${conversationId}`;

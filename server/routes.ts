@@ -138,24 +138,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
 
-        // Also check for recent conversations without ElevenLabs ID to avoid creating orphaned records
-        const recentConversations = await storage.getConversationsByUserId(user.id);
-        const recentPendingWithoutId = recentConversations.find(c => 
-          c.status === "pending" && 
-          !c.elevenlabsConversationId &&
-          (Date.now() - new Date(c.createdAt).getTime()) < 60000 // Within last minute
-        );
-        
-        if (recentPendingWithoutId && req.body.elevenlabsConversationId) {
-          // Update the recent pending conversation instead of creating new one
-          const updated = await storage.updateConversation(recentPendingWithoutId.id, {
-            elevenlabsConversationId: req.body.elevenlabsConversationId,
-            metadata: { ...recentPendingWithoutId.metadata, ...req.body.metadata }
-          });
-          console.log("📝 Updated existing pending conversation:", updated?.id, "with ElevenLabs ID:", req.body.elevenlabsConversationId);
-          return res.json(updated);
-        }
-
         const conversationData = {
           userId: user.id,
           status: "pending",
@@ -165,6 +147,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         const conversation = await storage.createConversation(conversationData);
         console.log("📝 Created conversation:", conversation.id, "for ElevenLabs ID:", req.body.elevenlabsConversationId);
+        console.log("📝 Request body:", JSON.stringify(req.body, null, 2));
+        console.log("📝 Call stack trace for conversation creation");
         res.json(conversation);
       } catch (error) {
         res.status(500).json({ message: "Failed to create conversation" });
