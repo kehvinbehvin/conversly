@@ -138,7 +138,7 @@ export function ConversationProvider({
 
       // Get signed URL
       console.log("🌐 Generating signed URL...");
-      const response = await apiRequest("/api/elevenlabs/signed-url", {
+      const response = await fetch("/api/elevenlabs/signed-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ agentId }),
