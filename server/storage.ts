@@ -22,6 +22,7 @@ export interface IStorage {
   getConversationsByUserId(userId: number): Promise<ConversationWithReview[]>;
   createConversation(conversation: InsertConversation): Promise<Conversation>;
   updateConversation(id: number, updates: Partial<Conversation>): Promise<Conversation | undefined>;
+  updateConversationFromWebhook(id: number, transcript: string, audioUrl: string | null, metadata: any): Promise<Conversation | undefined>;
   getConversationByElevenlabsId(elevenlabsId: string): Promise<Conversation | undefined>;
 
   // Review operations
@@ -121,6 +122,37 @@ export class MemStorage implements IStorage {
     if (!conversation) return undefined;
 
     const updated = { ...conversation, ...updates };
+    this.conversations.set(id, updated);
+    return updated;
+  }
+
+  async updateConversationFromWebhook(
+    id: number, 
+    transcript: string, 
+    audioUrl: string | null, 
+    metadata: any
+  ): Promise<Conversation | undefined> {
+    const conversation = this.conversations.get(id);
+    if (!conversation) return undefined;
+
+    // Merge webhook metadata with existing metadata
+    const mergedMetadata = {
+      ...conversation.metadata,
+      elevenlabs: {
+        ...conversation.metadata?.elevenlabs,
+        ...metadata,
+        lastWebhookUpdate: new Date().toISOString(),
+      }
+    };
+
+    const updated = { 
+      ...conversation, 
+      transcript: transcript || conversation.transcript,
+      audioUrl: audioUrl || conversation.audioUrl,
+      status: transcript ? "completed" : conversation.status,
+      metadata: mergedMetadata
+    };
+    
     this.conversations.set(id, updated);
     return updated;
   }

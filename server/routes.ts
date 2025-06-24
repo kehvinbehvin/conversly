@@ -303,14 +303,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
           JSON.stringify(webhookData, null, 2),
         );
 
-        // Extract data from the nested structure
+        // Validate webhook payload structure
+        if (!webhookData || typeof webhookData !== 'object') {
+          console.error("❌ Invalid webhook payload structure");
+          return res.status(400).json({ message: "Invalid webhook payload" });
+        }
+
+        if (!webhookData.data || typeof webhookData.data !== 'object') {
+          console.error("❌ Missing or invalid 'data' field in webhook payload");
+          console.error("📋 Available top-level fields:", Object.keys(webhookData));
+          return res.status(400).json({ message: "Missing or invalid data field" });
+        }
+
+        // Extract data from the nested structure with validation
         const { conversation_id, transcript: transcriptArray, metadata, analysis } = webhookData.data;
 
         // Validate required fields
-        if (!conversation_id) {
-          console.error("❌ Missing conversation_id in webhook payload");
+        if (!conversation_id || typeof conversation_id !== 'string') {
+          console.error("❌ Missing or invalid conversation_id in webhook payload");
           console.error("📋 Available data fields:", Object.keys(webhookData.data || {}));
-          return res.status(400).json({ message: "Missing conversation_id" });
+          return res.status(400).json({ message: "Missing or invalid conversation_id" });
         }
 
         console.log(
@@ -318,32 +330,39 @@ export async function registerRoutes(app: Express): Promise<Server> {
           conversation_id,
         );
 
-        // Convert transcript array to readable string
+        // Convert transcript array to readable string with validation
         let transcriptText = "";
         if (transcriptArray && Array.isArray(transcriptArray)) {
           transcriptText = transcriptArray
+            .filter((turn) => turn && typeof turn === 'object' && turn.role && turn.message)
             .map((turn) => `${turn.role}: ${turn.message}`)
             .join("\n");
         }
 
-        // Extract audio URL from metadata if available
-        const audio_url = null; // Audio URL not present in this payload structure
+        // Extract audio URL from metadata if available (not present in current payload structure)
+        const audio_url = null;
 
         console.log("📝 Processed transcript:", {
           originalFormat: "array",
           turnsCount: transcriptArray?.length || 0,
+          validTurns: transcriptArray?.filter(turn => turn && turn.role && turn.message)?.length || 0,
           processedLength: transcriptText.length,
           hasAudioUrl: !!audio_url,
         });
 
-        // Extract additional metadata
+        // Extract and validate additional metadata
         const callMetadata = {
-          duration: metadata?.call_duration_secs,
-          cost: metadata?.cost,
-          terminationReason: metadata?.termination_reason,
-          language: metadata?.main_language,
-          callSuccessful: analysis?.call_successful,
-          transcriptSummary: analysis?.transcript_summary,
+          webhookType: webhookData.type || null,
+          eventTimestamp: webhookData.event_timestamp || null,
+          status: webhookData.data?.status || null,
+          duration: metadata?.call_duration_secs || null,
+          cost: metadata?.cost || null,
+          terminationReason: metadata?.termination_reason || null,
+          language: metadata?.main_language || null,
+          callSuccessful: analysis?.call_successful || null,
+          transcriptSummary: analysis?.transcript_summary || null,
+          startTime: metadata?.start_time_unix_secs || null,
+          acceptedTime: metadata?.accepted_time_unix_secs || null,
         };
 
         console.log("📊 Call metadata:", callMetadata);
@@ -405,17 +424,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           metadata: callMetadata,
         });
 
-        // Update conversation with transcript, audio, and metadata
+        // Update conversation with transcript, audio, and metadata using webhook-specific method
         try {
-          await storage.updateConversation(conversation.id, {
-            transcript: transcriptText || "",
-            audioUrl: audio_url,
-            status: "completed",
-            metadata: {
-              ...conversation.metadata,
-              elevenlabs: callMetadata,
-            },
-          });
+          await storage.updateConversationFromWebhook(
+            conversation.id,
+            transcriptText || "",
+            audio_url,
+            callMetadata
+          );
           console.log("✅ Conversation updated successfully");
         } catch (updateError) {
           console.error("❌ Error updating conversation:", updateError);
