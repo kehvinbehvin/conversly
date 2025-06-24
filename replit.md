@@ -91,6 +91,11 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: Fixed duplicate conversations and dashboard refresh issues
+  - Fixed dashboard auto-refresh mechanism to properly update conversation list
+  - Prevented duplicate conversation creation by checking existing ElevenLabs IDs
+  - Eliminated duplicate transcript files by using consistent filenames
+  - Cleaned up transcript storage to use single files per conversation
 - June 24, 2025: Fixed microphone permission timing and dashboard refresh
   - Microphone access now properly occurs before WebSocket connection attempts
   - Dashboard now auto-refreshes every 5 seconds to show new conversations

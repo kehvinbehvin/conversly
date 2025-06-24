@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Link } from "wouter";
 import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
@@ -8,13 +9,19 @@ import { MessageCircle, BarChart3, Clock, TrendingUp, Star } from "lucide-react"
 import type { ConversationWithReview } from "@shared/schema";
 
 export default function Dashboard() {
-  const { data: conversations, isLoading } = useQuery<ConversationWithReview[]>({
+  const { data: conversations, isLoading, refetch } = useQuery<ConversationWithReview[]>({
     queryKey: ["/api/conversations"],
+    refetchInterval: 5000, // Refetch every 5 seconds to pick up new conversations
   });
 
   const { data: user } = useQuery({
     queryKey: ["/api/user"],
   });
+
+  // Force refetch when component mounts to ensure fresh data
+  useEffect(() => {
+    refetch();
+  }, [refetch]);
 
   const recentConversations = conversations?.slice(0, 3) || [];
   const completedConversations = conversations?.filter(c => c.status === "analyzed") || [];

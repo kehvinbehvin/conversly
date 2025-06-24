@@ -129,6 +129,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "User not found" });
         }
 
+        // Check if conversation with this ElevenLabs ID already exists
+        if (req.body.elevenlabsConversationId) {
+          const existingConversation = await storage.getConversationByElevenlabsId(req.body.elevenlabsConversationId);
+          if (existingConversation) {
+            console.log("📝 Conversation already exists:", existingConversation.id, "for ElevenLabs ID:", req.body.elevenlabsConversationId);
+            return res.json(existingConversation);
+          }
+        }
+
         const conversationData = {
           userId: user.id,
           status: "pending",

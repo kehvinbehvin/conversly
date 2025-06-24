@@ -62,6 +62,7 @@ export function ConversationProvider({
       setCurrentConversationId(props.conversationId);
       
       // Create database conversation record with the correct ElevenLabs ID
+      // Only create if we haven't already created one for this conversation
       try {
         const response = await fetch("/api/conversations", {
           method: "POST",
@@ -76,7 +77,8 @@ export function ConversationProvider({
           const conversation = await response.json();
           console.log("Database conversation created:", conversation.id, "for ElevenLabs ID:", props.conversationId);
         } else {
-          console.error("Failed to create database conversation:", await response.text());
+          const errorText = await response.text();
+          console.log("Database conversation may already exist:", errorText);
         }
       } catch (error) {
         console.error("Error creating database conversation:", error);
