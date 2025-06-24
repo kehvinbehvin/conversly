@@ -20,6 +20,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get ElevenLabs config
+  app.get("/api/elevenlabs/config", (req, res) => {
+    res.json({
+      apiKey: process.env.ELEVENLABS_API_KEY,
+      agentId: "agent_01jyfb9fh8f67agfzvv09tvg3t"
+    });
+  });
+
   // Get user conversations with reviews
   app.get("/api/conversations", async (req, res) => {
     try {

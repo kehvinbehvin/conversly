@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { useConversation } from "@elevenlabs/react";
+import { useQuery } from "@tanstack/react-query";
 
 interface ElevenLabsConversationProps {
   agentId: string;
@@ -20,8 +21,14 @@ export default function ElevenLabsConversation({
 }: ElevenLabsConversationProps) {
   const [isConnecting, setIsConnecting] = useState(false);
 
+  // Get ElevenLabs config from backend
+  const { data: config } = useQuery({
+    queryKey: ["/api/elevenlabs/config"],
+  });
+
   const conversation = useConversation({
     agentId,
+    apiKey: config?.apiKey,
     onConnect: (conversationId: string) => {
       console.log('Connected to ElevenLabs conversation:', conversationId);
       setIsConnecting(false);
@@ -43,7 +50,7 @@ export default function ElevenLabsConversation({
   });
 
   const startConversation = async () => {
-    if (disabled || isConnecting) return;
+    if (disabled || isConnecting || !config?.apiKey) return;
     
     setIsConnecting(true);
     try {
@@ -64,7 +71,7 @@ export default function ElevenLabsConversation({
   };
 
   const isConnected = conversation.status === 'connected';
-  const isLoading = isConnecting || conversation.status === 'connecting';
+  const isLoading = isConnecting || conversation.status === 'connecting' || !config?.apiKey;
 
   return (
     <div className="flex flex-col items-center space-y-6">
