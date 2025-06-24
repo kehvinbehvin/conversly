@@ -263,7 +263,7 @@ function ConversationPage() {
 }
 
 export default function Conversation() {
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 

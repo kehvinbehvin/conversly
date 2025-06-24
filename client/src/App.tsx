@@ -10,6 +10,7 @@ import Conversation from "@/pages/conversation";
 import Review from "@/pages/review";
 import History from "@/pages/history";
 import NotFound from "@/pages/not-found";
+import { ConversationProvider } from "@/contexts/ConversationContext";
 
 function Router() {
   return (
@@ -27,11 +28,13 @@ function Router() {
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Navigation />
-        <Toaster />
-        <Router />
-      </TooltipProvider>
+      <ConversationProvider>
+        <TooltipProvider>
+          <Navigation />
+          <Toaster />
+          <Router />
+        </TooltipProvider>
+      </ConversationProvider>
     </QueryClientProvider>
   );
 }
