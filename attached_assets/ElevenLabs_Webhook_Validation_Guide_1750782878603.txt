@@ -1,0 +1,82 @@
+Webhook Validation Guide for ElevenLabs (Node.js/Express)
+
+Goal:
+To validate a webhook request from ElevenLabs using HMAC signature verification and a timestamp to ensure the request was not tampered with and is recent.
+
+Step-by-Step Instructions:
+
+1. Parse the Raw Body
+
+app.use(bodyParser.raw({ type: '*/*' }));
+
+Why?
+- Signature validation depends on the exact raw bytes of the request body.
+- Any transformation (e.g., JSON parsing) would break the hash.
+- bodyParser.raw ensures the body is kept as a Buffer for accurate hash computation.
+
+2. Extract Signature and Timestamp from Headers
+
+const headers = req.headers['ElevenLabs-Signature'].split(',');
+const timestamp = headers.find((e) => e.startsWith('t=')).substring(2);
+const signature = headers.find((e) => e.startsWith('v0='));
+
+Header Format Example:
+- t=1719263154,v0=123abc456def...
+- t= is the UNIX timestamp.
+- v0= is the HMAC-SHA256 signature.
+
+3. Validate Timestamp (Prevent Replay Attacks)
+
+const reqTimestamp = timestamp * 1000; // Convert to ms
+const tolerance = Date.now() - 30 * 60 * 1000; // 30 minutes ago
+
+if (reqTimestamp < tolerance) {
+  res.status(403).send('Request expired');
+  return;
+}
+
+Why?
+- Protect against replay attacks — someone capturing a valid request and re-sending it later.
+
+4. Recreate the Signature on Your Side
+
+const message = `${timestamp}.${req.body}`;
+const digest = 'v0=' + crypto.createHmac('sha256', secret).update(message).digest('hex');
+
+How the HMAC is built:
+- Input: timestamp.rawBody
+- Algorithm: HMAC-SHA256
+- Secret: Your shared secret (WEBHOOK_SECRET)
+- Output Format: v0=<hexadecimal_signature>
+
+5. Compare the Signatures
+
+if (signature !== digest) {
+  res.status(401).send('Request unauthorized');
+  return;
+}
+
+Why?
+- If the signature doesn’t match, reject the request.
+- This ensures the message was not tampered with.
+
+6. Accept the Validated Request
+
+res.status(200).send();
+
+Once validation passes, proceed with your actual business logic.
+
+Security Summary:
+
+Layer        | Purpose
+-------------|----------------------------------------
+Raw body     | Preserves exact data for hashing
+Timestamp    | Prevents replay attacks
+HMAC-SHA256  | Ensures message integrity/authenticity
+Shared secret| Proves source authenticity
+
+Gotchas to Watch Out For:
+1. Wrong body encoding = signature mismatch
+2. Incorrect environment variable = all requests fail
+3. Clock drift on your server = false rejections
+4. Using req.body.toString() accidentally = breaks hash
