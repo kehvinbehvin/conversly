@@ -1,11 +1,4 @@
-import { useState } from "react";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useLocation } from "wouter";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Mic, Clock, AlertCircle } from "lucide-react";
-import { apiRequest } from "@/lib/queryClient";
 import ElevenLabsConversation from "@/components/ElevenLabsConversation";
 
 function ConversationPage() {
@@ -263,48 +256,6 @@ function ConversationPage() {
 }
 
 export default function Conversation() {
-  const [, navigate] = useLocation();
-  const { toast } = useToast();
-  const queryClient = useQueryClient();
-
-  // Create conversation mutation
-  const createConversationMutation = useMutation({
-    mutationFn: async (elevenlabsId: string) => {
-      const response = await apiRequest("/api/conversations", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ elevenlabsId }),
-      });
-      return response.json();
-    },
-    onSuccess: (data) => {
-      console.log("Create conversation response:", data);
-      console.log("Database conversation created:", data.id);
-      queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
-    },
-    onError: (error) => {
-      console.error("Failed to create conversation:", error);
-    },
-  });
-
-  const handleConversationStart = (elevenlabsId: string) => {
-    console.log("Starting conversation with ID:", elevenlabsId);
-    createConversationMutation.mutate(elevenlabsId);
-  };
-
-  const handleConversationEnd = (elevenlabsId: string) => {
-    console.log("Ending conversation with ID:", elevenlabsId);
-    navigate(`/review/${elevenlabsId}`);
-  };
-
-  const handleError = (error: Error) => {
-    console.error("Conversation error:", error);
-    toast({
-      title: "Conversation Error",
-      description: error.message,
-      variant: "destructive",
-    });
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-sage-50 to-brown-50 p-4">
