@@ -1,0 +1,119 @@
+📋 Webhook headers: {
+  'content-type': 'application/json',
+  'elevenlabs-signature': 'present',
+  'ElevenLabs-Signature': 'missing',
+  'user-agent': 'Python/3.12 aiohttp/3.11.16',
+  'content-length': '2418'
+}
+📦 ElevenLabs webhook payload: {
+  "type": "post_call_transcription",
+  "event_timestamp": 1750799444,
+  "data": {
+    "agent_id": "agent_01jyfb9fh8f67agfzvv09tvg3t",
+    "conversation_id": "conv_01jyhwem8tfvxsbq8mm5zrdcya",
+    "status": "done",
+    "transcript": [
+      {
+        "role": "agent",
+        "message": "Hey, how have you been? How was your weekend?",
+        "tool_calls": [],
+        "tool_results": [],
+        "feedback": null,
+        "llm_override": null,
+        "time_in_call_secs": 0,
+        "conversation_turn_metrics": null,
+        "rag_retrieval_info": null,
+        "llm_usage": null,
+        "interrupted": false,
+        "original_message": null,
+        "source_medium": null
+      }
+    ],
+    "metadata": {
+      "start_time_unix_secs": 1750799438,
+      "accepted_time_unix_secs": 1750799438,
+      "call_duration_secs": 4,
+      "cost": 48,
+      "deletion_settings": {
+        "deletion_time_unix_secs": null,
+        "deleted_logs_at_time_unix_secs": null,
+        "deleted_audio_at_time_unix_secs": null,
+        "deleted_transcript_at_time_unix_secs": null,
+        "delete_transcript_and_pii": false,
+        "delete_audio": false
+      },
+      "feedback": {
+        "overall_score": null,
+        "likes": 0,
+        "dislikes": 0
+      },
+      "authorization_method": "signed_url",
+      "charging": {
+        "dev_discount": false,
+        "is_burst": false,
+        "tier": "free",
+        "llm_usage": {
+          "irreversible_generation": {
+            "model_usage": {}
+          },
+          "initiated_generation": {
+            "model_usage": {}
+          }
+        },
+        "llm_price": 0,
+        "llm_charge": 0,
+        "call_charge": 48
+      },
+      "phone_call": null,
+      "batch_call": null,
+      "termination_reason": "Client disconnected",
+      "error": null,
+      "main_language": "en",
+      "rag_usage": null,
+      "text_only": false,
+      "features_usage": {
+        "language_detection": {
+          "enabled": false,
+          "used": false
+        },
+        "transfer_to_agent": {
+          "enabled": false,
+          "used": false
+        },
+        "transfer_to_number": {
+          "enabled": false,
+          "used": false
+        },
+        "multivoice": {
+          "enabled": false,
+          "used": false
+        },
+        "pii_zrm_workspace": false,
+        "pii_zrm_agent": false
+      }
+    },
+    "analysis": {
+      "evaluation_criteria_results": {},
+      "data_collection_results": {},
+      "call_successful": "success",
+      "transcript_summary": "The agent initiated the conversation with a casual greeting, inquiring about the user's well-being and weekend.\n"
+    },
+    "conversation_initiation_client_data": {
+      "conversation_config_override": {
+        "tts": null,
+        "conversation": null,
+        "agent": null
+      },
+      "custom_llm_extra_body": {},
+      "dynamic_variables": {
+        "system__agent_id": "agent_01jyfb9fh8f67agfzvv09tvg3t",
+        "system__conversation_id": "conv_01jyhwem8tfvxsbq8mm5zrdcya",
+        "system__caller_id": null,
+        "system__called_number": null,
+        "system__call_duration_secs": 4,
+        "system__time_utc": "2025-06-24T21:10:42.823451+00:00",
+        "system__call_sid": null
+      }
+    }
+  }
+}
