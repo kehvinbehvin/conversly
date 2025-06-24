@@ -21,12 +21,14 @@ export default function ElevenLabsConversation({
 }: ElevenLabsConversationProps) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [signedUrl, setSignedUrl] = useState<string | null>(null);
+  const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
 
   const conversation = useConversation({
     debug: true, // Enable debug mode for more detailed logs
     onConnect: (props: { conversationId: string }) => {
       console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
+      setCurrentConversationId(props.conversationId);
       onConversationStart?.(props.conversationId);
     },
     onDisconnect: (details: any) => {
@@ -34,13 +36,17 @@ export default function ElevenLabsConversation({
       console.log("Disconnect reason:", details.reason);
       console.log("Disconnect code:", details.code);
       console.log("Disconnect details:", JSON.stringify(details, null, 2));
+      
       setIsConnecting(false);
       setSignedUrl(null);
       
-      // Only call onConversationEnd for natural conversation endings, not user-initiated disconnects
-      if (details?.reason !== 'user' && details?.conversationId) {
-        onConversationEnd?.(details.conversationId);
+      // Always end the conversation when disconnected - UI should reflect reality
+      // Use the stored conversationId since disconnect details might not include it
+      const conversationId = details?.conversationId || currentConversationId;
+      if (conversationId) {
+        onConversationEnd?.(conversationId);
       }
+      setCurrentConversationId(null);
     },
     onError: (error: string) => {
       console.error("🔥 ElevenLabs conversation error:", error);

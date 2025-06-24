@@ -71,14 +71,12 @@ export default function Conversation() {
     setIsRecording(false);
     setConversationId(null);
 
-    // Only navigate if we have a valid conversation ID
-    if (elevenlabsId && dbConversationId) {
-      // Wait for analysis to complete, then navigate to review
-      setTimeout(() => {
-        queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
-        setLocation(`/review/${dbConversationId}`);
-      }, 3000);
-    }
+    // For now, just go back to dashboard when conversation ends
+    // Later we can add logic to wait for webhook completion and redirect to review
+    setTimeout(() => {
+      queryClient.invalidateQueries({ queryKey: ["/api/conversations"] });
+      setLocation("/dashboard");
+    }, 1000);
   };
 
   const handleError = (error: Error) => {
