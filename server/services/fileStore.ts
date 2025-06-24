@@ -97,3 +97,6 @@ export class FileStore {
 }
 
 export const fileStore = new FileStore();
+
+// Re-export cloud storage for backward compatibility
+export { cloudStorage, createCloudStorage, getStorageConfig } from './cloudStorage.js';

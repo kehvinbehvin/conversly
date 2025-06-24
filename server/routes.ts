@@ -5,7 +5,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
 import { analyzeConversation } from "./services/openai";
-import { fileStore, type TranscriptData } from "./services/fileStore";
+import { fileStore, cloudStorage, type TranscriptData } from "./services/fileStore";
 import { z } from "zod";
 import bodyParser from "body-parser";
 
@@ -391,8 +391,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
 
         // Save transcript only once
-        await fileStore.saveTranscript(transcriptFileData);
-        console.log("💾 Transcript saved to file store for ElevenLabs ID:", conversation_id);
+        await cloudStorage.saveTranscript(transcriptFileData);
+        console.log("💾 Transcript saved to cloud storage for ElevenLabs ID:", conversation_id);
 
         // Find conversation by ElevenLabs ID
         let conversation;
@@ -591,7 +591,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             analysis: webhookData?.data?.analysis,
             timestamp: Date.now(),
           };
-          await fileStore.saveTranscript(rawTranscriptData);
+          await cloudStorage.saveTranscript(rawTranscriptData);
           console.log("💾 Raw webhook data saved despite processing error");
         } catch (saveError) {
           console.error("❌ Failed to save raw webhook data:", saveError);
@@ -612,7 +612,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     express.urlencoded({ extended: false }),
     async (req, res) => {
       try {
-        const files = await fileStore.listTranscripts();
+        const files = await cloudStorage.listTranscripts();
         res.json({ transcripts: files });
       } catch (error) {
         res.status(500).json({ message: "Failed to list transcripts" });
@@ -628,7 +628,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req, res) => {
       try {
         const { elevenlabsId } = req.params;
-        const transcript = await fileStore.getTranscript(elevenlabsId);
+        const transcript = await cloudStorage.getTranscript(elevenlabsId);
         
         if (!transcript) {
           return res.status(404).json({ message: "Transcript not found" });
@@ -637,6 +637,40 @@ export async function registerRoutes(app: Express): Promise<Server> {
         res.json(transcript);
       } catch (error) {
         res.status(500).json({ message: "Failed to get transcript" });
+      }
+    },
+  );
+
+  // API endpoint to get cloud storage status and configuration
+  app.get(
+    "/api/storage/status",
+    express.json(),
+    express.urlencoded({ extended: false }),
+    async (req, res) => {
+      try {
+        const { getStorageConfig } = await import('./services/cloudStorage.js');
+        const config = getStorageConfig();
+        
+        // Test storage by listing transcripts
+        const files = await cloudStorage.listTranscripts();
+        
+        res.json({
+          provider: config.provider,
+          isWorking: true,
+          fileCount: files.length,
+          config: config.provider === 'aws' ? {
+            region: config.aws?.region,
+            bucketName: config.aws?.bucketName,
+            hasCredentials: !!(config.aws?.accessKeyId && config.aws?.secretAccessKey)
+          } : null
+        });
+      } catch (error) {
+        console.error("Storage status check failed:", error);
+        res.json({
+          provider: 'unknown',
+          isWorking: false,
+          error: error instanceof Error ? error.message : 'Unknown error'
+        });
       }
     },
   );

@@ -1,6 +1,6 @@
 import { Link, useLocation } from "wouter";
 import { Button } from "@/components/ui/button";
-import { MessageCircle, BarChart3, History } from "lucide-react";
+import { MessageCircle, BarChart3, History, Database } from "lucide-react";
 
 export default function Navigation() {
   const [location] = useLocation();
@@ -48,6 +48,16 @@ export default function Navigation() {
               >
                 <History className="w-4 h-4" />
                 <span>History</span>
+              </Button>
+            </Link>
+            
+            <Link href="/storage">
+              <Button 
+                variant={location === "/storage" ? "default" : "ghost"}
+                className="flex items-center space-x-2"
+              >
+                <Database className="w-4 h-4" />
+                <span>Storage</span>
               </Button>
             </Link>
           </div>
