@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 24, 2025: Object store implementation for transcript data
+  - Created FileStore service to save transcript data as JSON files
+  - Enhanced webhook handler to automatically create conversations when missing
+  - Fixed conversation ID mismatch between ElevenLabs and database
+  - Added API endpoints to list and retrieve saved transcript files
+  - Improved error handling to save raw webhook data even when processing fails
 - June 24, 2025: Major codebase cleanup and architectural simplification
   - Removed legacy conversation timer and recording state management
   - Simplified conversation page to pure UI component without complex state

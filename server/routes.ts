@@ -5,6 +5,7 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
 import { analyzeConversation } from "./services/openai";
+import { fileStore, type TranscriptData } from "./services/fileStore";
 import { z } from "zod";
 import bodyParser from "body-parser";
 
@@ -131,11 +132,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const conversationData = {
           userId: user.id,
           status: "pending",
-          elevenlabsConversationId: req.body.elevenlabsConversationId,
+          elevenlabsConversationId: req.body.elevenlabsConversationId || null,
           metadata: req.body.metadata || {},
         };
 
         const conversation = await storage.createConversation(conversationData);
+        console.log("📝 Created conversation:", conversation.id, "for ElevenLabs ID:", req.body.elevenlabsConversationId);
         res.json(conversation);
       } catch (error) {
         res.status(500).json({ message: "Failed to create conversation" });
