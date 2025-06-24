@@ -1,3 +1,4 @@
+import { Client } from '@replit/object-storage';
 import { TranscriptData } from './fileStore.js';
 
 export interface ReplitObjectStorageConfig {
@@ -5,10 +6,14 @@ export interface ReplitObjectStorageConfig {
 }
 
 export class ReplitObjectStorage {
+  private client: Client;
   private bucketId: string;
 
   constructor(config: ReplitObjectStorageConfig) {
     this.bucketId = config.bucketId;
+    // Initialize Replit Object Storage client - it automatically handles authentication
+    // using the environment credentials provided by Replit
+    this.client = new Client();
   }
 
   private getKey(elevenlabsId: string): string {
@@ -19,25 +24,25 @@ export class ReplitObjectStorage {
     const key = this.getKey(data.elevenlabsId);
     
     try {
-      // Use Replit's built-in object storage without external authentication
-      const response = await fetch(`https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data, null, 2),
-      });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Failed to save to Replit Object Storage: ${response.status} ${response.statusText} - ${errorText}`);
-      }
+      // Use Replit Object Storage client with proper authentication
+      await this.client.uploadFromText(
+        this.bucketId,
+        key,
+        JSON.stringify(data, null, 2),
+        {
+          contentType: 'application/json',
+          metadata: {
+            conversationId: data.conversationId,
+            elevenlabsId: data.elevenlabsId,
+            timestamp: data.timestamp.toString(),
+          }
+        }
+      );
 
       console.log(`☁️ Transcript saved to Replit Object Storage: ${this.bucketId}/${key}`);
       return `replit://${this.bucketId}/${key}`;
     } catch (error) {
       console.error('Failed to save transcript to Replit Object Storage:', error);
-      // Fall back to local storage if cloud storage fails
       throw error;
     }
   }
@@ -46,19 +51,12 @@ export class ReplitObjectStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const response = await fetch(`https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`);
-      
-      if (response.status === 404) {
+      const content = await this.client.downloadAsText(this.bucketId, key);
+      return JSON.parse(content);
+    } catch (error: any) {
+      if (error.message?.includes('not found') || error.message?.includes('404') || error.statusCode === 404) {
         return null;
       }
-      
-      if (!response.ok) {
-        throw new Error(`Failed to get from Replit Object Storage: ${response.status} ${response.statusText}`);
-      }
-
-      const content = await response.text();
-      return JSON.parse(content);
-    } catch (error) {
       console.error('Failed to get transcript from Replit Object Storage:', error);
       return null;
     }
@@ -66,20 +64,13 @@ export class ReplitObjectStorage {
 
   async listTranscripts(): Promise<string[]> {
     try {
-      const response = await fetch(`https://kv.replit.com/${this.bucketId}?prefix=transcripts/`);
+      const objects = await this.client.list(this.bucketId, {
+        prefix: 'transcripts/',
+      });
       
-      if (!response.ok) {
-        throw new Error(`Failed to list from Replit Object Storage: ${response.status} ${response.statusText}`);
-      }
-
-      const data = await response.json();
-      
-      if (!data.keys) {
-        return [];
-      }
-
-      return data.keys
-        .filter((key: string) => key.endsWith('.json'))
+      return objects
+        .filter(obj => obj.key.endsWith('.json'))
+        .map(obj => obj.key)
         .sort((a: string, b: string) => b.localeCompare(a)); // Sort by newest first
     } catch (error) {
       console.error('Failed to list transcripts from Replit Object Storage:', error);
@@ -91,28 +82,27 @@ export class ReplitObjectStorage {
     const key = this.getKey(elevenlabsId);
     
     try {
-      const response = await fetch(`https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`, {
-        method: 'DELETE',
-      });
-
-      if (response.status === 404) {
-        return false; // Already deleted or doesn't exist
-      }
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete from Replit Object Storage: ${response.status} ${response.statusText}`);
-      }
-
+      await this.client.delete(this.bucketId, key);
       console.log(`🗑️ Transcript deleted from Replit Object Storage: ${this.bucketId}/${key}`);
       return true;
-    } catch (error) {
+    } catch (error: any) {
+      if (error.message?.includes('not found') || error.message?.includes('404') || error.statusCode === 404) {
+        return false; // Already deleted or doesn't exist
+      }
       console.error('Failed to delete transcript from Replit Object Storage:', error);
       return false;
     }
   }
 
   async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
-    // Return the Replit KV store URL
-    return `https://kv.replit.com/${this.bucketId}/${encodeURIComponent(key)}`;
+    try {
+      // Generate a signed URL for the object
+      return await this.client.getDownloadUrl(this.bucketId, key, {
+        expiresIn,
+      });
+    } catch (error) {
+      console.error('Failed to generate signed URL:', error);
+      throw error;
+    }
   }
 }

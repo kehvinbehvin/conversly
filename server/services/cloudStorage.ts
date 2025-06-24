@@ -225,15 +225,11 @@ export function getStorageConfig(): CloudStorageConfig {
   const provider = (process.env.STORAGE_PROVIDER as 'replit' | 'local') || 'replit';
   
   if (provider === 'replit') {
-    const bucketId = process.env.REPLIT_DB_URL ? 
-      'replit-objstore-988cc690-5963-48b8-b852-b976020113c7' : // Use default bucket from .replit
-      process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID;
+    // Use the default bucket ID from .replit configuration
+    const bucketId = 'replit-objstore-988cc690-5963-48b8-b852-b976020113c7';
     
-    if (!bucketId) {
-      console.warn('Replit object storage bucket ID not found, falling back to local storage');
-      return { provider: 'local' };
-    }
-
+    console.log(`Using Replit Object Storage with bucket: ${bucketId}`);
+    
     return {
       provider: 'replit',
       replit: {

@@ -22,7 +22,6 @@ function Router() {
       <Route path="/conversation/:id" component={Review} />
       <Route path="/history" component={History} />
       <Route path="/storage" component={lazy(() => import("./pages/storage"))} />
-      <Route path="/storage/test" component={lazy(() => import("./pages/storage-test"))} />
       <Route component={NotFound} />
     </Switch>
   );
