@@ -31,16 +31,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
 
       // Create signed URL using ElevenLabs API
-      const signedUrlResponse = await fetch("https://api.elevenlabs.io/v1/convai/conversation/get_signed_url", {
-        method: "POST",
+      const signedUrlResponse = await fetch(`https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId}`, {
+        method: "GET",
         headers: {
-          "Content-Type": "application/json",
           "xi-api-key": apiKey
-        },
-        body: JSON.stringify({
-          agent_id: agentId,
-          expires_at: new Date(Date.now() + 30 * 60 * 1000).toISOString() // 30 minutes from now
-        })
+        }
       });
 
       if (!signedUrlResponse.ok) {
