@@ -1,0 +1,173 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(39, 45%, 96%);
+  --foreground: hsl(20, 18%, 3%);
+  --muted: hsl(38, 35%, 88%);
+  --muted-foreground: hsl(25, 8%, 40%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(20, 18%, 3%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(20, 18%, 3%);
+  --border: hsl(20, 8%, 86%);
+  --input: hsl(20, 8%, 86%);
+  --primary: hsl(14, 78%, 58%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(38, 35%, 88%);
+  --secondary-foreground: hsl(24, 12%, 8%);
+  --accent: hsl(38, 35%, 88%);
+  --accent-foreground: hsl(24, 12%, 8%);
+  --destructive: hsl(0, 84.2%, 60.2%);
+  --destructive-foreground: hsl(60, 9.1%, 97.8%);
+  --ring: hsl(20, 14.3%, 4.1%);
+  --radius: 0.5rem;
+  
+  /* Custom color variables - less muted, more vibrant */
+  --warm-brown-50: hsl(39, 45%, 96%);
+  --warm-brown-100: hsl(38, 35%, 88%);
+  --warm-brown-200: hsl(35, 28%, 78%);
+  --warm-brown-300: hsl(35, 25%, 62%);
+  --warm-brown-400: hsl(30, 22%, 46%);
+  --warm-brown-500: hsl(28, 20%, 38%);
+  --warm-brown-600: hsl(25, 18%, 30%);
+  --warm-brown-700: hsl(22, 16%, 22%);
+  --warm-brown-800: hsl(20, 18%, 15%);
+  --warm-brown-900: hsl(18, 18%, 8%);
+  
+  --coral-50: hsl(15, 92%, 95%);
+  --coral-100: hsl(15, 88%, 88%);
+  --coral-200: hsl(15, 85%, 78%);
+  --coral-300: hsl(15, 82%, 68%);
+  --coral-400: hsl(14, 78%, 62%);
+  --coral-500: hsl(14, 78%, 58%);
+  --coral-600: hsl(13, 72%, 50%);
+  --coral-700: hsl(12, 68%, 42%);
+  --coral-800: hsl(11, 62%, 35%);
+  --coral-900: hsl(10, 58%, 28%);
+  
+  --sage-50: hsl(100, 32%, 94%);
+  --sage-100: hsl(102, 28%, 85%);
+  --sage-200: hsl(103, 25%, 75%);
+  --sage-300: hsl(104, 22%, 62%);
+  --sage-400: hsl(105, 20%, 54%);
+  --sage-500: hsl(106, 18%, 46%);
+  --sage-600: hsl(107, 16%, 38%);
+  --sage-700: hsl(108, 14%, 30%);
+  --sage-800: hsl(109, 12%, 22%);
+  --sage-900: hsl(110, 10%, 15%);
+}
+
+.dark {
+  --background: hsl(240, 10%, 3.9%);
+  --foreground: hsl(0, 0%, 98%);
+  --muted: hsl(240, 3.7%, 15.9%);
+  --muted-foreground: hsl(240, 5%, 64.9%);
+  --popover: hsl(240, 10%, 3.9%);
+  --popover-foreground: hsl(0, 0%, 98%);
+  --card: hsl(240, 10%, 3.9%);
+  --card-foreground: hsl(0, 0%, 98%);
+  --border: hsl(240, 3.7%, 15.9%);
+  --input: hsl(240, 3.7%, 15.9%);
+  --primary: hsl(14, 71%, 63%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(240, 3.7%, 15.9%);
+  --secondary-foreground: hsl(0, 0%, 98%);
+  --accent: hsl(240, 3.7%, 15.9%);
+  --accent-foreground: hsl(0, 0%, 98%);
+  --destructive: hsl(0, 62.8%, 30.6%);
+  --destructive-foreground: hsl(0, 0%, 98%);
+  --ring: hsl(240, 4.9%, 83.9%);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+}
+
+@layer utilities {
+  .warm-gradient {
+    background: linear-gradient(135deg, var(--warm-brown-100) 0%, var(--warm-brown-200) 100%);
+  }
+  
+  .coral-gradient {
+    background: linear-gradient(135deg, var(--coral-100) 0%, var(--coral-200) 100%);
+  }
+  
+  .sage-gradient {
+    background: linear-gradient(135deg, var(--sage-100) 0%, var(--sage-200) 100%);
+  }
+  
+  .text-warm-brown-50 { color: var(--warm-brown-50); }
+  .text-warm-brown-100 { color: var(--warm-brown-100); }
+  .text-warm-brown-200 { color: var(--warm-brown-200); }
+  .text-warm-brown-300 { color: var(--warm-brown-300); }
+  .text-warm-brown-400 { color: var(--warm-brown-400); }
+  .text-warm-brown-500 { color: var(--warm-brown-500); }
+  .text-warm-brown-600 { color: var(--warm-brown-600); }
+  .text-warm-brown-700 { color: var(--warm-brown-700); }
+  .text-warm-brown-800 { color: var(--warm-brown-800); }
+  .text-warm-brown-900 { color: var(--warm-brown-900); }
+  
+  .text-coral-50 { color: var(--coral-50); }
+  .text-coral-100 { color: var(--coral-100); }
+  .text-coral-200 { color: var(--coral-200); }
+  .text-coral-300 { color: var(--coral-300); }
+  .text-coral-400 { color: var(--coral-400); }
+  .text-coral-500 { color: var(--coral-500); }
+  .text-coral-600 { color: var(--coral-600); }
+  .text-coral-700 { color: var(--coral-700); }
+  .text-coral-800 { color: var(--coral-800); }
+  .text-coral-900 { color: var(--coral-900); }
+  
+  .text-sage-50 { color: var(--sage-50); }
+  .text-sage-100 { color: var(--sage-100); }
+  .text-sage-200 { color: var(--sage-200); }
+  .text-sage-300 { color: var(--sage-300); }
+  .text-sage-400 { color: var(--sage-400); }
+  .text-sage-500 { color: var(--sage-500); }
+  .text-sage-600 { color: var(--sage-600); }
+  .text-sage-700 { color: var(--sage-700); }
+  .text-sage-800 { color: var(--sage-800); }
+  .text-sage-900 { color: var(--sage-900); }
+  
+  .bg-warm-brown-50 { background-color: var(--warm-brown-50); }
+  .bg-warm-brown-100 { background-color: var(--warm-brown-100); }
+  .bg-warm-brown-200 { background-color: var(--warm-brown-200); }
+  .bg-warm-brown-300 { background-color: var(--warm-brown-300); }
+  .bg-warm-brown-400 { background-color: var(--warm-brown-400); }
+  .bg-warm-brown-500 { background-color: var(--warm-brown-500); }
+  .bg-warm-brown-600 { background-color: var(--warm-brown-600); }
+  .bg-warm-brown-700 { background-color: var(--warm-brown-700); }
+  .bg-warm-brown-800 { background-color: var(--warm-brown-800); }
+  .bg-warm-brown-900 { background-color: var(--warm-brown-900); }
+  
+  .bg-coral-50 { background-color: var(--coral-50); }
+  .bg-coral-100 { background-color: var(--coral-100); }
+  .bg-coral-200 { background-color: var(--coral-200); }
+  .bg-coral-300 { background-color: var(--coral-300); }
+  .bg-coral-400 { background-color: var(--coral-400); }
+  .bg-coral-500 { background-color: var(--coral-500); }
+  .bg-coral-600 { background-color: var(--coral-600); }
+  .bg-coral-700 { background-color: var(--coral-700); }
+  .bg-coral-800 { background-color: var(--coral-800); }
+  .bg-coral-900 { background-color: var(--coral-900); }
+  
+  .bg-sage-50 { background-color: var(--sage-50); }
+  .bg-sage-100 { background-color: var(--sage-100); }
+  .bg-sage-200 { background-color: var(--sage-200); }
+  .bg-sage-300 { background-color: var(--sage-300); }
+  .bg-sage-400 { background-color: var(--sage-400); }
+  .bg-sage-500 { background-color: var(--sage-500); }
+  .bg-sage-600 { background-color: var(--sage-600); }
+  .bg-sage-700 { background-color: var(--sage-700); }
+  .bg-sage-800 { background-color: var(--sage-800); }
+  .bg-sage-900 { background-color: var(--sage-900); }
+}
