@@ -62,8 +62,8 @@ export default function Conversation() {
     setError(null);
     // startTimer();
 
-    // Create database record
-    createConversationMutation.mutate(elevenlabsId);
+    // Test: Comment out database mutation to see if this fixes disconnection
+    // createConversationMutation.mutate(elevenlabsId);
   };
 
   const handleConversationEnd = (elevenlabsId: string) => {
