@@ -1,4 +1,5 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
+import express from "express";
 import { createServer, type Server } from "http";
 import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
@@ -171,20 +172,46 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
 
+  // Webhook signature verification middleware
+  function verifyWebhookSignature(req: Request, res: Response, next: NextFunction) {
+    // Only process POST requests
+    if (req.method !== 'POST') {
+      return res.status(405).json({ message: "Method not allowed" });
+    }
+
+    // Handle case-sensitive headers
+    const signature = req.headers['elevenlabs-signature'] || req.headers['ElevenLabs-Signature'] as string;
+    const secret = process.env.ELEVENLABS_WEBHOOK_SECRET;
+    const rawBody = req.body; // assume already a buffer
+
+    console.log("🔑 Webhook secret configured:", secret ? 'yes' : 'no');
+    console.log("🔐 Signature provided:", signature ? 'yes' : 'no');
+
+    const result = verifyElevenLabsWebhook(rawBody, signature, secret);
+    if (!result.isValid) {
+      console.error("❌ Webhook verification failed:", result.error);
+      const statusCode = result.error?.includes("Timestamp") ? 403 : 401;
+      return res.status(statusCode).json({ message: result.error || "Invalid signature" });
+    }
+
+    if (secret) {
+      console.log("✅ Webhook signature verified successfully");
+    } else {
+      console.log("⚠️ Skipping signature verification (no secret configured)");
+    }
+
+    next();
+  }
+
   // Add raw body parsing middleware specifically for ElevenLabs webhook
   app.use('/api/webhook/elevenlabs', express.raw({ type: '*/*' }));
 
   // ElevenLabs webhook endpoint
-  app.post("/api/webhook/elevenlabs", async (req, res) => {
+  app.post("/api/webhook/elevenlabs", verifyWebhookSignature, async (req, res) => {
     const startTime = Date.now();
     console.log("🎯 ElevenLabs webhook received at", new Date().toISOString());
     
     try {
-      // Only process POST requests
-      if (req.method !== 'POST') {
-        return res.status(405).json({ message: "Method not allowed" });
-      }
-
       // Log request headers for debugging
       console.log("📋 Webhook headers:", {
         'content-type': req.headers['content-type'],
@@ -194,29 +221,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         'content-length': req.headers['content-length']
       });
 
-      // Handle case-sensitive headers
-      const signatureHeader = req.headers['elevenlabs-signature'] || req.headers['ElevenLabs-Signature'] as string;
-      const webhookSecret = process.env.ELEVENLABS_WEBHOOK_SECRET;
-      
-      // Log webhook secret configuration status
-      console.log("🔑 Webhook secret configured:", webhookSecret ? 'yes' : 'no');
-      console.log("🔐 Signature provided:", signatureHeader ? 'yes' : 'no');
-      
-      // Verify webhook signature
-      const verification = verifyElevenLabsWebhook(req.body, signatureHeader, webhookSecret);
-      
-      if (!verification.isValid) {
-        console.error("❌ Webhook verification failed:", verification.error);
-        const statusCode = verification.error?.includes("Timestamp") ? 403 : 401;
-        return res.status(statusCode).json({ message: verification.error || "Webhook verification failed" });
-      }
-      
-      if (webhookSecret) {
-        console.log("✅ Webhook signature verified successfully");
-      } else {
-        console.log("⚠️ Skipping signature verification (no secret configured)");
-      }
-      
       // Parse JSON from raw buffer
       let webhookData;
       try {
