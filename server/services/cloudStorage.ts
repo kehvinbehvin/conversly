@@ -225,8 +225,8 @@ export function getStorageConfig(): CloudStorageConfig {
   const provider = (process.env.STORAGE_PROVIDER as 'replit' | 'local') || 'replit';
   
   if (provider === 'replit') {
-    // Use the default bucket ID from .replit configuration
-    const bucketId = 'replit-objstore-988cc690-5963-48b8-b852-b976020113c7';
+    // Use the bucket ID from environment variables (set by user)
+    const bucketId = process.env.REPLIT_OBJECT_STORAGE_BUCKET_ID || 'replit-objstore-988cc690-5963-48b8-b852-b976020113c7';
     
     console.log(`Using Replit Object Storage with bucket: ${bucketId}`);
     

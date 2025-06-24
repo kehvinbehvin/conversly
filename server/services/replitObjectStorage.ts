@@ -52,7 +52,21 @@ export class ReplitObjectStorage {
     
     try {
       const content = await this.client.downloadAsText(this.bucketId, key);
-      return JSON.parse(content);
+      
+      // Log the actual content for debugging
+      console.log('Downloaded content type:', typeof content);
+      console.log('Downloaded content:', content);
+      
+      // Handle case where content might be an object instead of string
+      if (typeof content === 'object' && content !== null) {
+        return content as TranscriptData;
+      }
+      
+      if (typeof content === 'string') {
+        return JSON.parse(content);
+      }
+      
+      throw new Error(`Unexpected content type: ${typeof content}`);
     } catch (error: any) {
       if (error.message?.includes('not found') || error.message?.includes('404') || error.statusCode === 404) {
         return null;
@@ -64,14 +78,28 @@ export class ReplitObjectStorage {
 
   async listTranscripts(): Promise<string[]> {
     try {
-      const objects = await this.client.list(this.bucketId, {
+      const result = await this.client.list(this.bucketId, {
         prefix: 'transcripts/',
       });
       
-      return objects
-        .filter(obj => obj.key.endsWith('.json'))
-        .map(obj => obj.key)
-        .sort((a: string, b: string) => b.localeCompare(a)); // Sort by newest first
+      // The Replit Object Storage client should return an array of objects
+      if (Array.isArray(result)) {
+        return result
+          .filter((obj: any) => obj.key?.endsWith('.json'))
+          .map((obj: any) => obj.key)
+          .sort((a: string, b: string) => b.localeCompare(a));
+      }
+      
+      // Handle if it's wrapped in an object
+      if (result && typeof result === 'object' && Array.isArray(result.objects)) {
+        return result.objects
+          .filter((obj: any) => obj.key?.endsWith('.json'))
+          .map((obj: any) => obj.key)
+          .sort((a: string, b: string) => b.localeCompare(a));
+      }
+      
+      console.warn('Unexpected list result format:', typeof result, result);
+      return [];
     } catch (error) {
       console.error('Failed to list transcripts from Replit Object Storage:', error);
       return [];
