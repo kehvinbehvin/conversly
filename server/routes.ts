@@ -1,12 +1,18 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { createHmac, timingSafeEqual } from "crypto";
+import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
 import { analyzeConversation } from "./services/openai";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   
+  // Initialize ElevenLabs client
+  const elevenLabsClient = new ElevenLabsClient({
+    apiKey: process.env.ELEVENLABS_API_KEY
+  });
+
   // Get current user (demo user for MVP)
   app.get("/api/user", async (req, res) => {
     try {
@@ -23,32 +29,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Generate signed URL for ElevenLabs conversation
   app.post("/api/elevenlabs/signed-url", async (req, res) => {
     try {
-      const agentId = "agent_01jyfb9fh8f67agfzvv09tvg3t";
-      const apiKey = process.env.ELEVENLABS_API_KEY;
+      const { agentId } = req.body;
+      const defaultAgentId = "agent_01jyfb9fh8f67agfzvv09tvg3t";
+      const finalAgentId = agentId || defaultAgentId;
       
-      if (!apiKey) {
+      if (!process.env.ELEVENLABS_API_KEY) {
         return res.status(500).json({ message: "ElevenLabs API key not configured" });
       }
 
-      // Create signed URL using ElevenLabs API
-      const signedUrlResponse = await fetch(`https://api.elevenlabs.io/v1/convai/conversation/get_signed_url?agent_id=${agentId}`, {
-        method: "GET",
-        headers: {
-          "xi-api-key": apiKey
-        }
+      console.log("Generating signed URL for agent:", finalAgentId);
+
+      // Use ElevenLabs SDK to generate signed URL
+      const response = await elevenLabsClient.conversationalAi.conversations.getSignedUrl({
+        agentId: finalAgentId
       });
 
-      if (!signedUrlResponse.ok) {
-        const errorText = await signedUrlResponse.text();
-        console.error("Failed to generate signed URL:", errorText);
-        return res.status(500).json({ message: "Failed to generate signed URL" });
-      }
-
-      const signedUrlData = await signedUrlResponse.json();
-      res.json({ signedUrl: signedUrlData.signed_url });
+      console.log("Successfully generated signed URL");
+      res.json({ signedUrl: response.signedUrl });
     } catch (error) {
       console.error("Error generating signed URL:", error);
-      res.status(500).json({ message: "Failed to generate signed URL" });
+      res.status(500).json({ 
+        message: "Failed to generate signed URL",
+        error: error instanceof Error ? error.message : String(error)
+      });
     }
   });
 

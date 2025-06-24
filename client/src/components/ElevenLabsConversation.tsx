@@ -51,8 +51,10 @@ export default function ElevenLabsConversation({
     
     setIsConnecting(true);
     try {
-      // Generate signed URL from backend
-      const response = await apiRequest("POST", "/api/elevenlabs/signed-url", {});
+      // Generate signed URL from backend with agent ID
+      const response = await apiRequest("POST", "/api/elevenlabs/signed-url", {
+        agentId: agentId
+      });
       const data = await response.json();
       
       if (!data.signedUrl) {
