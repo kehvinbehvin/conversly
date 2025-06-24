@@ -172,7 +172,7 @@ export default function Storage() {
             <Alert>
               <Cloud className="h-4 w-4" />
               <AlertDescription>
-                Replit Object Storage is automatically configured and ready to use. No additional setup required!
+                Replit Object Storage with local fallback ensures your transcript data is always saved reliably.
               </AlertDescription>
             </Alert>
 
@@ -180,6 +180,7 @@ export default function Storage() {
               <div>
                 <h4 className="font-medium mb-2">Features</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
+                  <li>Hybrid storage: Cloud first, local fallback</li>
                   <li>Automatic backup and redundancy</li>
                   <li>Scalable storage with high availability</li>
                   <li>Integrated with your Replit environment</li>

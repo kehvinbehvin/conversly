@@ -577,7 +577,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.error("💥 Webhook processing failed:", {
           error: error instanceof Error ? error.message : String(error),
           stack: error instanceof Error ? error.stack : undefined,
-          elevenlabsId: webhookData?.data?.conversation_id,
+          elevenlabsId: req.body?.data?.conversation_id || "unknown",
           processingTime,
         });
 
@@ -585,10 +585,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         try {
           const rawTranscriptData: TranscriptData = {
             conversationId: "error",
-            elevenlabsId: webhookData?.data?.conversation_id || "unknown",
-            transcript: webhookData?.data?.transcript,
-            metadata: webhookData?.data?.metadata,
-            analysis: webhookData?.data?.analysis,
+            elevenlabsId: req.body?.data?.conversation_id || "unknown",
+            transcript: req.body?.data?.transcript,
+            metadata: req.body?.data?.metadata,
+            analysis: req.body?.data?.analysis,
             timestamp: Date.now(),
           };
           await cloudStorage.saveTranscript(rawTranscriptData);

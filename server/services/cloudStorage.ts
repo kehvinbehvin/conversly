@@ -1,4 +1,5 @@
 import { TranscriptData } from './fileStore.js';
+import { ReplitObjectStorage, type ReplitObjectStorageConfig } from './replitObjectStorage.js';
 
 export interface CloudStorageConfig {
   provider: 'replit' | 'local';
@@ -15,121 +16,102 @@ export interface ICloudStorage {
   getSignedUrl(key: string, expiresIn?: number): Promise<string>;
 }
 
-export class ReplitStorage implements ICloudStorage {
-  private bucketId: string;
+// Hybrid storage class that tries Replit Object Storage first, falls back to local
+export class ReplitStorageWithFallback implements ICloudStorage {
+  private replitStorage: ReplitObjectStorage | null = null;
+  private localStorage: LocalStorageWrapper;
 
   constructor(config: CloudStorageConfig['replit']) {
-    if (!config) {
-      throw new Error('Replit configuration is required for ReplitStorage');
+    this.localStorage = new LocalStorageWrapper();
+    
+    if (config?.bucketId) {
+      try {
+        this.replitStorage = new ReplitObjectStorage({
+          bucketId: config.bucketId
+        });
+      } catch (error) {
+        console.warn('Failed to initialize Replit Object Storage, using local storage:', error);
+      }
     }
-    this.bucketId = config.bucketId;
-  }
-
-  private getKey(elevenlabsId: string): string {
-    return `transcripts/transcript_${elevenlabsId}.json`;
   }
 
   async saveTranscript(data: TranscriptData): Promise<string> {
-    const key = this.getKey(data.elevenlabsId);
-    
-    try {
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o?uploadType=media&name=${encodeURIComponent(key)}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(data, null, 2),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Failed to save to Replit storage: ${response.status} ${response.statusText}`);
+    // Try Replit Object Storage first
+    if (this.replitStorage) {
+      try {
+        return await this.replitStorage.saveTranscript(data);
+      } catch (error) {
+        console.warn('Replit Object Storage failed, falling back to local storage:', error);
       }
-
-      console.log(`☁️ Transcript saved to Replit storage: ${this.bucketId}/${key}`);
-      return `replit://${this.bucketId}/${key}`;
-    } catch (error) {
-      console.error('Failed to save transcript to Replit storage:', error);
-      throw error;
     }
+    
+    // Fallback to local storage
+    return await this.localStorage.saveTranscript(data);
   }
 
   async getTranscript(elevenlabsId: string): Promise<TranscriptData | null> {
-    const key = this.getKey(elevenlabsId);
-    
-    try {
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`);
-      
-      if (response.status === 404) {
-        return null;
+    // Try Replit Object Storage first
+    if (this.replitStorage) {
+      try {
+        const result = await this.replitStorage.getTranscript(elevenlabsId);
+        if (result) return result;
+      } catch (error) {
+        console.warn('Replit Object Storage failed, trying local storage:', error);
       }
-      
-      if (!response.ok) {
-        throw new Error(`Failed to get from Replit storage: ${response.status} ${response.statusText}`);
-      }
-
-      const content = await response.text();
-      return JSON.parse(content);
-    } catch (error: any) {
-      if (error.message?.includes('404')) {
-        return null;
-      }
-      console.error('Failed to get transcript from Replit storage:', error);
-      throw error;
     }
+    
+    // Fallback to local storage
+    return await this.localStorage.getTranscript(elevenlabsId);
   }
 
   async listTranscripts(): Promise<string[]> {
-    try {
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o?prefix=transcripts/`);
-      
-      if (!response.ok) {
-        throw new Error(`Failed to list from Replit storage: ${response.status} ${response.statusText}`);
+    // Try Replit Object Storage first
+    if (this.replitStorage) {
+      try {
+        const replitFiles = await this.replitStorage.listTranscripts();
+        if (replitFiles.length > 0) return replitFiles;
+      } catch (error) {
+        console.warn('Replit Object Storage failed, trying local storage:', error);
       }
-
-      const data = await response.json();
-      
-      if (!data.items) {
-        return [];
-      }
-
-      return data.items
-        .filter((item: any) => item.name?.endsWith('.json'))
-        .map((item: any) => item.name)
-        .sort((a: string, b: string) => b.localeCompare(a)); // Sort by newest first
-    } catch (error) {
-      console.error('Failed to list transcripts from Replit storage:', error);
-      return [];
     }
+    
+    // Fallback to local storage
+    return await this.localStorage.listTranscripts();
   }
 
   async deleteTranscript(elevenlabsId: string): Promise<boolean> {
-    const key = this.getKey(elevenlabsId);
+    let deleted = false;
     
-    try {
-      const response = await fetch(`https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}`, {
-        method: 'DELETE',
-      });
-
-      if (response.status === 404) {
-        return false; // Already deleted or doesn't exist
+    // Try to delete from Replit Object Storage
+    if (this.replitStorage) {
+      try {
+        deleted = await this.replitStorage.deleteTranscript(elevenlabsId);
+      } catch (error) {
+        console.warn('Failed to delete from Replit Object Storage:', error);
       }
-
-      if (!response.ok) {
-        throw new Error(`Failed to delete from Replit storage: ${response.status} ${response.statusText}`);
-      }
-
-      console.log(`🗑️ Transcript deleted from Replit storage: ${this.bucketId}/${key}`);
-      return true;
-    } catch (error) {
-      console.error('Failed to delete transcript from Replit storage:', error);
-      return false;
     }
+    
+    // Also try to delete from local storage
+    try {
+      const localDeleted = await this.localStorage.deleteTranscript(elevenlabsId);
+      deleted = deleted || localDeleted;
+    } catch (error) {
+      console.warn('Failed to delete from local storage:', error);
+    }
+    
+    return deleted;
   }
 
   async getSignedUrl(key: string, expiresIn: number = 3600): Promise<string> {
-    // For Replit storage, we can return the direct URL as it's already accessible
-    // In a production environment, you might want to implement proper signed URLs
-    return `https://storage.googleapis.com/storage/v1/b/${this.bucketId}/o/${encodeURIComponent(key)}?alt=media`;
+    if (this.replitStorage) {
+      try {
+        return await this.replitStorage.getSignedUrl(key, expiresIn);
+      } catch (error) {
+        console.warn('Failed to get signed URL from Replit Object Storage:', error);
+      }
+    }
+    
+    throw new Error('Signed URLs not supported for local storage');
   }
 }
 
@@ -137,7 +119,7 @@ export class ReplitStorage implements ICloudStorage {
 export function createCloudStorage(config: CloudStorageConfig): ICloudStorage {
   switch (config.provider) {
     case 'replit':
-      return new ReplitStorage(config.replit);
+      return new ReplitStorageWithFallback(config.replit);
     case 'local':
       // Return local file storage wrapped to match interface
       return new LocalStorageWrapper();
