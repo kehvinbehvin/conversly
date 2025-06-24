@@ -1,0 +1,50 @@
+Minor Suggestions & Improvements for ElevenLabs Webhook Validation
+
+1. Header Case-Sensitivity
+-------------------------------------------------
+Problem:
+  Using `req.headers['elevenlabs-signature']` assumes lowercase, but some providers use PascalCase.
+
+Suggestion:
+  Use a fallback approach to handle both:
+
+  const signature = req.headers['elevenlabs-signature'] || req.headers['ElevenLabs-Signature'];
+
+2. Missing Imports for Crypto Functions
+-------------------------------------------------
+Problem:
+  `createHmac` and `timingSafeEqual` are used but not imported.
+
+Suggestion:
+  Add this at the top of the file:
+
+  import { createHmac, timingSafeEqual } from 'crypto';
+
+3. Robust Timestamp Parsing
+-------------------------------------------------
+Problem:
+  parseInt(timestamp) * 1000 can result in NaN if the timestamp is malformed.
+
+Suggestion:
+  Use a safer conversion:
+
+  const reqTimestamp = Number(timestamp) * 1000;
+  if (isNaN(reqTimestamp)) return { isValid: false, error: "Invalid timestamp format" };
+
+4. Request Method Check (Optional)
+-------------------------------------------------
+Problem:
+  Middleware applies to all request methods on /api/webhook/elevenlabs
+
+Suggestion:
+  Guard it to only apply for POST requests:
+
+  if (req.method !== 'POST') return next();
+
+5. Production Logging Consideration
+-------------------------------------------------
+Problem:
+  Verbose logs (e.g., raw body, signature) may leak sensitive info in production.
+
+Suggestion:
+  Use a logging library that supports environments, or conditionally mute logs in production.
