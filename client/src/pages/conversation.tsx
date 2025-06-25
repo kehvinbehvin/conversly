@@ -122,16 +122,16 @@ export default function Conversation() {
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8">
+        <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Chat Thread */}
           <ChatThread 
             messages={transcriptWithReviews}
-            className="lg:col-span-1"
+            className="lg:col-span-2"
           />
 
           {/* Review Summary */}
           {review && (
-            <div className="space-y-6">
+            <div className="lg:col-span-1 space-y-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
@@ -140,7 +140,7 @@ export default function Conversation() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-warm-brown-700 leading-relaxed">
+                  <p className="text-warm-brown-700 leading-relaxed text-sm">
                     {review.summary}
                   </p>
                 </CardContent>
@@ -148,15 +148,15 @@ export default function Conversation() {
 
               {/* Action Items */}
               <Card className="bg-coral-50 border-coral-200">
-                <CardContent className="p-6">
-                  <h3 className="font-semibold text-warm-brown-800 mb-4">
+                <CardContent className="p-4 lg:p-6">
+                  <h3 className="font-semibold text-warm-brown-800 mb-3">
                     Ready for Your Next Session?
                   </h3>
-                  <p className="text-warm-brown-600 mb-4">
+                  <p className="text-warm-brown-600 mb-4 text-sm">
                     Practice makes perfect. Keep building your conversation skills with another session.
                   </p>
                   <Link href="/conversation">
-                    <Button className="bg-coral-500 hover:bg-coral-600 text-white">
+                    <Button className="bg-coral-500 hover:bg-coral-600 text-white w-full lg:w-auto">
                       Start New Conversation
                     </Button>
                   </Link>

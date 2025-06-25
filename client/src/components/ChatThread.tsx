@@ -52,17 +52,18 @@ export default function ChatThread({ messages, className }: ChatThreadProps) {
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <MessageCircle className="w-5 h-5 text-warm-brown-600" />
-            <span>Conversation Thread</span>
+            <span className="text-lg">Conversation Thread</span>
           </div>
           <div className="flex items-center space-x-1 text-sm text-warm-brown-500">
             <Clock className="w-4 h-4" />
-            <span>{messages.length} messages</span>
+            <span className="hidden sm:inline">{messages.length} messages</span>
+            <span className="sm:hidden">{messages.length}</span>
           </div>
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="h-96 px-6 pb-6" ref={scrollAreaRef}>
-          <div className="space-y-6">
+        <ScrollArea className="h-96 px-4 sm:px-6 pb-6" ref={scrollAreaRef}>
+          <div className="space-y-4 sm:space-y-6">
             {messages.map((message, index) => (
               <ChatMessage
                 key={`${message.index}-${index}`}
