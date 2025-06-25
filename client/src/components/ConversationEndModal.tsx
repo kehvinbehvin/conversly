@@ -17,11 +17,9 @@ export default function ConversationEndModal({
   conversationId 
 }: ConversationEndModalProps) {
   const [showCTA, setShowCTA] = useState(false);
-  
-  console.log("🔔 ConversationEndModal render - isOpen:", isOpen, "conversationId:", conversationId);
 
   // Poll for conversation existence using conversationId from ElevenLabs
-  const { data: conversations } = useQuery({
+  const { data: conversations } = useQuery<any[]>({
     queryKey: ['/api/conversations'],
     enabled: !!conversationId && isOpen && !showCTA,
     refetchInterval: 1000, // Poll every second

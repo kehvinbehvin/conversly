@@ -48,6 +48,9 @@ export function ConversationProvider({
     onError,
   });
 
+  // Store conversation ID in ref to persist through state changes
+  const conversationIdRef = useRef<string | null>(null);
+
   // Update callbacks without causing re-renders
   useEffect(() => {
     callbacksRef.current = {
@@ -66,6 +69,7 @@ export function ConversationProvider({
       console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
+      conversationIdRef.current = props.conversationId;
       
       // Prevent duplicate conversation creation
       if (createdConversationsRef.current.has(props.conversationId)) {
@@ -114,11 +118,13 @@ export function ConversationProvider({
     },
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);
-      console.log("🔍 Current conversation ID:", currentConversationId);
+      console.log("🔍 Current conversation ID (state):", currentConversationId);
+      console.log("🔍 Current conversation ID (ref):", conversationIdRef.current);
       console.log("🔍 Details conversation ID:", details?.conversationId);
       setIsConnecting(false);
       
-      const conversationId = details?.conversationId || currentConversationId;
+      // Use ref value which persists through state changes
+      const conversationId = details?.conversationId || conversationIdRef.current;
       console.log("🔍 Final conversation ID to use:", conversationId);
       
       // Show modal BEFORE clearing state
@@ -131,12 +137,13 @@ export function ConversationProvider({
       }
       
       // Clear tracking when conversation ends
-      if (currentConversationId) {
-        createdConversationsRef.current.delete(currentConversationId);
+      if (conversationIdRef.current) {
+        createdConversationsRef.current.delete(conversationIdRef.current);
       }
       
-      // Clear currentConversationId AFTER using it for modal
+      // Clear conversation ID from both state and ref
       setCurrentConversationId(null);
+      conversationIdRef.current = null;
     },
     onError: (error: string) => {
       console.error("🔥 ElevenLabs conversation error:", error);
@@ -217,7 +224,7 @@ export function ConversationProvider({
       }
       
       setIsConnecting(false);
-      setCurrentConversationId(null);
+      // Don't clear conversation ID here - let onDisconnect handle it
     } catch (error) {
       console.error("❌ Failed to end conversation:", error);
     }
