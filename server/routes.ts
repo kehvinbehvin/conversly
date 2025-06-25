@@ -4,13 +4,11 @@ import { createServer, type Server } from "http";
 import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
-import { analyzeConversation } from "./services/braintrust";
-import { createReviewWithTranscripts } from "./services/reviewAnalyzer";
+import { analyzeConversationWithBraintrust } from "./services/braintrust";
 import type { TranscriptObject } from "@shared/schema";
 import * as transcriptRoutes from "./routes/transcripts";
 import * as reviewRoutes from "./routes/reviews";
 import { z } from "zod";
-import bodyParser from "body-parser";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize ElevenLabs client
@@ -463,7 +461,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("📝 Updating conversation with:", {
           transcriptTurns: transcriptData.length,
           hasAudioUrl: !!audio_url,
-          audioUrl: audio_url ? audio_url.substring(0, 50) + "..." : null,
+          audioUrl: audio_url && typeof audio_url === 'string' ? audio_url.substring(0, 50) + "..." : null,
           metadata: callMetadata,
         });
 

@@ -7,9 +7,9 @@ import { CheckCircle, XCircle, Cloud, HardDrive, AlertTriangle, Copy } from 'luc
 import { useToast } from '@/hooks/use-toast';
 
 interface StorageStatus {
-  provider: 'local' | 'unknown';
+  provider: 'database' | 'unknown';
   isWorking: boolean;
-  fileCount?: number;
+  conversationCount?: number;
   error?: string;
 }
 

@@ -68,7 +68,6 @@ export function ConversationProvider({
   // Use ElevenLabs SDK with stable callbacks
   const conversation = useElevenLabsConversation({
     onConnect: async (props: { conversationId: string }) => {
-      console.log("✅ Connected to ElevenLabs conversation:", props);
       setIsConnecting(false);
       setCurrentConversationId(props.conversationId);
       conversationIdRef.current = props.conversationId;
@@ -118,25 +117,14 @@ export function ConversationProvider({
       
       callbacksRef.current.onConversationStart?.(props.conversationId);
     },
-    onDisconnect: (details: any) => {
-      console.log("❌ Disconnected from ElevenLabs conversation:", details);
-      console.log("🔍 Current conversation ID (state):", currentConversationId);
-      console.log("🔍 Current conversation ID (ref):", conversationIdRef.current);
-      console.log("🔍 Details conversation ID:", details?.conversationId);
+    onDisconnect: (details: { conversationId?: string; reason?: string }) => {
       setIsConnecting(false);
       
-      // Use ref value which persists through state changes
       const conversationId = details?.conversationId || conversationIdRef.current;
-      console.log("🔍 Final conversation ID to use:", conversationId);
       
-      // Show modal BEFORE clearing state
       if (conversationId) {
-        console.log("🔔 Setting showEndModal to true for conversation:", conversationId);
-        setModalConversationId(conversationId); // Store for modal
+        setModalConversationId(conversationId);
         setShowEndModal(true);
-        // Don't call onConversationEnd callback here - let modal handle navigation
-      } else {
-        console.log("⚠️ No conversation ID found, modal will not show");
       }
       
       // Clear tracking when conversation ends
@@ -149,12 +137,8 @@ export function ConversationProvider({
       conversationIdRef.current = null;
     },
     onError: (error: string) => {
-      console.error("🔥 ElevenLabs conversation error:", error);
       setIsConnecting(false);
       callbacksRef.current.onError?.(new Error(error));
-    },
-    onMessage: (props: { message: string; source: string }) => {
-      console.log("📝 ElevenLabs message:", props);
     },
   });
 
@@ -221,15 +205,12 @@ export function ConversationProvider({
 
   const endConversation = async () => {
     try {
-      console.log("🛑 Ending conversation...");
       if (conversation.status === "connected") {
         await conversation.endSession();
       }
-      
       setIsConnecting(false);
-      // Don't clear conversation ID here - let onDisconnect handle it
     } catch (error) {
-      console.error("❌ Failed to end conversation:", error);
+      console.error("Failed to end conversation:", error);
     }
   };
 

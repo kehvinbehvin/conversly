@@ -171,7 +171,7 @@ export class MemStorage implements IStorage {
     id: number, 
     transcriptData: TranscriptObject[], 
     audioUrl: string | null, 
-    metadata: any
+    metadata: Record<string, unknown>
   ): Promise<Conversation | undefined> {
     const conversation = this.conversations.get(id);
     if (!conversation) return undefined;

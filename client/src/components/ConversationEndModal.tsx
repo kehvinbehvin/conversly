@@ -17,11 +17,9 @@ export default function ConversationEndModal({
   conversationId 
 }: ConversationEndModalProps) {
   const [showCTA, setShowCTA] = useState(false);
-  
-  console.log("🔔 Modal render - isOpen:", isOpen, "conversationId:", conversationId);
 
   // Poll for conversation existence using conversationId from ElevenLabs
-  const { data: conversations } = useQuery<any[]>({
+  const { data: conversations } = useQuery<ConversationWithReview[]>({
     queryKey: ['/api/conversations'],
     enabled: !!conversationId && isOpen && !showCTA,
     refetchInterval: 1000, // Poll every second
@@ -29,21 +27,14 @@ export default function ConversationEndModal({
   });
 
   // Find conversation by ElevenLabs ID
-  const conversation = conversations?.find((conv: any) => 
+  const conversation = conversations?.find((conv) => 
     conv.elevenlabsConversationId === conversationId
   );
 
   // Switch to CTA only when conversation is complete with review
   useEffect(() => {
     if (conversation && conversation.status === 'completed' && conversation.review && !showCTA) {
-      console.log("Conversation and review complete, showing CTA:", conversation);
       setShowCTA(true);
-    } else if (conversation) {
-      console.log("Conversation found but not ready:", {
-        status: conversation.status,
-        hasReview: !!conversation.review,
-        showCTA
-      });
     }
   }, [conversation, showCTA]);
 
