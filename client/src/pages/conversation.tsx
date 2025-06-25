@@ -5,10 +5,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Star, AlertCircle } from "lucide-react";
-import ElevenLabsConversation from "@/components/ElevenLabsConversation";
+import { lazy, Suspense } from "react";
 import ChatThread from "@/components/ChatThread";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 import type { ConversationWithReview, TranscriptWithReview } from "@shared/schema";
+
+const ElevenLabsConversation = lazy(() => import("@/components/ElevenLabsConversation"));
 
 export default function Conversation() {
   const { id } = useParams();
@@ -36,7 +38,9 @@ export default function Conversation() {
               </p>
             </CardHeader>
             <CardContent className="flex flex-col items-center space-y-8 pb-8">
-              <ElevenLabsConversation agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
+              <Suspense fallback={<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-coral-500"></div>}>
+                <ElevenLabsConversation agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
+              </Suspense>
             </CardContent>
           </Card>
         </div>
