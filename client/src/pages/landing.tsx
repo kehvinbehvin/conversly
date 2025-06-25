@@ -262,7 +262,7 @@ export default function Landing() {
       </section>
 
       {/* Social Proof Section */}
-      <section className="py-20 coral-gradient">
+      {/* <section className="py-20 coral-gradient">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-6 mb-16">
             <h2 className="text-4xl font-bold text-warm-brown-800">What Our Users Say</h2>
@@ -333,7 +333,7 @@ export default function Landing() {
             </Card>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* CTA Section */}
       <section className="py-20 bg-warm-brown-800 text-white">
