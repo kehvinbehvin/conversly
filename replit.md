@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 25, 2025: Added comprehensive documentation and pushed to GitHub
+  - Created detailed README.md covering complete system architecture  
+  - Documented all third-party integrations (ElevenLabs, Braintrust, PostgreSQL)
+  - Added setup instructions for development and production deployment
+  - Explained data flow, testing strategy, and security considerations
+  - Committed all changes and pushed to GitHub remote repository
 - June 25, 2025: Streamlined Braintrust integration with direct invoke() API
   - Replaced complex `loadPrompt()` + OpenAI approach with direct `invoke()` function
   - Simplified response parsing and eliminated JSON parsing errors

@@ -29,7 +29,7 @@ export async function analyzeConversationWithBraintrust(
     const transcriptString = formattedTranscript.join("\n");
 
     const result = await invoke({
-      projectName: process.env.BRAINTRUST_PROJECT_NAME || "Conversly",
+      projectName: process.env.BRAINTRUST_PROJECT_NAME || "Yappy-first-project",
       slug: "conversation-consultant-7a00",
       input: { transcript: transcriptString },
     });

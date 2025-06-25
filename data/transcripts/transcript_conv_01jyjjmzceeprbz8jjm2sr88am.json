@@ -1,0 +1,249 @@
+{
+  "conversationId": "68",
+  "elevenlabsId": "conv_01jyjjmzceeprbz8jjm2sr88am",
+  "transcript": [
+    {
+      "role": "agent",
+      "message": "Hey, how have you been? How was your weekend?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 0,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    },
+    {
+      "role": "user",
+      "message": "It was good. Went to LA for the weekend.",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 0,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": "audio"
+    },
+    {
+      "role": "agent",
+      "message": "That sounds like a fun getaway! Did you get to explore any cool spots or try any new coffee places while you were there?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 6,
+      "conversation_turn_metrics": {
+        "metrics": {
+          "convai_llm_service_ttf_sentence": {
+            "elapsed_time": 0.9379216410015943
+          },
+          "convai_llm_service_ttfb": {
+            "elapsed_time": 0.8211448459987878
+          }
+        }
+      },
+      "rag_retrieval_info": null,
+      "llm_usage": {
+        "model_usage": {
+          "gpt-4o": {
+            "input": {
+              "tokens": 91,
+              "price": 0.0002275
+            },
+            "input_cache_read": {
+              "tokens": 1664,
+              "price": 0.00208
+            },
+            "input_cache_write": {
+              "tokens": 0,
+              "price": 0
+            },
+            "output_total": {
+              "tokens": 27,
+              "price": 0.00027
+            }
+          }
+        }
+      },
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    },
+    {
+      "role": "user",
+      "message": "No, not really.",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 13,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": "audio"
+    },
+    {
+      "role": "agent",
+      "message": "That's alright, sometimes just being in a new...",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 16,
+      "conversation_turn_metrics": {
+        "metrics": {
+          "convai_llm_service_ttf_sentence": {
+            "elapsed_time": 1.0556791210037773
+          },
+          "convai_llm_service_ttfb": {
+            "elapsed_time": 0.7891081100024167
+          }
+        }
+      },
+      "rag_retrieval_info": null,
+      "llm_usage": {
+        "model_usage": {
+          "gpt-4o": {
+            "input": {
+              "tokens": 130,
+              "price": 0.000325
+            },
+            "input_cache_read": {
+              "tokens": 1664,
+              "price": 0.00208
+            },
+            "input_cache_write": {
+              "tokens": 0,
+              "price": 0
+            },
+            "output_total": {
+              "tokens": 26,
+              "price": 0.00026
+            }
+          }
+        }
+      },
+      "interrupted": true,
+      "original_message": "That's alright, sometimes just being in a new place is refreshing enough. Is there anything else I can help you with today?",
+      "source_medium": null
+    }
+  ],
+  "metadata": {
+    "start_time_unix_secs": 1750822714,
+    "accepted_time_unix_secs": 1750822715,
+    "call_duration_secs": 20,
+    "cost": 254,
+    "deletion_settings": {
+      "deletion_time_unix_secs": null,
+      "deleted_logs_at_time_unix_secs": null,
+      "deleted_audio_at_time_unix_secs": null,
+      "deleted_transcript_at_time_unix_secs": null,
+      "delete_transcript_and_pii": false,
+      "delete_audio": false
+    },
+    "feedback": {
+      "overall_score": null,
+      "likes": 0,
+      "dislikes": 0
+    },
+    "authorization_method": "signed_url",
+    "charging": {
+      "dev_discount": false,
+      "is_burst": false,
+      "tier": "free",
+      "llm_usage": {
+        "irreversible_generation": {
+          "model_usage": {
+            "gpt-4o": {
+              "input": {
+                "tokens": 221,
+                "price": 0.0005525
+              },
+              "input_cache_read": {
+                "tokens": 3328,
+                "price": 0.00416
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0
+              },
+              "output_total": {
+                "tokens": 53,
+                "price": 0.00053
+              }
+            }
+          }
+        },
+        "initiated_generation": {
+          "model_usage": {
+            "gpt-4o": {
+              "input": {
+                "tokens": 221,
+                "price": 0.0005525
+              },
+              "input_cache_read": {
+                "tokens": 3328,
+                "price": 0.00416
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0
+              },
+              "output_total": {
+                "tokens": 53,
+                "price": 0.00053
+              }
+            }
+          }
+        }
+      },
+      "llm_price": 0.0052425,
+      "llm_charge": 54,
+      "call_charge": 200
+    },
+    "phone_call": null,
+    "batch_call": null,
+    "termination_reason": "Client disconnected",
+    "error": null,
+    "main_language": "en",
+    "rag_usage": null,
+    "text_only": false,
+    "features_usage": {
+      "language_detection": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_agent": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_number": {
+        "enabled": false,
+        "used": false
+      },
+      "multivoice": {
+        "enabled": false,
+        "used": false
+      },
+      "pii_zrm_workspace": false,
+      "pii_zrm_agent": false
+    }
+  },
+  "analysis": {
+    "evaluation_criteria_results": {},
+    "data_collection_results": {},
+    "call_successful": "success",
+    "transcript_summary": "The agent initiated a casual conversation, inquiring about the user's weekend. The user mentioned going to Los Angeles, but didn't explore much. The agent acknowledged this and continued the conversation.\n"
+  },
+  "timestamp": 1750822736629
+}
