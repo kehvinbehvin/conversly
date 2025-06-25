@@ -179,12 +179,12 @@ export function ConversationProvider({
         throw new Error(`Failed to get signed URL: ${response.statusText}`);
       }
 
-      const { signed_url } = await response.json();
-      console.log("📝 Received signed URL:", signed_url);
+      const { signedUrl } = await response.json();
+      console.log("📝 Received signed URL:", signedUrl);
 
       // Start conversation session with signed URL
       console.log("🚀 Starting conversation session...");
-      await conversation.startSession({ signedUrl: signed_url });
+      await conversation.startSession({ signedUrl });
     } catch (error) {
       console.error("❌ Failed to start conversation:", error);
       setIsConnecting(false);
