@@ -126,7 +126,9 @@ export default function Conversation() {
   }
 
   const review = conversation.review;
-  const transcriptWithReviews = review?.transcriptWithReviews as TranscriptWithReview[] || [];
+  const transcriptWithReviews = Array.isArray(review?.transcriptWithReviews) 
+    ? review.transcriptWithReviews as TranscriptWithReview[] 
+    : [];
 
   return (
     <div className="min-h-screen bg-warm-brown-50 py-8">

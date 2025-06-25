@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui/scroll-area";
+import { ScrollArea } from "@/components/ui";
 import { MessageCircle, Clock } from "lucide-react";
 import ChatMessage from "./ChatMessage";
 import type { TranscriptWithReview } from "@shared/schema";
@@ -27,7 +27,7 @@ export default function ChatThread({ messages, className }: ChatThreadProps) {
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
   };
 
-  if (!messages || messages.length === 0) {
+  if (!Array.isArray(messages) || messages.length === 0) {
     return (
       <Card className={className}>
         <CardHeader>

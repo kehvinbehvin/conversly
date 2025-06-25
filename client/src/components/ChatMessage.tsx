@@ -8,8 +8,13 @@ interface ChatMessageProps {
 }
 
 export default function ChatMessage({ message, timestamp }: ChatMessageProps) {
+  // Add null check for message
+  if (!message) {
+    return null;
+  }
+  
   const isAgent = message.role === "agent";
-  const hasReview = message.review && message.review.trim() !== "";
+  const hasReview = message.review && typeof message.review === 'string' && message.review.trim() !== "";
 
   return (
     <div className="space-y-3 w-full">
@@ -44,7 +49,7 @@ export default function ChatMessage({ message, timestamp }: ChatMessageProps) {
               : "bg-coral-500 text-white rounded-tr-none"
           )}>
             <p className="text-sm leading-relaxed whitespace-pre-wrap break-words">
-              {message.message}
+              {message.message || 'No message content'}
             </p>
             {timestamp && (
               <p className={cn(
