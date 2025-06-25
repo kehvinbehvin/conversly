@@ -33,10 +33,17 @@ export default function ConversationEndModal({
     conv.elevenlabsConversationId === conversationId
   );
 
-  // Switch to CTA when conversation is found
+  // Switch to CTA only when conversation is complete with review
   useEffect(() => {
-    if (conversation && !showCTA) {
+    if (conversation && conversation.status === 'completed' && conversation.review && !showCTA) {
+      console.log("Conversation and review complete, showing CTA:", conversation);
       setShowCTA(true);
+    } else if (conversation) {
+      console.log("Conversation found but not ready:", {
+        status: conversation.status,
+        hasReview: !!conversation.review,
+        showCTA
+      });
     }
   }, [conversation, showCTA]);
 

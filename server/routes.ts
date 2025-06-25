@@ -102,19 +102,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
     async (req, res) => {
       try {
         const id = parseInt(req.params.id);
-        const conversation = await storage.getConversation(id);
+        if (isNaN(id)) {
+          return res.status(400).json({ message: "Invalid conversation ID" });
+        }
 
+        const conversation = await storage.getConversation(id);
         if (!conversation) {
           return res.status(404).json({ message: "Conversation not found" });
         }
 
         const review = await storage.getReviewByConversationId(id);
 
+        // Include transcript data if available
+        const transcript = conversation.transcriptId ? 
+          await storage.getTranscript(conversation.transcriptId) : null;
+
         res.json({
           ...conversation,
           review,
+          transcript,
+          // Helper flags for frontend
+          isComplete: conversation.status === 'completed' && !!review,
         });
       } catch (error) {
+        console.error("Error fetching conversation:", error);
         res.status(500).json({ message: "Failed to get conversation" });
       }
     },

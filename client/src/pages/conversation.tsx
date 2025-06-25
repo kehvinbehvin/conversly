@@ -86,6 +86,45 @@ export default function Conversation() {
     );
   }
 
+  // Early return if conversation isn't fully loaded
+  if (!conversation) {
+    return null;
+  }
+
+  // Check if conversation is still processing
+  if (conversation.status !== 'completed' || !conversation.review) {
+    return (
+      <div className="min-h-screen bg-warm-brown-50 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Link href="/dashboard">
+            <Button variant="ghost" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+          
+          <Card>
+            <CardContent className="p-8 text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-coral-500 mx-auto mb-4"></div>
+              <h2 className="text-xl font-semibold text-warm-brown-800 mb-2">
+                Processing Your Conversation
+              </h2>
+              <p className="text-warm-brown-600 mb-4">
+                We're analyzing your conversation and generating feedback. This usually takes a few moments.
+              </p>
+              <Button 
+                onClick={() => window.location.reload()} 
+                variant="outline"
+              >
+                Refresh Page
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
   const review = conversation.review;
   const transcriptWithReviews = review?.transcriptWithReviews as TranscriptWithReview[] || [];
 
