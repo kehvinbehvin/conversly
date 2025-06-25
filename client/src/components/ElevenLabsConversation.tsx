@@ -13,7 +13,7 @@ export default function ElevenLabsConversation({
   const { 
     isConnecting, 
     isConnected, 
-    currentConversationId,
+    modalConversationId,
     showEndModal,
     startConversation, 
     endConversation, 
@@ -78,7 +78,7 @@ export default function ElevenLabsConversation({
       <ConversationEndModal
         isOpen={showEndModal}
         onClose={closeEndModal}
-        conversationId={currentConversationId}
+        conversationId={modalConversationId}
       />
     </div>
   );

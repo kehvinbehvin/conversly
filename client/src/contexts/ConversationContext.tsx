@@ -5,6 +5,7 @@ interface ConversationContextType {
   isConnecting: boolean;
   isConnected: boolean;
   currentConversationId: string | null;
+  modalConversationId: string | null;
   showEndModal: boolean;
   startConversation: (agentId: string) => Promise<void>;
   endConversation: () => void;
@@ -39,6 +40,7 @@ export function ConversationProvider({
 }: ConversationProviderProps) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [modalConversationId, setModalConversationId] = useState<string | null>(null);
   const [showEndModal, setShowEndModal] = useState(false);
   
   // Use refs to store stable references that persist across re-renders
@@ -130,6 +132,7 @@ export function ConversationProvider({
       // Show modal BEFORE clearing state
       if (conversationId) {
         console.log("🔔 Setting showEndModal to true for conversation:", conversationId);
+        setModalConversationId(conversationId); // Store for modal
         setShowEndModal(true);
         // Don't call onConversationEnd callback here - let modal handle navigation
       } else {
@@ -232,12 +235,14 @@ export function ConversationProvider({
 
   const closeEndModal = () => {
     setShowEndModal(false);
+    setModalConversationId(null);
   };
 
   const value: ConversationContextType = {
     isConnecting,
     isConnected: conversation.status === "connected",
     currentConversationId,
+    modalConversationId,
     showEndModal,
     startConversation,
     endConversation,
