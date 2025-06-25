@@ -65,18 +65,27 @@ export class ReplitStorageWithFallback implements ICloudStorage {
   }
 
   async listTranscripts(): Promise<string[]> {
+    let cloudFiles: string[] = [];
+    let localFiles: string[] = [];
+    
     // Try Replit Object Storage first
     if (this.replitStorage) {
       try {
-        const replitFiles = await this.replitStorage.listTranscripts();
-        if (replitFiles.length > 0) return replitFiles;
+        cloudFiles = await this.replitStorage.listTranscripts();
       } catch (error) {
         console.warn('Replit Object Storage failed, trying local storage:', error);
       }
     }
     
-    // Fallback to local storage
-    return await this.localStorage.listTranscripts();
+    // Also get local files as backup
+    try {
+      localFiles = await this.localStorage.listTranscripts();
+    } catch (error) {
+      console.warn('Local storage failed:', error);
+    }
+    
+    // Return cloud files if available, otherwise local files
+    return cloudFiles.length > 0 ? cloudFiles : localFiles;
   }
 
   async deleteTranscript(elevenlabsId: string): Promise<boolean> {

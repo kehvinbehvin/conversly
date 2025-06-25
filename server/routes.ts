@@ -380,7 +380,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         console.log("📊 Call metadata:", callMetadata);
 
-        // Save transcript data to file store first
+        // Prepare transcript data
         const transcriptFileData: TranscriptData = {
           conversationId: "", // Will be set after finding/creating conversation
           elevenlabsId: conversation_id,
@@ -389,10 +389,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
           analysis: webhookData.data?.analysis,
           timestamp: Date.now(),
         };
-
-        // Save transcript only once
-        await cloudStorage.saveTranscript(transcriptFileData);
-        console.log("💾 Transcript saved to cloud storage for ElevenLabs ID:", conversation_id);
 
         // Find conversation by ElevenLabs ID
         let conversation;
@@ -431,9 +427,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
 
-        // Update transcript file with conversation ID and save final version
+        // Update transcript data with conversation ID and save to cloud storage
         transcriptFileData.conversationId = conversation.id.toString();
-        await fileStore.saveTranscript(transcriptFileData);
+        await cloudStorage.saveTranscript(transcriptFileData);
+        console.log("💾 Transcript saved to cloud storage for ElevenLabs ID:", conversation_id);
 
         console.log("✅ Found conversation:", {
           id: conversation.id,

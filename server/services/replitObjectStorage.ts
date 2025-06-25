@@ -53,20 +53,24 @@ export class ReplitObjectStorage {
     try {
       const content = await this.client.downloadAsText(this.bucketId, key);
       
-      // Log the actual content for debugging
-      console.log('Downloaded content type:', typeof content);
-      console.log('Downloaded content:', content);
-      
-      // Handle case where content might be an object instead of string
+      // Handle the actual Replit Object Storage response format
       if (typeof content === 'object' && content !== null) {
-        return content as TranscriptData;
+        // Check for the response wrapper format: { ok: true, value: "actual content" }
+        if (content.ok && typeof content.value === 'string') {
+          return JSON.parse(content.value);
+        }
+        // If it's already the parsed object without wrapper
+        if (!content.ok && !content.value) {
+          return content as TranscriptData;
+        }
       }
       
+      // If it's a string, parse it directly
       if (typeof content === 'string') {
         return JSON.parse(content);
       }
       
-      throw new Error(`Unexpected content type: ${typeof content}`);
+      throw new Error(`Unexpected content format: ${typeof content}`);
     } catch (error: any) {
       if (error.message?.includes('not found') || error.message?.includes('404') || error.statusCode === 404) {
         return null;
@@ -82,17 +86,27 @@ export class ReplitObjectStorage {
         prefix: 'transcripts/',
       });
       
-      // The Replit Object Storage client should return an array of objects
-      if (Array.isArray(result)) {
-        return result
-          .filter((obj: any) => obj.key?.endsWith('.json'))
-          .map((obj: any) => obj.key)
-          .sort((a: string, b: string) => b.localeCompare(a));
+      // Handle the actual Replit Object Storage response format
+      if (result && typeof result === 'object') {
+        // Check for the actual response structure from logs: { ok: true, value: [...] }
+        if (result.ok && Array.isArray(result.value)) {
+          // The result.value contains bucket objects, we need to list objects within our bucket
+          console.log('Replit Object Storage bucket list - no direct object listing available');
+          return [];
+        }
+        
+        // Handle if objects are returned directly
+        if (Array.isArray(result.objects)) {
+          return result.objects
+            .filter((obj: any) => obj.key?.endsWith('.json'))
+            .map((obj: any) => obj.key)
+            .sort((a: string, b: string) => b.localeCompare(a));
+        }
       }
       
-      // Handle if it's wrapped in an object
-      if (result && typeof result === 'object' && Array.isArray(result.objects)) {
-        return result.objects
+      // If result is directly an array
+      if (Array.isArray(result)) {
+        return result
           .filter((obj: any) => obj.key?.endsWith('.json'))
           .map((obj: any) => obj.key)
           .sort((a: string, b: string) => b.localeCompare(a));

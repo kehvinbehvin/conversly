@@ -97,8 +97,9 @@ Conversly is a conversational practice application designed to help users improv
   - Configured automatic storage using default bucket from .replit configuration
   - Implemented proper authentication using official @replit/object-storage client
   - Successfully integrated cloud storage with bucket ID authentication
-  - Fixed data retrieval and listing operations for proper JSON handling
-  - Added robust error handling with graceful fallback to local storage
+  - Fixed duplicate storage issue - transcripts now save only to cloud storage (not both)
+  - Removed duplicate fileStore.saveTranscript() calls from webhook processing
+  - Added robust error handling with graceful fallback to local storage only when cloud fails
   - Updated storage management UI to show hybrid storage status with current file count
 - June 24, 2025: Fixed duplicate conversation creation issue
   - Root cause identified: Two separate conversation creation points in App.tsx and ConversationContext
