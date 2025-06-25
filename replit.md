@@ -91,19 +91,13 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
-- June 24, 2025: Implemented hybrid object storage with Replit Object Storage
-  - Created hybrid storage system with Replit Object Storage primary and local fallback
-  - Fixed webhook processing errors and undefined variable references
-  - Configured automatic storage using default bucket from .replit configuration
-  - Implemented proper authentication using official @replit/object-storage client
-  - Successfully integrated cloud storage with bucket ID authentication
-  - Fixed duplicate storage issue - transcripts now save only to cloud storage (not both)
-  - Removed duplicate fileStore.saveTranscript() calls from webhook processing
-  - Implemented comprehensive response format handling for downloadAsText and downloadAsBytes
-  - Fixed Buffer conversion issues and API response wrapper handling
-  - Added robust error handling with graceful fallback to local storage only when cloud fails
-  - Updated storage management UI to show hybrid storage status with current file count
-  - All conversation transcripts now save exclusively to Replit Object Storage bucket
+- June 25, 2025: Simplified storage to local-only file system
+  - Removed all Replit Object Storage components due to persistent API retrieval issues
+  - Uninstalled @replit/object-storage package and cleaned up related code
+  - Converted to local file storage using data/transcripts directory
+  - Updated storage UI to show local file count and status
+  - All conversation transcripts now save reliably to local file system
+  - Eliminated cloud storage dependencies and simplified architecture
 - June 24, 2025: Fixed duplicate conversation creation issue
   - Root cause identified: Two separate conversation creation points in App.tsx and ConversationContext
   - Removed duplicate conversation creation from App.tsx onConversationStart callback

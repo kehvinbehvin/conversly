@@ -7,14 +7,10 @@ import { CheckCircle, XCircle, Cloud, HardDrive, AlertTriangle, Copy } from 'luc
 import { useToast } from '@/hooks/use-toast';
 
 interface StorageStatus {
-  provider: 'replit' | 'local' | 'unknown';
+  provider: 'local' | 'unknown';
   isWorking: boolean;
   fileCount?: number;
   error?: string;
-  config?: {
-    bucketId?: string;
-    bucketName?: string;
-  };
 }
 
 export default function Storage() {
