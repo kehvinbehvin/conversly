@@ -11,6 +11,9 @@ import {
   BarChart3,
   Star,
 } from "lucide-react";
+import { AnonymousConversationProvider } from "@/contexts/AnonymousConversationContext";
+import AnonymousConversationTool from "@/components/AnonymousConversationTool";
+import AnonymousReviewPanel from "@/components/AnonymousReviewPanel";
 
 export default function Landing() {
   const scrollToSection = (id: string) => {
@@ -97,46 +100,17 @@ export default function Landing() {
             </div>
 
             <div className="relative">
-              {/* Abstract conversation visualization */}
-              <Card className="relative w-full h-96 bg-white/60 backdrop-blur-sm shadow-2xl border border-white/50">
-                <CardContent className="p-8 h-full">
-                  {/* Conversation bubbles illustration */}
-                  <div className="space-y-4">
-                    <div className="flex justify-end">
-                      <div className="bg-coral-100 rounded-2xl p-4 max-w-xs">
-                        <p className="text-warm-brown-700 text-sm">
-                          "How was your weekend?"
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex justify-start">
-                      <div className="bg-sage-100 rounded-2xl p-4 max-w-xs">
-                        <p className="text-warm-brown-700 text-sm">
-                          "It was great! I went hiking with friends and
-                          discovered a beautiful trail..."
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex justify-end">
-                      <div className="bg-coral-100 rounded-2xl p-4 max-w-xs">
-                        <p className="text-warm-brown-700 text-sm">
-                          "That sounds wonderful! What made it special?"
-                        </p>
-                      </div>
-                    </div>
+              {/* Free Practice Tool - Above the Fold */}
+              <AnonymousConversationProvider>
+                <div className="grid lg:grid-cols-2 gap-6 mb-8">
+                  <div className="h-96">
+                    <AnonymousConversationTool agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
                   </div>
-
-                  {/* AI feedback indicator */}
-                  <div className="absolute bottom-4 left-4 right-4 bg-warm-brown-700 rounded-xl p-4 text-white">
-                    <div className="flex items-center space-x-2">
-                      <div className="w-2 h-2 bg-sage-400 rounded-full animate-pulse"></div>
-                      <span className="text-sm">
-                        AI analyzing conversation...
-                      </span>
-                    </div>
+                  <div className="h-96">
+                    <AnonymousReviewPanel />
                   </div>
-                </CardContent>
-              </Card>
+                </div>
+              </AnonymousConversationProvider>
 
               {/* Floating elements */}
               <div className="absolute -top-4 -right-4 w-20 h-20 coral-gradient rounded-full opacity-60"></div>
