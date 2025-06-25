@@ -11,10 +11,21 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import type { ConversationWithReview, TranscriptWithReview } from "@shared/schema";
 
 export default function ConversationDetail({ id }: { id: string }) {
+  // Scroll to top when component mounts or id changes
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [id]);
   const { data: conversation, isLoading, error } = useQuery<ConversationWithReview>({
     queryKey: [`/api/conversations/${id}`],
     enabled: !!id,
   });
+
+  // Additional scroll to top when conversation data loads (handles modal navigation timing)
+  useEffect(() => {
+    if (conversation && !isLoading) {
+      window.scrollTo(0, 0);
+    }
+  }, [conversation, isLoading]);
 
   if (isLoading) {
     return (
