@@ -4,7 +4,7 @@ import { createServer, type Server } from "http";
 import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
-import { analyzeConversation } from "./services/openai";
+import { analyzeConversation } from "./services/braintrust";
 import { createReviewWithImprovements } from "./services/reviewAnalyzer";
 import { fileStore, cloudStorage, type TranscriptData } from "./services/fileStore";
 import * as transcriptRoutes from "./routes/transcripts";
