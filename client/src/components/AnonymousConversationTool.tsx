@@ -45,56 +45,41 @@ export default function AnonymousConversationTool({
           )}
         </div>
 
-        <div className="space-y-6 text-center w-full">
-          {!isConnected && !isConnecting && (
-            <Button
-              onClick={handleStartConversation}
-              size="lg"
-              className="bg-coral-500 text-white px-10 py-5 rounded-full text-xl font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl w-full max-w-sm"
-            >
-              Start Free Conversation
-            </Button>
-          )}
-
-          {isConnecting && (
-            <div className="space-y-4">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-coral-500 mx-auto"></div>
-              <p className="text-lg text-warm-brown-600 font-medium">Connecting to AI coach...</p>
-            </div>
-          )}
-
-          {isConnected && (
-            <div className="space-y-4">
-              <div className="bg-green-100 border border-green-300 rounded-lg p-4 mb-4">
-                <p className="text-green-800 font-semibold text-lg">
-                  🎙️ Conversation Active
-                </p>
-                <p className="text-green-700 text-sm mt-1">
-                  Speak naturally - the AI is listening
-                </p>
-              </div>
-              <Button
-                onClick={handleEndConversation}
-                size="lg"
-                variant="destructive"
-                className="px-10 py-5 rounded-full text-xl font-semibold w-full max-w-sm"
-              >
-                End Conversation
-              </Button>
-            </div>
-          )}
-        </div>
-
         {!isConnected && !isConnecting && (
-          <div className="text-center space-y-3 bg-sage-50 p-6 rounded-xl">
-            <p className="text-base text-warm-brown-700 font-medium">
-              Practice makes perfect
-            </p>
-            <div className="grid grid-cols-1 gap-2 text-sm text-warm-brown-600">
-              <div>✓ No account required</div>
-              <div>✓ 5-minute sessions</div>
-              <div>✓ Instant AI feedback</div>
+          <Button
+            onClick={handleStartConversation}
+            size="lg"
+            className="bg-coral-500 text-white px-12 py-6 rounded-full text-2xl font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+          >
+            Click to Start Conversation
+          </Button>
+        )}
+
+        {isConnecting && (
+          <div className="space-y-4">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-coral-500 mx-auto"></div>
+            <p className="text-lg text-warm-brown-600 font-medium">Connecting to AI coach...</p>
+          </div>
+        )}
+
+        {isConnected && (
+          <div className="space-y-6">
+            <div className="bg-green-100 border border-green-300 rounded-xl p-6">
+              <p className="text-green-800 font-semibold text-xl">
+                🎙️ Conversation Active
+              </p>
+              <p className="text-green-700 text-base mt-2">
+                Speak naturally - the AI is listening
+              </p>
             </div>
+            <Button
+              onClick={handleEndConversation}
+              size="lg"
+              variant="destructive"
+              className="px-12 py-6 rounded-full text-xl font-semibold"
+            >
+              End Conversation
+            </Button>
           </div>
         )}
       </CardContent>
