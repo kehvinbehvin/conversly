@@ -91,6 +91,13 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 25, 2025: **LANDING PAGE UI REDESIGN COMPLETED** - Simplified and optimized conversation tool layout
+  - **Hero Layout**: Conversation tool and review panel prominently featured above the fold with 500px height
+  - **Simplified Conversation Start**: Single clear "Click to Start Conversation" button, removed confusing mic icon
+  - **Condensed Review Panel**: Rating as compact fraction (4/5), removed summary and duplicate sections
+  - **Optimized Scrolling**: Only chat thread scrollable, fixed header and rating for better UX
+  - **Reduced Information Overload**: Removed "Practice makes perfect" section, detailed feedback, and account CTA
+  - **Clean Visual Design**: Enhanced spacing, colors, and typography for professional appearance
 - June 25, 2025: **ANONYMOUS CONVERSATION TOOL IMPLEMENTED** - Free-to-use practice tool on landing page
   - **Side-by-side Layout**: Conversation tool and review panel positioned above the fold
   - **SSE Architecture**: Server-Sent Events for real-time notifications, avoiding WebSocket conflicts with Vite HMR

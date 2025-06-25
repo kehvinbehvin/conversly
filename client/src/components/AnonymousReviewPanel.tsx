@@ -94,34 +94,21 @@ export default function AnonymousReviewPanel() {
         </CardHeader>
         
         <CardContent className="flex-1 flex flex-col px-6">
-          {/* Condensed Rating */}
-          <div className="flex items-center justify-between bg-yellow-50 rounded-lg p-4 mb-4 border border-yellow-200">
-            <span className="font-semibold text-warm-brown-700">Rating:</span>
-            <div className="flex items-center space-x-1">
-              {[...Array(5)].map((_, i) => (
-                <Star
-                  key={i}
-                  className={`w-5 h-5 ${
-                    i < (review.overallRating || 0)
-                      ? "text-yellow-500 fill-current"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-              <span className="ml-2 font-bold text-warm-brown-800">
-                {review.overallRating || 0}/5
-              </span>
+          {/* Compact Rating as Fraction */}
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="font-semibold text-warm-brown-800 flex items-center">
+              <MessageCircle className="w-4 h-4 mr-2 text-coral-500" />
+              Conversation with Feedback
+            </h4>
+            <div className="text-lg font-bold text-warm-brown-800 bg-yellow-50 px-3 py-1 rounded">
+              {review.overallRating || 0}/5
             </div>
           </div>
 
           {/* Conversation Transcript - Scrollable Only */}
           {mergedTranscripts.length > 0 && (
-            <div className="flex-1 flex flex-col">
-              <h4 className="font-semibold text-warm-brown-800 flex items-center mb-3">
-                <MessageCircle className="w-4 h-4 mr-2 text-coral-500" />
-                Conversation with Feedback
-              </h4>
-              <div className="flex-1 overflow-y-auto border border-coral-200 rounded-lg">
+            <div className="flex-1 overflow-hidden border border-coral-200 rounded-lg">
+              <div className="h-full overflow-y-auto">
                 <ChatThread messages={mergedTranscripts} />
               </div>
             </div>
