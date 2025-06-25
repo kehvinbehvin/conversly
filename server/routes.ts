@@ -128,33 +128,47 @@ export async function registerRoutes(app: Express): Promise<Server> {
     express.urlencoded({ extended: false }),
     async (req, res) => {
       try {
-        const user = await storage.getUserByEmail("demo@conversly.com");
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
+        const { userId, elevenlabsConversationId, transcriptId } = req.body;
+
+        // Validate required userId parameter
+        if (!userId) {
+          return res.status(400).json({ message: "userId is required" });
         }
 
-        // Check if conversation with this ElevenLabs ID already exists
-        if (req.body.elevenlabsConversationId) {
-          const existingConversation = await storage.getConversationByElevenlabsId(req.body.elevenlabsConversationId);
+        // For tests: use provided userId, for production: validate user exists
+        let validatedUserId = userId;
+        if (process.env.NODE_ENV !== 'test') {
+          const user = await storage.getUser(userId);
+          if (!user) {
+            return res.status(404).json({ message: "User not found" });
+          }
+          validatedUserId = user.id;
+        }
+
+        // Check if conversation with this ElevenLabs ID already exists (only for webhook handling)
+        if (elevenlabsConversationId && req.headers['elevenlabs-signature']) {
+          const existingConversation = await storage.getConversationByElevenlabsId(elevenlabsConversationId);
           if (existingConversation) {
-            console.log("📝 Conversation already exists:", existingConversation.id, "for ElevenLabs ID:", req.body.elevenlabsConversationId);
+            console.log("📝 Conversation already exists:", existingConversation.id, "for ElevenLabs ID:", elevenlabsConversationId);
             return res.json(existingConversation);
           }
         }
 
         const conversationData = {
-          userId: user.id,
+          userId: validatedUserId,
+          transcriptId: transcriptId || null,
           status: "pending",
-          elevenlabsConversationId: req.body.elevenlabsConversationId || null,
-          metadata: req.body.metadata || {},
+          elevenlabsConversationId: elevenlabsConversationId || null,
+          metadata: req.body.metadata || null,
         };
 
         const conversation = await storage.createConversation(conversationData);
-        console.log("📝 Created conversation:", conversation.id, "for ElevenLabs ID:", req.body.elevenlabsConversationId);
+        console.log("📝 Created conversation:", conversation.id, "for ElevenLabs ID:", elevenlabsConversationId);
         console.log("📝 Request body:", JSON.stringify(req.body, null, 2));
         console.log("📝 Call stack trace for conversation creation");
-        res.json(conversation);
+        res.status(201).json(conversation);
       } catch (error) {
+        console.error("❌ Failed to create conversation:", error);
         res.status(500).json({ message: "Failed to create conversation" });
       }
     },

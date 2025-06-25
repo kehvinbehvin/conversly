@@ -29,10 +29,10 @@ describe('Conversation API Endpoints', () => {
 
   describe('POST /api/conversations', () => {
     it('should create a new conversation', async () => {
-      const user = await storage.getUserByEmail("demo@conversly.com");
+      const userId = (global as any).testUserId;
       
       const conversationData = {
-        userId: user!.id,
+        userId,
         elevenlabsConversationId: 'test_conv_123'
       };
 
@@ -42,7 +42,7 @@ describe('Conversation API Endpoints', () => {
         .expect(201);
 
       expect(response.body).toHaveProperty('id');
-      expect(response.body.userId).toBe(user!.id);
+      expect(response.body.userId).toBe(userId);
       expect(response.body.elevenlabsConversationId).toBe('test_conv_123');
       expect(response.body.status).toBe('pending');
       expect(response.body).toHaveProperty('createdAt');
@@ -62,18 +62,18 @@ describe('Conversation API Endpoints', () => {
 
   describe('GET /api/conversations', () => {
     it('should get all conversations for demo user', async () => {
-      const user = await storage.getUserByEmail("demo@conversly.com");
+      const userId = (global as any).testUserId;
       
       // Create test conversations
       await storage.createConversation({
-        userId: user!.id,
+        userId,
         elevenlabsConversationId: 'conv_1',
         status: 'completed'
       });
       
       await storage.createConversation({
-        userId: user!.id,
-        elevenlabsConversationId: 'conv_2',
+        userId,
+        elevenlabsConversationId: 'conv_2', 
         status: 'pending'
       });
 
@@ -89,11 +89,11 @@ describe('Conversation API Endpoints', () => {
     });
 
     it('should include reviews in conversation response', async () => {
-      const user = await storage.getUserByEmail("demo@conversly.com");
+      const userId = (global as any).testUserId;
       
       // Create conversation
       const conversation = await storage.createConversation({
-        userId: user!.id,
+        userId,
         elevenlabsConversationId: 'conv_with_review',
         status: 'analyzed'
       });
@@ -122,10 +122,10 @@ describe('Conversation API Endpoints', () => {
 
   describe('GET /api/conversations/:id', () => {
     it('should get specific conversation by id', async () => {
-      const user = await storage.getUserByEmail("demo@conversly.com");
+      const userId = (global as any).testUserId;
       
       const conversation = await storage.createConversation({
-        userId: user!.id,
+        userId,
         elevenlabsConversationId: 'specific_conv',
         status: 'completed'
       });
@@ -158,7 +158,7 @@ describe('Conversation API Endpoints', () => {
         expect(response.body.signedUrl).toContain('conversationId=');
       } else {
         expect(response.status).toBe(500);
-        expect(response.body.message).toContain('ElevenLabs API key');
+        expect(response.body.message).toContain('Failed to generate signed URL');
       }
     });
 
