@@ -17,6 +17,14 @@ export default function Conversation() {
     return (
       <div className="min-h-screen bg-gradient-to-br from-sage-50 to-brown-50 p-4">
         <div className="max-w-4xl mx-auto pt-8">
+          {/* Back to Dashboard Button */}
+          <Link href="/dashboard">
+            <Button variant="ghost" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+          
           <Card className="border-sage-200 shadow-lg">
             <CardHeader className="text-center pb-6">
               <CardTitle className="text-3xl font-bold text-brown-800">
