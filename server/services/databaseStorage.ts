@@ -19,7 +19,7 @@ import {
   type ConversationWithReviewAndImprovements
 } from "@shared/schema";
 import { db } from "../db";
-import { eq } from "drizzle-orm";
+import { eq, desc } from "drizzle-orm";
 import type { IStorage } from "../storage";
 
 export class DatabaseStorage implements IStorage {
@@ -77,7 +77,7 @@ export class DatabaseStorage implements IStorage {
       .from(conversations)
       .leftJoin(reviews, eq(conversations.id, reviews.conversationId))
       .where(eq(conversations.userId, userId))
-      .orderBy(conversations.createdAt);
+      .orderBy(desc(conversations.createdAt));
 
     return userConversations.map(row => ({
       ...row.conversations,
@@ -212,6 +212,6 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(improvements)
       .where(eq(improvements.id, id));
-    return result.rowCount > 0;
+    return (result as any).rowCount > 0;
   }
 }

@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 25, 2025: Switched to database storage for production deployment
+  - Successfully migrated from memory storage to PostgreSQL database storage
+  - All data now persists between server restarts and deployments
+  - Demo user automatically created during database initialization
+  - Full CRUD operations working with database backend
+  - Verified data integrity across all entities (users, conversations, transcripts, reviews, improvements)
 - June 25, 2025: Implemented persistent database storage with comprehensive data model
   - Added transcripts table with file_location and content fields
   - Created improvements table for granular feedback tied to transcript sections
