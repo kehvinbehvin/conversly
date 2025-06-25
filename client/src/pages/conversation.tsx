@@ -1,23 +1,170 @@
+import { useParams, Link } from "wouter";
+import { useQuery } from "@tanstack/react-query";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { ArrowLeft, Star, AlertCircle } from "lucide-react";
 import ElevenLabsConversation from "@/components/ElevenLabsConversation";
+import ChatThread from "@/components/ChatThread";
+import type { ConversationWithReview, TranscriptWithReview } from "@shared/schema";
 
 export default function Conversation() {
+  const { id } = useParams();
+  
+  // If no ID provided, show the conversation starter interface
+  if (!id) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-sage-50 to-brown-50 p-4">
+        <div className="max-w-4xl mx-auto pt-8">
+          <Card className="border-sage-200 shadow-lg">
+            <CardHeader className="text-center pb-6">
+              <CardTitle className="text-3xl font-bold text-brown-800">
+                Practice Session
+              </CardTitle>
+              <p className="text-brown-600 mt-2">
+                Start a conversation to practice your communication skills
+              </p>
+            </CardHeader>
+            <CardContent className="flex flex-col items-center space-y-8 pb-8">
+              <ElevenLabsConversation agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Show conversation with ID - display chat thread and review
+  const { data: conversation, isLoading, error } = useQuery<ConversationWithReview>({
+    queryKey: [`/api/conversations/${id}`],
+    enabled: !!id,
+  });
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-warm-brown-50 py-8">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Skeleton className="h-8 w-48 mb-6" />
+          <div className="grid lg:grid-cols-2 gap-8">
+            <Skeleton className="h-96 w-full" />
+            <Skeleton className="h-96 w-full" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !conversation) {
+    return (
+      <div className="min-h-screen bg-warm-brown-50 py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Card>
+            <CardContent className="p-8 text-center">
+              <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
+              <h2 className="text-xl font-semibold text-warm-brown-800 mb-2">
+                Conversation Not Found
+              </h2>
+              <p className="text-warm-brown-600 mb-4">
+                The conversation you're looking for doesn't exist or couldn't be loaded.
+              </p>
+              <Link href="/dashboard">
+                <Button>Back to Dashboard</Button>
+              </Link>
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const review = conversation.review;
+  const transcriptWithReviews = review?.transcriptWithReviews as TranscriptWithReview[] || [];
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sage-50 to-brown-50 p-4">
-      <div className="max-w-4xl mx-auto pt-8">
-        <Card className="border-sage-200 shadow-lg">
-          <CardHeader className="text-center pb-6">
-            <CardTitle className="text-3xl font-bold text-brown-800">
-              Practice Session
-            </CardTitle>
-            <p className="text-brown-600 mt-2">
-              Start a conversation to practice your communication skills
-            </p>
-          </CardHeader>
-          <CardContent className="flex flex-col items-center space-y-8 pb-8">
-            <ElevenLabsConversation agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
-          </CardContent>
-        </Card>
+    <div className="min-h-screen bg-warm-brown-50 py-8">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header */}
+        <div className="mb-8">
+          <Link href="/dashboard">
+            <Button variant="ghost" className="mb-4">
+              <ArrowLeft className="w-4 h-4 mr-2" />
+              Back to Dashboard
+            </Button>
+          </Link>
+          
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-warm-brown-800 mb-2">
+                Conversation Review
+              </h1>
+              <p className="text-warm-brown-600">
+                {new Date(conversation.createdAt).toLocaleDateString()} • Practice Session
+              </p>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              {review?.overallRating && (
+                <div className="flex items-center space-x-2">
+                  <Star className="w-5 h-5 text-coral-500 fill-current" />
+                  <span className="text-xl font-bold text-warm-brown-800">
+                    {review.overallRating}/5
+                  </span>
+                </div>
+              )}
+              <Badge 
+                variant={conversation.status === "completed" ? "default" : "secondary"}
+                className={conversation.status === "completed" ? "bg-sage-100 text-sage-700" : ""}
+              >
+                {conversation.status === "completed" ? "Analysis Complete" : conversation.status}
+              </Badge>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid lg:grid-cols-2 gap-8">
+          {/* Chat Thread */}
+          <ChatThread 
+            messages={transcriptWithReviews}
+            className="lg:col-span-1"
+          />
+
+          {/* Review Summary */}
+          {review && (
+            <div className="space-y-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center space-x-2">
+                    <Star className="w-5 h-5 text-sage-500" />
+                    <span>Overall Assessment</span>
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-warm-brown-700 leading-relaxed">
+                    {review.summary}
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Action Items */}
+              <Card className="bg-coral-50 border-coral-200">
+                <CardContent className="p-6">
+                  <h3 className="font-semibold text-warm-brown-800 mb-4">
+                    Ready for Your Next Session?
+                  </h3>
+                  <p className="text-warm-brown-600 mb-4">
+                    Practice makes perfect. Keep building your conversation skills with another session.
+                  </p>
+                  <Link href="/conversation">
+                    <Button className="bg-coral-500 hover:bg-coral-600 text-white">
+                      Start New Conversation
+                    </Button>
+                  </Link>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

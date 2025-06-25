@@ -19,7 +19,8 @@ function Router() {
       <Route path="/" component={Landing} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/conversation" component={Conversation} />
-      <Route path="/conversation/:id" component={Review} />
+      <Route path="/conversation/:id" component={Conversation} />
+      <Route path="/review/:id" component={Review} />
       <Route path="/history" component={History} />
       <Route path="/storage" component={lazy(() => import("./pages/storage"))} />
       <Route component={NotFound} />

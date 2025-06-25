@@ -93,26 +93,7 @@ export type ConversationWithReview = Conversation & {
   transcript?: Transcript;
 };
 
-// Legacy types for backward compatibility
-export type ReviewHighlight = {
-  text: string;
-  feedback: string;
-  type: "positive" | "improvement" | "neutral";
-  startTime?: number;
-  endTime?: number;
-};
-
-export type ReviewSuggestion = {
-  category: string;
-  suggestion: string;
-  priority: "high" | "medium" | "low";
-};
-
-export type ReviewStrength = {
-  category: string;
-  description: string;
-  examples: string[];
-};
+// Legacy types removed - no longer used after refactor
 
 // Database relations
 export const usersRelations = relations(users, ({ many }) => ({

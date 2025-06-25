@@ -214,7 +214,7 @@ export default function Landing() {
                 </div>
                 <h3 className="text-xl font-semibold text-warm-brown-800 mb-4">Detailed Analytics</h3>
                 <p className="text-warm-brown-600">
-                  Track your progress with conversation metrics and improvement insights over time.
+                  Track your progress with conversation metrics and detailed feedback over time.
                 </p>
               </CardContent>
             </Card>
