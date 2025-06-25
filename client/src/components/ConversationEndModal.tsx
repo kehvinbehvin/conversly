@@ -18,20 +18,25 @@ export default function ConversationEndModal({
 }: ConversationEndModalProps) {
   const [showCTA, setShowCTA] = useState(false);
 
-  // Poll for conversation existence
-  const { data: conversation, isSuccess } = useQuery({
-    queryKey: [`/api/conversations/${conversationId}`],
+  // Poll for conversation existence using conversationId from ElevenLabs
+  const { data: conversations } = useQuery({
+    queryKey: ['/api/conversations'],
     enabled: !!conversationId && isOpen && !showCTA,
     refetchInterval: 1000, // Poll every second
     retry: true,
   });
 
+  // Find conversation by ElevenLabs ID
+  const conversation = conversations?.find((conv: any) => 
+    conv.elevenlabsConversationId === conversationId
+  );
+
   // Switch to CTA when conversation is found
   useEffect(() => {
-    if (isSuccess && conversation && !showCTA) {
+    if (conversation && !showCTA) {
       setShowCTA(true);
     }
-  }, [isSuccess, conversation, showCTA]);
+  }, [conversation, showCTA]);
 
   // Reset state when modal closes
   useEffect(() => {
@@ -95,7 +100,7 @@ export default function ConversationEndModal({
               </div>
               
               <div className="flex flex-col w-full space-y-3">
-                <Link href={`/conversation/${conversationId}`}>
+                <Link href={`/conversation/${conversation.id}`}>
                   <Button 
                     className="w-full bg-coral-500 hover:bg-coral-600 text-white"
                     onClick={onClose}

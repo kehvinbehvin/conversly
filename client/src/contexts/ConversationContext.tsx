@@ -5,8 +5,10 @@ interface ConversationContextType {
   isConnecting: boolean;
   isConnected: boolean;
   currentConversationId: string | null;
+  showEndModal: boolean;
   startConversation: (agentId: string) => Promise<void>;
   endConversation: () => void;
+  closeEndModal: () => void;
   onConversationStart?: (conversationId: string) => void;
   onConversationEnd?: (conversationId: string) => void;
   onError?: (error: Error) => void;
@@ -37,6 +39,7 @@ export function ConversationProvider({
 }: ConversationProviderProps) {
   const [isConnecting, setIsConnecting] = useState(false);
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
+  const [showEndModal, setShowEndModal] = useState(false);
   
   // Use refs to store stable references that persist across re-renders
   const callbacksRef = useRef({
@@ -120,6 +123,8 @@ export function ConversationProvider({
       
       const conversationId = details?.conversationId || currentConversationId;
       if (conversationId) {
+        // Show modal when conversation ends
+        setShowEndModal(true);
         callbacksRef.current.onConversationEnd?.(conversationId);
       }
       setCurrentConversationId(null);
@@ -209,12 +214,18 @@ export function ConversationProvider({
     }
   };
 
+  const closeEndModal = () => {
+    setShowEndModal(false);
+  };
+
   const value: ConversationContextType = {
     isConnecting,
     isConnected: conversation.status === "connected",
     currentConversationId,
+    showEndModal,
     startConversation,
     endConversation,
+    closeEndModal,
     onConversationStart,
     onConversationEnd,
     onError,

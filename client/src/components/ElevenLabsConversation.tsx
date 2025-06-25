@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Mic, MicOff, Loader2 } from "lucide-react";
 import { useConversation } from "@/contexts/ConversationContext";
+import ConversationEndModal from "./ConversationEndModal";
 
 interface ElevenLabsConversationProps {
   agentId: string;
@@ -9,7 +10,15 @@ interface ElevenLabsConversationProps {
 export default function ElevenLabsConversation({
   agentId,
 }: ElevenLabsConversationProps) {
-  const { isConnecting, isConnected, startConversation, endConversation } = useConversation();
+  const { 
+    isConnecting, 
+    isConnected, 
+    currentConversationId,
+    showEndModal,
+    startConversation, 
+    endConversation, 
+    closeEndModal 
+  } = useConversation();
 
   const handleStartConversation = () => {
     if (!isConnecting) {
@@ -64,6 +73,13 @@ export default function ElevenLabsConversation({
           </p>
         )}
       </div>
+
+      {/* Conversation End Modal */}
+      <ConversationEndModal
+        isOpen={showEndModal}
+        onClose={closeEndModal}
+        conversationId={currentConversationId}
+      />
     </div>
   );
 }
