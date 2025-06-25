@@ -25,8 +25,8 @@ export async function createReviewWithTranscripts(conversationId: number, transc
     // Generate summary and rating
     const reviewCount = reviewObjects.length;
     const summary = reviewCount > 0 
-      ? `Analysis completed with ${reviewCount} review items for conversation turns.`
-      : "Conversation practice session completed successfully.";
+      ? `Conversation analysis completed with ${reviewCount} review items for conversation turns.`
+      : "Conversation analysis completed - practice session finished successfully.";
     const overallRating = Math.max(1, Math.min(5, 4 - Math.floor(reviewCount / 5)));
 
     // Create review record with merged transcript and review data

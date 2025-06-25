@@ -130,12 +130,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const { userId, elevenlabsConversationId, transcriptId } = req.body;
 
         // Validate required userId parameter
-        if (!userId) {
-          return res.status(400).json({ message: "userId is required" });
-        }
-
-        // For tests: use provided userId, for production: validate user exists
         let validatedUserId = userId;
+        
+        // If no userId provided, use demo user
+        if (!validatedUserId) {
+          const user = await storage.getUserByEmail("demo@conversly.com");
+          if (!user) {
+            return res.status(404).json({ message: "Demo user not found" });
+          }
+          validatedUserId = user.id;
+        }
         if (process.env.NODE_ENV !== 'test') {
           const user = await storage.getUser(userId);
           if (!user) {
