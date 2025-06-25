@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 25, 2025: Integrated Braintrust SDK for conversation analysis
+  - Replaced direct OpenAI calls with Braintrust wrapOpenAI for monitoring and prompt management
+  - Updated analysis to focus on Individual B's responses matching client's JSON schema requirements
+  - Created adapter layer to maintain backward compatibility with existing database structure
+  - All webhook processing now uses Braintrust for conversation analysis with improved monitoring
+  - Comprehensive test suite validates integration points and data transformation
 - June 25, 2025: Fixed frontend-backend integration issues
   - Corrected POST /api/conversations to include required userId parameter
   - Updated conversation status filtering from "analyzed" to "completed" across all frontend pages
