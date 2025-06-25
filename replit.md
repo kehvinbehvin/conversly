@@ -91,6 +91,14 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 25, 2025: **MAJOR REFACTOR COMPLETED** - Simplified data modeling architecture
+  - **Database Schema**: Removed improvements table entirely, updated transcripts to store JSON arrays, reviews now contain merged transcript+review data
+  - **Webhook Processing**: Extracts structured TranscriptObject arrays (index, role, message, time_in_call_secs) from ElevenLabs payload
+  - **LLM Integration**: Braintrust receives JSON transcript arrays and returns index-based ReviewObject arrays  
+  - **Review Storage**: Merges transcript data with LLM reviews by index, stores complete merged data in reviews table
+  - **File Storage Removal**: Eliminated all cloudStorage, fileStore, and file system dependencies completely
+  - **API Cleanup**: Removed all improvement-related endpoints and backward compatibility code
+  - **Data Flow**: Simplified to webhook → transcript extraction → LLM analysis → merged review storage
 - June 25, 2025: Added comprehensive documentation and pushed to GitHub
   - Created detailed README.md covering complete system architecture  
   - Documented all third-party integrations (ElevenLabs, Braintrust, PostgreSQL)

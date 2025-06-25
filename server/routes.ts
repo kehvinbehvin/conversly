@@ -446,7 +446,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Log what we're updating
         console.log("📝 Updating conversation with:", {
-          hasTranscriptData: transcriptData.length > 0,
           transcriptTurns: transcriptData.length,
           hasAudioUrl: !!audio_url,
           audioUrl: audio_url ? audio_url.substring(0, 50) + "..." : null,
@@ -584,103 +583,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // API endpoint to get cloud storage status and configuration
-  app.get(
-    "/api/storage/status",
-    express.json(),
-    express.urlencoded({ extended: false }),
-    async (req, res) => {
-      try {
-        const { getStorageConfig } = await import('./services/cloudStorage.js');
-        const config = getStorageConfig();
-        
-        // Test storage by listing transcripts
-        const files = await cloudStorage.listTranscripts();
-        
-        res.json({
-          provider: config.provider,
-          isWorking: true,
-          fileCount: files.length,
-          config: config.provider === 'replit' ? {
-            bucketId: config.replit?.bucketId,
-          } : null
-        });
-      } catch (error) {
-        console.error("Storage status check failed:", error);
-        res.json({
-          provider: 'unknown',
-          isWorking: false,
-          error: error instanceof Error ? error.message : 'Unknown error'
-        });
-      }
-    },
-  );
 
-  // API endpoint to test object storage
-  app.post(
-    "/api/storage/test",
-    express.json(),
-    express.urlencoded({ extended: false }),
-    async (req, res) => {
-      try {
-        console.log("🧪 Running storage test via API...");
-        
-        // Create test data
-        const testData: TranscriptData = {
-          conversationId: "api-test-" + Date.now(),
-          elevenlabsId: "api_test_" + Date.now(),
-          transcript: [
-            { role: "agent", message: "API test message for storage verification" },
-            { role: "user", message: "API test response to verify upload functionality" }
-          ],
-          metadata: {
-            testMode: true,
-            apiTest: true,
-            timestamp: Date.now()
-          },
-          timestamp: Date.now()
-        };
-
-        // Test save
-        const savedPath = await cloudStorage.saveTranscript(testData);
-        console.log(`✅ API test: Document saved to ${savedPath}`);
-
-        // Test retrieve
-        const retrieved = await cloudStorage.getTranscript(testData.elevenlabsId);
-        
-        // Test list
-        const allFiles = await cloudStorage.listTranscripts();
-        
-        // Clean up test file
-        const deleted = await cloudStorage.deleteTranscript(testData.elevenlabsId);
-        
-        res.json({
-          success: true,
-          results: {
-            saved: !!savedPath,
-            retrieved: !!retrieved,
-            fileCount: allFiles.length,
-            testDataMatch: retrieved?.conversationId === testData.conversationId,
-            cleanedUp: deleted
-          },
-          storage: {
-            provider: "hybrid",
-            cloudAttempted: true,
-            localFallback: true
-          },
-          message: "Storage test completed successfully"
-        });
-        
-      } catch (error) {
-        console.error("💥 API storage test failed:", error);
-        res.status(500).json({
-          success: false,
-          error: error instanceof Error ? error.message : 'Unknown error',
-          message: "Storage test failed"
-        });
-      }
-    },
-  );
 
   return createServer(app);
 }
