@@ -35,5 +35,65 @@ waitForPort = 5000
 localPort = 5000
 externalPort = 80
 
+[[ports]]
+localPort = 35987
+externalPort = 4200
+
+[[ports]]
+localPort = 36145
+externalPort = 8099
+
+[[ports]]
+localPort = 36571
+externalPort = 6800
+
+[[ports]]
+localPort = 37469
+externalPort = 8000
+
+[[ports]]
+localPort = 39395
+externalPort = 6000
+
+[[ports]]
+localPort = 41023
+externalPort = 3001
+
+[[ports]]
+localPort = 42535
+externalPort = 8080
+
+[[ports]]
+localPort = 42883
+externalPort = 8008
+
+[[ports]]
+localPort = 44233
+externalPort = 5173
+
+[[ports]]
+localPort = 44717
+externalPort = 3000
+
+[[ports]]
+localPort = 44913
+externalPort = 3002
+
+[[ports]]
+localPort = 44959
+externalPort = 3003
+
+[[ports]]
+localPort = 45713
+externalPort = 8081
+
+[[ports]]
+localPort = 46239
+externalPort = 9000
+
+[[ports]]
+localPort = 46599
+externalPort = 5000
+
 [objectStorage]
 defaultBucketID = "replit-objstore-988cc690-5963-48b8-b852-b976020113c7"

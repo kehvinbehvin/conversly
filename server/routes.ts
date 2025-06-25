@@ -9,6 +9,7 @@ import { createReviewWithImprovements } from "./services/reviewAnalyzer";
 import { fileStore, cloudStorage, type TranscriptData } from "./services/fileStore";
 import * as transcriptRoutes from "./routes/transcripts";
 import * as improvementRoutes from "./routes/improvements";
+import * as reviewRoutes from "./routes/reviews";
 import { z } from "zod";
 import bodyParser from "body-parser";
 
@@ -598,6 +599,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/transcripts/:id", transcriptRoutes.getTranscript);
   app.post("/api/transcripts", express.json(), transcriptRoutes.createTranscript);
   app.patch("/api/transcripts/:id", express.json(), transcriptRoutes.updateTranscript);
+
+  // Review routes
+  app.get("/api/reviews/:id", reviewRoutes.getReview);
+  app.get("/api/conversations/:conversationId/review", reviewRoutes.getReviewByConversationId);
+  app.post("/api/reviews", express.json(), reviewRoutes.createReview);
+  app.patch("/api/reviews/:id", express.json(), reviewRoutes.updateReview);
 
   // Improvement routes
   app.get("/api/improvements/:id", improvementRoutes.getImprovement);
