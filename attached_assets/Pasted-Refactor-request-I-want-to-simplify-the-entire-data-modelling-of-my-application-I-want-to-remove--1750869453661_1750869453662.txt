@@ -1,0 +1,60 @@
+Refactor request:
+
+I want to simplify the entire data modelling of my application.
+I want to remove the improvements table and consolidate them into the conversation and transcripts and review tables.
+I want to remove the storage of transcripts into the file system entirely.
+What should remain the same:
+
+When a user starts a conversation, we will create a new conversation row with the elevanLabs's conversation id as we are doing now.
+Then we pass the webhook transcript data to the llm for review
+Then we store the review.
+What needs to change:
+
+The data structures that are being extracted from the webhook payload and being passed to the LLM and the data structures that are being used to extract the LLM response and store into our database. See "Changes in Data structure from webhook to LLM" section below.
+Our database schema. I want to remove the improvements table. Instead, i will store the new data structure that is extracted from the webhook payload which is to be passed to the LLM as a JSON object and store it as a column in our transcript table.
+Our database schema. When the LLM returns its response as per the output in the example section below. We will merge its review objects together with the transcript object based on the index of the review. Eg: If review is for index 4, we will merge the review into the transcript object. If there is no review for a index, we use a null value. Then after this mergining process, we will have a new transcript array merged with review data. Then store it into the review table. So this means that there will be changes to the review table.
+Remove any code pertaining to the file cloud storage for transcripts.
+Changes in Data structure from webhook to LLM
+* This Object will be extracted from the webhook payload and stored in the database
+* New Transcript Object:
+* {
+* "index": number, // This is the index of the transcript object in the array
+* "role": "agent" | "user",
+* "message": string,
+* "time_in_call_secs": number,
+* }
+*
+* New Transcript Array Data Structure:
+* [
+* Transcript Object,
+* Transcript Object,
+* ... (more transcript objects)
+* ]
+*
+* New LLM Reviewer Input Data Structure:
+* - New Transcript Array Data Structure as a JSON stringified array
+*
+* New LLM Reviewer Output Data Structure:
+* -
+* [
+* New Review Object,
+* New Review Object,
+* ... (more review objects)
+* ]
+*
+* New Review Object:
+* {
+* "index": number, // This is the index of the transcript object that this review is for
+* "review": string, // This is the review of the transcript object
+* }
+
+What questions do you have, clarifiy and tell me your approach before you start implementing.
+
+Remember that you are an engineer.
+Think system wide first before focusing to different parts of the system
+Break down large tasks into smaller sub problems and tackle them systematically
+Read error messages and logs to identify location of errors
+Trace the code
+Use Logical conclusions to rule out options
+Do not guess and do not assume.
+Validate your assumptions
