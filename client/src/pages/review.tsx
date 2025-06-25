@@ -21,6 +21,12 @@ export default function Review() {
     enabled: !!conversation?.review?.id,
   });
 
+  // Fetch transcript separately since it's not included in conversation response
+  const { data: transcript } = useQuery({
+    queryKey: [`/api/transcripts/${conversation?.transcriptId}`],
+    enabled: !!conversation?.transcriptId,
+  });
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-warm-brown-50 py-8">
@@ -131,7 +137,7 @@ export default function Review() {
             </Card>
 
             {/* Transcript with Inline Feedback */}
-            {conversation.transcript?.content && improvements && improvements.length > 0 && (
+            {transcript?.content && improvements && improvements.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle>Transcript with Interactive Feedback</CardTitle>
@@ -141,7 +147,7 @@ export default function Review() {
                 </CardHeader>
                 <CardContent>
                   <InlineHighlighter 
-                    content={conversation.transcript.content}
+                    content={transcript.content}
                     improvements={improvements}
                     className="text-warm-brown-700 leading-relaxed"
                   />
