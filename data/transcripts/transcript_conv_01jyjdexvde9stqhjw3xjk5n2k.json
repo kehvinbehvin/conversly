@@ -1,0 +1,288 @@
+{
+  "conversationId": "52",
+  "elevenlabsId": "conv_01jyjdexvde9stqhjw3xjk5n2k",
+  "transcript": [
+    {
+      "role": "agent",
+      "message": "Hey, how have you been? How was your weekend?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 0,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    },
+    {
+      "role": "user",
+      "message": "It was good.",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 4,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": "audio"
+    },
+    {
+      "role": "agent",
+      "message": "Glad to hear that! Did you do anything fun or relaxing?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 6,
+      "conversation_turn_metrics": {
+        "metrics": {
+          "convai_llm_service_ttf_sentence": {
+            "elapsed_time": 0.770414877217263
+          },
+          "convai_llm_service_ttfb": {
+            "elapsed_time": 0.660209211986512
+          }
+        }
+      },
+      "rag_retrieval_info": null,
+      "llm_usage": {
+        "model_usage": {
+          "gpt-4o": {
+            "input": {
+              "tokens": 1748,
+              "price": 0.00437
+            },
+            "input_cache_read": {
+              "tokens": 0,
+              "price": 0
+            },
+            "input_cache_write": {
+              "tokens": 0,
+              "price": 0
+            },
+            "output_total": {
+              "tokens": 14,
+              "price": 0.00014
+            }
+          }
+        }
+      },
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    },
+    {
+      "role": "user",
+      "message": "Went to the beach.",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 11,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": "audio"
+    },
+    {
+      "role": "agent",
+      "message": "That sounds lovely! Did you get a chance to catch some sun or maybe enjoy a good book by the shore?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 13,
+      "conversation_turn_metrics": {
+        "metrics": {
+          "convai_llm_service_ttf_sentence": {
+            "elapsed_time": 0.6489289468154311
+          },
+          "convai_llm_service_ttfb": {
+            "elapsed_time": 0.6262364247813821
+          }
+        }
+      },
+      "rag_retrieval_info": null,
+      "llm_usage": {
+        "model_usage": {
+          "gpt-4o": {
+            "input": {
+              "tokens": 110,
+              "price": 0.000275
+            },
+            "input_cache_read": {
+              "tokens": 1664,
+              "price": 0.00208
+            },
+            "input_cache_write": {
+              "tokens": 0,
+              "price": 0
+            },
+            "output_total": {
+              "tokens": 24,
+              "price": 0.00024
+            }
+          }
+        }
+      },
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    },
+    {
+      "role": "user",
+      "message": "No.",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 18,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": "audio"
+    },
+    {
+      "role": "agent",
+      "message": "Got it, sometimes just being by the water is enough...",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 20,
+      "conversation_turn_metrics": {
+        "metrics": {
+          "convai_llm_service_ttf_sentence": {
+            "elapsed_time": 1.233207693323493
+          },
+          "convai_llm_service_ttfb": {
+            "elapsed_time": 1.0553224459290504
+          }
+        }
+      },
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": true,
+      "original_message": "Got it, sometimes just being by the water is enough. Is there anything else you'd like to chat about or something I can help you with today?",
+      "source_medium": null
+    }
+  ],
+  "metadata": {
+    "start_time_unix_secs": 1750817273,
+    "accepted_time_unix_secs": 1750817274,
+    "call_duration_secs": 25,
+    "cost": 321,
+    "deletion_settings": {
+      "deletion_time_unix_secs": null,
+      "deleted_logs_at_time_unix_secs": null,
+      "deleted_audio_at_time_unix_secs": null,
+      "deleted_transcript_at_time_unix_secs": null,
+      "delete_transcript_and_pii": false,
+      "delete_audio": false
+    },
+    "feedback": {
+      "overall_score": null,
+      "likes": 0,
+      "dislikes": 0
+    },
+    "authorization_method": "signed_url",
+    "charging": {
+      "dev_discount": false,
+      "is_burst": false,
+      "tier": "free",
+      "llm_usage": {
+        "irreversible_generation": {
+          "model_usage": {
+            "gpt-4o": {
+              "input": {
+                "tokens": 1858,
+                "price": 0.004645
+              },
+              "input_cache_read": {
+                "tokens": 1664,
+                "price": 0.00208
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0
+              },
+              "output_total": {
+                "tokens": 38,
+                "price": 0.00038
+              }
+            }
+          }
+        },
+        "initiated_generation": {
+          "model_usage": {
+            "gpt-4o": {
+              "input": {
+                "tokens": 1858,
+                "price": 0.004645
+              },
+              "input_cache_read": {
+                "tokens": 1664,
+                "price": 0.00208
+              },
+              "input_cache_write": {
+                "tokens": 0,
+                "price": 0
+              },
+              "output_total": {
+                "tokens": 38,
+                "price": 0.00038
+              }
+            }
+          }
+        }
+      },
+      "llm_price": 0.007105,
+      "llm_charge": 72,
+      "call_charge": 249
+    },
+    "phone_call": null,
+    "batch_call": null,
+    "termination_reason": "Client disconnected",
+    "error": null,
+    "main_language": "en",
+    "rag_usage": null,
+    "text_only": false,
+    "features_usage": {
+      "language_detection": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_agent": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_number": {
+        "enabled": false,
+        "used": false
+      },
+      "multivoice": {
+        "enabled": false,
+        "used": false
+      },
+      "pii_zrm_workspace": false,
+      "pii_zrm_agent": false
+    }
+  },
+  "analysis": {
+    "evaluation_criteria_results": {},
+    "data_collection_results": {},
+    "call_successful": "success",
+    "transcript_summary": "The agent initiated a casual conversation, inquiring about the user's weekend. The user reported going to the beach, but did not engage in sunbathing or reading. The agent acknowledged the user's response.\n"
+  },
+  "timestamp": 1750817316800
+}

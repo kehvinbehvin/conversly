@@ -1,0 +1,202 @@
+"""
+Step-by-Step Guide: Integrating Braintrust as the Single Source of Truth for Prompts
+Target repo: React + Vite
+
+------------------------------------------------------------------------
+Prerequisites
+------------------------------------------------------------------------
+1. Node.js (>=14) & npm/yarn installed
+2. An existing React + Vite project (created via `npm create vite@latest` or similar)
+3. A Braintrust account with API key (https://braintrust.dev)
+4. An OpenAI API key (if using OpenAI models)
+5. git for version control
+
+------------------------------------------------------------------------
+1. Install Braintrust CLI and SDK
+------------------------------------------------------------------------
+# Global CLI (optional, or use npx)
+npm install -g @braintrust/cli
+
+# In your project directory:
+cd your-react-vite-app
+npm install --save braintrust openai
+
+# Verify installation
+npx braintrust --help
+
+Explanation:
+- The CLI helps manage prompts from terminal.
+- The SDK lets your app fetch prompts at runtime.
+
+------------------------------------------------------------------------
+2. Initialize Braintrust in Your Repo
+------------------------------------------------------------------------
+npx braintrust init
+
+This creates a `braintrust.config.json`:
+{
+  "projectName": "MyViteApp",
+  "defaults": {
+    "model": "gpt-4o-mini",
+    "temperature": 0.7
+  },
+  "promptDir": "./prompts"
+}
+
+Explanation:
+- `projectName` identifies your Braintrust project.
+- `promptDir` is the local directory for prompt templates.
+
+------------------------------------------------------------------------
+3. Configure Environment Variables
+------------------------------------------------------------------------
+Create a `.env` file at project root:
+
+VITE_BRAINTRUST_API_KEY=your_braintrust_api_key
+VITE_OPENAI_API_KEY=your_openai_api_key
+VITE_BRAINTRUST_PROJECT_NAME=MyViteApp
+
+Then update `vite.config.js` to load `.env.*` (Vite loads VITE_ prefix by default).
+
+Explanation:
+- VITE_ prefix exposes variables to browser code safely.
+- Never commit real keys—use `.gitignore`.
+
+------------------------------------------------------------------------
+4. Author Prompt Templates Locally
+------------------------------------------------------------------------
+Inside `./prompts`, create a file: `answer-question.mustache`
+
+Contents:
+\`\`\`
+You are a helpful assistant. Use the following question to craft an answer:
+{{question}}
+\`\`\`
+
+Explanation:
+- Mustache syntax defines variables.
+- File name (without extension) becomes your prompt slug.
+
+------------------------------------------------------------------------
+5. Push Prompts to Braintrust
+------------------------------------------------------------------------
+npx braintrust push
+
+Key outputs:
+- Shows diff between local and remote.
+- Uploads new or changed templates.
+
+Explanation:
+- Every prompt is versioned on Braintrust.
+- Use `npx braintrust diff` to preview changes.
+
+------------------------------------------------------------------------
+6. Fetch Prompts in React/Vite
+------------------------------------------------------------------------
+Create `src/braintrustClient.ts`:
+
+\`\`\`ts
+import { wrapOpenAI, loadPrompt } from "braintrust";
+import { OpenAI } from "openai";
+
+const openai = wrapOpenAI(new OpenAI({
+  apiKey: import.meta.env.VITE_OPENAI_API_KEY
+}), {
+  projectName: import.meta.env.VITE_BRAINTRUST_PROJECT_NAME
+});
+
+export async function getPromptAnswer(question: string) {
+  // Load latest version by slug
+  const prompt = await loadPrompt({
+    projectName: import.meta.env.VITE_BRAINTRUST_PROJECT_NAME,
+    slug: "answer-question"
+  });
+
+  const messages = prompt.build({ question });
+  const completion = await openai.chat.completions.create({
+    messages,
+    model: prompt.defaults.model,
+    temperature: prompt.defaults.temperature
+  });
+  return completion.choices[0].message.content;
+}
+\`\`\`
+
+Explanation:
+- `loadPrompt()` fetches from Braintrust (with caching).
+- `wrapOpenAI` proxies requests for logging/tracing.
+
+------------------------------------------------------------------------
+7. Use in a React Component
+------------------------------------------------------------------------
+In `src/App.tsx`:
+\`\`\`tsx
+import { useState } from "react";
+import { getPromptAnswer } from "./braintrustClient";
+
+export default function App() {
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState("");
+
+  async function handleAsk() {
+    const resp = await getPromptAnswer(question);
+    setAnswer(resp);
+  }
+
+  return (
+    <div>
+      <h1>Ask the AI</h1>
+      <input
+        value={question}
+        onChange={e => setQuestion(e.target.value)}
+        placeholder="Type your question"
+      />
+      <button onClick={handleAsk}>Ask</button>
+      {answer && <pre>{answer}</pre>}
+    </div>
+  );
+}
+\`\`\`
+
+Explanation:
+- Simple interactive UI demonstrates runtime prompt loading.
+
+------------------------------------------------------------------------
+8. Version Pinning (Optional)
+------------------------------------------------------------------------
+To lock to a prompt revision:
+\`\`\`ts
+const prompt = await loadPrompt({
+  projectName: "MyViteApp",
+  slug: "answer-question",
+  version: "5878bd218351fb8e"
+});
+\`\`\`
+
+Explanation:
+- Guarantees stability in production even if templates update.
+
+------------------------------------------------------------------------
+9. Local Development vs Production
+------------------------------------------------------------------------
+- In **dev**, Braintrust caches locally, so edits in `.prompts/` + `npx braintrust push` reflect immediately.
+- In **prod**, rely on Braintrust CDN; consider pre-warming cache on startup.
+
+------------------------------------------------------------------------
+10. Advanced: Human-in-the-Loop & Evals
+------------------------------------------------------------------------
+- Define evals in `./evals/*.js` and push via CLI.
+- Use Braintrust dashboard to review outputs and scores.
+
+------------------------------------------------------------------------
+11. Monitoring & Logs
+------------------------------------------------------------------------
+- All calls through `wrapOpenAI()` appear in Braintrust UI under “Traces”.
+- Track token usage, latency, regression alerts.
+
+------------------------------------------------------------------------
+Conclusion
+------------------------------------------------------------------------
+You now have a React + Vite app entirely driven by Braintrust-hosted prompts.  
+Edit prompts in the Braintrust UI or locally and push—no code redeploy required!
+"""
