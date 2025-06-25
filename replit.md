@@ -91,6 +91,13 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 25, 2025: **ANONYMOUS CONVERSATION TOOL IMPLEMENTED** - Free-to-use practice tool on landing page
+  - **Side-by-side Layout**: Conversation tool and review panel positioned above the fold
+  - **WebSocket Architecture**: Real-time notifications when AI reviews are ready, registration occurs only after conversation ID is available
+  - **Anonymous User System**: Conversations saved under anonymous@conversly.com for usage analytics
+  - **Session Storage**: Maintains conversation state until page refresh for anonymous users
+  - **Component Reuse**: Leveraged existing ElevenLabs components and conversation workflow
+  - **Proper Timing**: WebSocket registration happens in onConnect callback when conversation ID is known, not on page load
 - June 25, 2025: **TECH DEBT CLEANUP COMPLETED** - Comprehensive codebase cleanup and optimization
   - **TypeScript Improvements**: Removed 100+ `any` types, added proper type annotations for API responses and webhook data
   - **Import Optimization**: Cleaned up unused imports, removed duplicate dependencies, added centralized UI component exports

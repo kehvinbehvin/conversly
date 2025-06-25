@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useMemo, ReactNode } from "react";
 import { useConversation } from "@elevenlabs/react";
-import { useWebSocket } from "@/hooks/useWebSocket";
+import { useSSE } from "@/hooks/useWebSocket";
 import { useQuery } from "@tanstack/react-query";
 import type { ConversationWithReview } from "@shared/schema";
 
@@ -41,9 +41,9 @@ export function AnonymousConversationProvider({
   const conversationIdRef = useRef<string | null>(null);
   const createdConversationsRef = useRef<Set<string>>(new Set());
 
-  // WebSocket connection for real-time notifications
-  const { registerForConversation } = useWebSocket({
-    onMessage: (message) => {
+  // SSE connection for real-time notifications
+  const { isConnected: sseConnected, registerForConversation } = useSSE({
+    onMessage: (message: any) => {
       if (message.type === 'review_ready' && message.conversationId === conversationIdRef.current) {
         console.log('📡 Review ready notification received');
         setIsReviewReady(true);
@@ -99,8 +99,9 @@ export function AnonymousConversationProvider({
       setCurrentConversationId(props.conversationId);
       conversationIdRef.current = props.conversationId;
       
-      // Register for WebSocket notifications
+      // Register for WebSocket notifications now that we have conversation ID
       registerForConversation(props.conversationId);
+      console.log('📡 Registered WebSocket for conversation:', props.conversationId);
       
       // Prevent duplicate conversation creation
       if (createdConversationsRef.current.has(props.conversationId)) {

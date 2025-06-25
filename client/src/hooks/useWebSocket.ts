@@ -1,84 +1,79 @@
 import { useEffect, useRef, useState } from 'react';
 
-interface WebSocketMessage {
+interface SSEMessage {
   type: string;
   conversationId?: string;
   dbConversationId?: number;
 }
 
-interface UseWebSocketOptions {
-  onMessage?: (message: WebSocketMessage) => void;
+interface UseSSEOptions {
+  onMessage?: (message: SSEMessage) => void;
   onConnect?: () => void;
   onDisconnect?: () => void;
 }
 
-export function useWebSocket(options: UseWebSocketOptions = {}) {
+export function useSSE(options: UseSSEOptions = {}) {
   const [isConnected, setIsConnected] = useState(false);
-  const wsRef = useRef<WebSocket | null>(null);
-  const { onMessage, onConnect, onDisconnect } = options;
-
+  const eventSourceRef = useRef<EventSource | null>(null);
+  const optionsRef = useRef(options);
+  
+  // Update options ref when they change
   useEffect(() => {
-    // Determine WebSocket URL based on current location
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-    const wsUrl = `${protocol}//${window.location.host}/ws`;
-    
-    console.log('📡 Connecting to WebSocket:', wsUrl);
-    
-    const ws = new WebSocket(wsUrl);
-    wsRef.current = ws;
+    optionsRef.current = options;
+  }, [options]);
 
-    ws.onopen = () => {
-      console.log('✅ WebSocket connected');
-      setIsConnected(true);
-      onConnect?.();
-    };
-
-    ws.onmessage = (event) => {
-      try {
-        const message: WebSocketMessage = JSON.parse(event.data);
-        console.log('📨 WebSocket message received:', message);
-        onMessage?.(message);
-      } catch (error) {
-        console.error('❌ Error parsing WebSocket message:', error);
-      }
-    };
-
-    ws.onclose = () => {
-      console.log('📡 WebSocket disconnected');
-      setIsConnected(false);
-      onDisconnect?.();
-    };
-
-    ws.onerror = (error) => {
-      console.error('❌ WebSocket error:', error);
-    };
-
-    return () => {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.close();
-      }
-    };
-  }, [onMessage, onConnect, onDisconnect]);
-
-  const sendMessage = (message: WebSocketMessage) => {
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(JSON.stringify(message));
-      console.log('📤 WebSocket message sent:', message);
-    } else {
-      console.warn('⚠️ WebSocket not connected, cannot send message:', message);
+  const connectSSE = (conversationId: string) => {
+    if (eventSourceRef.current) {
+      eventSourceRef.current.close();
     }
+
+    const sseUrl = `/api/events/${conversationId}`;
+    console.log('📡 Connecting to SSE:', sseUrl);
+    
+    const eventSource = new EventSource(sseUrl);
+    eventSourceRef.current = eventSource;
+
+    eventSource.onopen = () => {
+      console.log('✅ SSE connected');
+      setIsConnected(true);
+      optionsRef.current.onConnect?.();
+    };
+
+    eventSource.onmessage = (event) => {
+      try {
+        const message: SSEMessage = JSON.parse(event.data);
+        console.log('📨 SSE message received:', message);
+        optionsRef.current.onMessage?.(message);
+      } catch (error) {
+        console.error('❌ Error parsing SSE message:', error);
+      }
+    };
+
+    eventSource.onerror = (error) => {
+      console.error('❌ SSE error:', error);
+      setIsConnected(false);
+      optionsRef.current.onDisconnect?.();
+    };
   };
 
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (eventSourceRef.current) {
+        eventSourceRef.current.close();
+      }
+    };
+  }, []);
+
   const registerForConversation = (conversationId: string) => {
-    sendMessage({
-      type: 'register',
-      conversationId
-    });
+    connectSSE(conversationId);
   };
 
   return {
     isConnected,
-    sendMessage,
     registerForConversation
   };
 }
+
+// Backward compatibility alias
+export const useWebSocket = useSSE;

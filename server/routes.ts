@@ -3,7 +3,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { createServer, type Server } from "http";
 import { createHmac, timingSafeEqual } from "crypto";
-import { WebSocketServer } from "ws";
+// Removed WebSocket import - using SSE instead
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
 import { analyzeConversationWithBraintrust } from "./services/braintrust";
@@ -13,8 +13,8 @@ import * as reviewRoutes from "./routes/reviews";
 import { createReviewWithTranscripts } from "./services/reviewAnalyzer";
 import { z } from "zod";
 
-// WebSocket connection management
-const wsConnections = new Map<string, any>();
+// SSE connection management for real-time notifications
+const sseConnections = new Map<string, Response>();
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize ElevenLabs client
@@ -549,17 +549,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
               });
               console.log("✅ Conversation status updated to 'completed'");
 
-              // Notify WebSocket clients that review is ready
-              const wsClient = wsConnections.get(conversation_id);
-              if (wsClient && wsClient.readyState === 1) { // WebSocket.OPEN
-                wsClient.send(JSON.stringify({
+              // Notify SSE clients that review is ready
+              const sseClient = sseConnections.get(conversation_id);
+              if (sseClient && !sseClient.destroyed) {
+                sseClient.write(`data: ${JSON.stringify({
                   type: "review_ready",
                   conversationId: conversation_id,
                   dbConversationId: conversation.id
-                }));
-                console.log("📡 Sent review_ready notification to WebSocket client");
+                })}\n\n`);
+                console.log("📡 Sent review_ready notification to SSE client");
               } else {
-                console.log("📡 No active WebSocket connection for conversation:", conversation_id);
+                console.log("📡 No active SSE connection for conversation:", conversation_id);
               }
             } else {
               console.error("❌ Failed to create review with transcript analysis");
@@ -660,65 +660,37 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  const server = createServer(app);
-  
-  // Setup WebSocket server with noServer option to avoid conflicts with Vite
-  const wss = new WebSocketServer({ noServer: true });
-  
-  // Handle WebSocket upgrades manually
-  server.on('upgrade', (request, socket, head) => {
-    const pathname = new URL(request.url || '', `http://${request.headers.host}`).pathname;
+  // Add SSE endpoint for real-time notifications
+  app.get('/api/events/:conversationId', (req, res) => {
+    const conversationId = req.params.conversationId;
     
-    // Only handle our custom WebSocket path
-    if (pathname === '/ws') {
-      wss.handleUpgrade(request, socket, head, (ws) => {
-        wss.emit('connection', ws, request);
-      });
-    } else {
-      // Let other upgrade handlers (like Vite HMR) handle other paths
-      socket.destroy();
-    }
-  });
-  
-  wss.on('connection', (ws, req) => {
-    console.log('📡 New WebSocket connection established');
-    
-    ws.on('message', (message) => {
-      try {
-        const data = JSON.parse(message.toString());
-        console.log('📨 WebSocket message received:', data);
-        
-        if (data.type === 'register' && data.conversationId) {
-          // Register WebSocket connection with ElevenLabs conversation ID
-          wsConnections.set(data.conversationId, ws);
-          console.log('✅ WebSocket registered for conversation:', data.conversationId);
-          
-          ws.send(JSON.stringify({
-            type: 'registered',
-            conversationId: data.conversationId
-          }));
-        }
-      } catch (error) {
-        console.error('❌ Error parsing WebSocket message:', error);
-      }
+    // Set SSE headers
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache',
+      'Connection': 'keep-alive',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Headers': 'Cache-Control'
     });
     
-    ws.on('close', () => {
-      // Remove connection from map when closed
-      const entries = Array.from(wsConnections.entries());
-      for (const [conversationId, client] of entries) {
-        if (client === ws) {
-          wsConnections.delete(conversationId);
-          console.log('📡 WebSocket connection closed for conversation:', conversationId);
-          break;
-        }
-      }
+    // Store the connection
+    sseConnections.set(conversationId, res);
+    console.log('📡 SSE connection established for conversation:', conversationId);
+    
+    // Send initial connection message
+    res.write(`data: ${JSON.stringify({ type: 'connected', conversationId })}\n\n`);
+    
+    // Handle client disconnect
+    req.on('close', () => {
+      sseConnections.delete(conversationId);
+      console.log('📡 SSE connection closed for conversation:', conversationId);
     });
     
-    ws.on('error', (error) => {
-      console.error('❌ WebSocket error:', error);
+    req.on('aborted', () => {
+      sseConnections.delete(conversationId);
+      console.log('📡 SSE connection aborted for conversation:', conversationId);
     });
   });
 
-  return server;
+  return createServer(app);
 }
