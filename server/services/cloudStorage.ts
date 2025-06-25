@@ -36,17 +36,37 @@ export class ReplitStorageWithFallback implements ICloudStorage {
   }
 
   async saveTranscript(data: TranscriptData): Promise<string> {
-    // Try Replit Object Storage first
+    let cloudResult: string | null = null;
+    let localResult: string | null = null;
+    
+    // Always try cloud storage first
     if (this.replitStorage) {
       try {
-        return await this.replitStorage.saveTranscript(data);
+        cloudResult = await this.replitStorage.saveTranscript(data);
+        console.log('✅ Transcript saved to cloud storage');
       } catch (error) {
-        console.warn('Replit Object Storage failed, falling back to local storage:', error);
+        console.warn('⚠️ Cloud storage failed, will use local fallback:', error);
       }
     }
     
-    // Fallback to local storage
-    return await this.localStorage.saveTranscript(data);
+    // Save to local storage as backup (or primary if cloud failed)
+    try {
+      localResult = await this.localStorage.saveTranscript(data);
+      if (!cloudResult) {
+        console.log('✅ Transcript saved to local storage (primary)');
+      } else {
+        console.log('✅ Transcript also backed up locally');
+      }
+    } catch (localError) {
+      console.error('❌ Local storage also failed:', localError);
+      if (cloudResult) {
+        return cloudResult; // Return cloud result if local backup fails
+      }
+      throw localError;
+    }
+    
+    // Return cloud result if available, otherwise local
+    return cloudResult || localResult;
   }
 
   async getTranscript(elevenlabsId: string): Promise<TranscriptData | null> {
@@ -65,27 +85,18 @@ export class ReplitStorageWithFallback implements ICloudStorage {
   }
 
   async listTranscripts(): Promise<string[]> {
-    let cloudFiles: string[] = [];
     let localFiles: string[] = [];
     
-    // Try Replit Object Storage first
-    if (this.replitStorage) {
-      try {
-        cloudFiles = await this.replitStorage.listTranscripts();
-      } catch (error) {
-        console.warn('Replit Object Storage failed, trying local storage:', error);
-      }
-    }
-    
-    // Also get local files as backup
+    // Since Replit Object Storage doesn't support listing, use local files as reference
     try {
       localFiles = await this.localStorage.listTranscripts();
     } catch (error) {
       console.warn('Local storage failed:', error);
     }
     
-    // Return cloud files if available, otherwise local files
-    return cloudFiles.length > 0 ? cloudFiles : localFiles;
+    // For now, return local files count since cloud listing isn't supported
+    // The actual transcripts are still saved to cloud storage
+    return localFiles;
   }
 
   async deleteTranscript(elevenlabsId: string): Promise<boolean> {
