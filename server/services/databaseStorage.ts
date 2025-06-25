@@ -3,7 +3,6 @@ import {
   conversations, 
   reviews,
   transcripts,
-  improvements,
   type User, 
   type InsertUser, 
   type Conversation,
@@ -12,11 +11,10 @@ import {
   type InsertReview,
   type Transcript,
   type InsertTranscript,
-  type Improvement,
-  type InsertImprovement,
   type ConversationWithReview,
-  type ReviewWithImprovements,
-  type ConversationWithReviewAndImprovements
+  type TranscriptObject,
+  type ReviewObject,
+  type TranscriptWithReview
 } from "@shared/schema";
 import { db } from "../db";
 import { eq, desc } from "drizzle-orm";
@@ -104,23 +102,22 @@ export class DatabaseStorage implements IStorage {
 
   async updateConversationFromWebhook(
     id: number, 
-    transcriptContent: string, 
+    transcriptData: TranscriptObject[], 
     audioUrl: string | null, 
     metadata: any
   ): Promise<Conversation | undefined> {
     const conversation = await this.getConversation(id);
     if (!conversation) return undefined;
 
-    // Create or update transcript
+    // Create or update transcript with new data structure
     let transcriptId = conversation.transcriptId;
-    if (transcriptContent && !transcriptId) {
+    if (transcriptData && transcriptData.length > 0 && !transcriptId) {
       const transcript = await this.createTranscript({
-        fileLocation: `data/transcripts/${id}-${Date.now()}.json`,
-        content: transcriptContent
+        transcriptData: transcriptData
       });
       transcriptId = transcript.id;
-    } else if (transcriptContent && transcriptId) {
-      await this.updateTranscript(transcriptId, { content: transcriptContent });
+    } else if (transcriptData && transcriptData.length > 0 && transcriptId) {
+      await this.updateTranscript(transcriptId, { transcriptData: transcriptData });
     }
 
     // Update conversation
@@ -129,7 +126,7 @@ export class DatabaseStorage implements IStorage {
       .set({
         transcriptId,
         audioUrl: audioUrl || conversation.audioUrl,
-        status: transcriptContent ? "completed" : conversation.status,
+        status: transcriptData.length > 0 ? "pending" : conversation.status,
         metadata: metadata || conversation.metadata
       })
       .where(eq(conversations.id, id))
@@ -177,41 +174,4 @@ export class DatabaseStorage implements IStorage {
     return review || undefined;
   }
 
-  // Improvement operations
-  async getImprovement(id: number): Promise<Improvement | undefined> {
-    const [improvement] = await db.select().from(improvements).where(eq(improvements.id, id));
-    return improvement || undefined;
-  }
-
-  async getImprovementsByReviewId(reviewId: number): Promise<Improvement[]> {
-    return await db
-      .select()
-      .from(improvements)
-      .where(eq(improvements.reviewId, reviewId))
-      .orderBy(improvements.transcriptSectionStart);
-  }
-
-  async createImprovement(insertImprovement: InsertImprovement): Promise<Improvement> {
-    const [improvement] = await db
-      .insert(improvements)
-      .values(insertImprovement)
-      .returning();
-    return improvement;
-  }
-
-  async updateImprovement(id: number, updates: Partial<Improvement>): Promise<Improvement | undefined> {
-    const [improvement] = await db
-      .update(improvements)
-      .set(updates)
-      .where(eq(improvements.id, id))
-      .returning();
-    return improvement || undefined;
-  }
-
-  async deleteImprovement(id: number): Promise<boolean> {
-    const result = await db
-      .delete(improvements)
-      .where(eq(improvements.id, id));
-    return (result as any).rowCount > 0;
-  }
 }

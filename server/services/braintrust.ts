@@ -1,6 +1,6 @@
 import { invoke } from "braintrust";
 import { z } from "zod";
-import type { Improvement } from "@shared/schema";
+import type { Improvement, ReviewObject, TranscriptObject } from "@shared/schema";
 
 export interface BraintrustFeedbackItem {
   location: string;
@@ -10,6 +10,7 @@ export interface BraintrustFeedbackItem {
 
 export interface BraintrustResponse {
   improvements: BraintrustFeedbackItem[];
+  reviews: ReviewObject[];
 }
 
 export interface ConversationAnalysis {
@@ -22,27 +23,32 @@ export interface ConversationAnalysis {
 }
 
 export async function analyzeConversationWithBraintrust(
-  transcript: string,
+  transcriptJson: string,
 ): Promise<BraintrustResponse> {
   try {
-    const formattedTranscript = formatTranscriptForAnalysis(transcript);
-    const transcriptString = formattedTranscript.join("\n");
+    // Parse the JSON string to get transcript array
+    const transcriptData: TranscriptObject[] = JSON.parse(transcriptJson);
 
     const result = await invoke({
       projectName: process.env.BRAINTRUST_PROJECT_NAME || "Yappy-first-project",
       slug: "conversation-consultant-7a00",
-      input: { transcript: transcriptString },
+      input: { transcript: transcriptJson },
     });
 
-    let improvements: BraintrustFeedbackItem[];
+    // Handle the new response format with reviews
+    let reviews: ReviewObject[] = [];
+    if (result.reviews && Array.isArray(result.reviews)) {
+      reviews = result.reviews;
+    } else if (Array.isArray(result)) {
+      reviews = result;
+    }
+
+    // Legacy improvements support (for backward compatibility)
+    let improvements: BraintrustFeedbackItem[] = [];
     if (result.improvements && Array.isArray(result.improvements)) {
       improvements = result.improvements;
     } else if (result.location && result.improvement) {
       improvements = [result];
-    } else if (Array.isArray(result)) {
-      improvements = result;
-    } else {
-      throw new Error("Invalid response structure from Braintrust analysis");
     }
 
     const validatedImprovements = improvements
@@ -59,7 +65,23 @@ export async function analyzeConversationWithBraintrust(
       })
       .filter(Boolean) as BraintrustFeedbackItem[];
 
-    return { improvements: validatedImprovements };
+    const validatedReviews = reviews
+      .map((item, index) => {
+        if (typeof item.index !== 'number' || !item.review) {
+          console.warn(`Skipping invalid review at index ${index}:`, item);
+          return null;
+        }
+        return {
+          index: item.index,
+          review: String(item.review),
+        };
+      })
+      .filter(Boolean) as ReviewObject[];
+
+    return { 
+      improvements: validatedImprovements,
+      reviews: validatedReviews 
+    };
   } catch (error) {
     console.error("Braintrust analysis error:", error);
     throw new Error(

@@ -3,7 +3,6 @@ import {
   conversations, 
   reviews,
   transcripts,
-  improvements,
   type User, 
   type InsertUser, 
   type Conversation,
@@ -12,11 +11,10 @@ import {
   type InsertReview,
   type Transcript,
   type InsertTranscript,
-  type Improvement,
-  type InsertImprovement,
   type ConversationWithReview,
-  type ReviewWithImprovements,
-  type ConversationWithReviewAndImprovements
+  type TranscriptObject,
+  type ReviewObject,
+  type TranscriptWithReview
 } from "@shared/schema";
 
 export interface IStorage {
@@ -35,7 +33,7 @@ export interface IStorage {
   getConversationsByUserId(userId: number): Promise<ConversationWithReview[]>;
   createConversation(conversation: InsertConversation): Promise<Conversation>;
   updateConversation(id: number, updates: Partial<Conversation>): Promise<Conversation | undefined>;
-  updateConversationFromWebhook(id: number, transcriptContent: string, audioUrl: string | null, metadata: any): Promise<Conversation | undefined>;
+  updateConversationFromWebhook(id: number, transcriptData: TranscriptObject[], audioUrl: string | null, metadata: any): Promise<Conversation | undefined>;
   getConversationByElevenlabsId(elevenlabsId: string): Promise<Conversation | undefined>;
 
   // Review operations
@@ -43,13 +41,6 @@ export interface IStorage {
   getReviewByConversationId(conversationId: number): Promise<Review | undefined>;
   createReview(review: InsertReview): Promise<Review>;
   updateReview(id: number, updates: Partial<Review>): Promise<Review | undefined>;
-
-  // Improvement operations
-  getImprovement(id: number): Promise<Improvement | undefined>;
-  getImprovementsByReviewId(reviewId: number): Promise<Improvement[]>;
-  createImprovement(improvement: InsertImprovement): Promise<Improvement>;
-  updateImprovement(id: number, updates: Partial<Improvement>): Promise<Improvement | undefined>;
-  deleteImprovement(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -57,24 +48,20 @@ export class MemStorage implements IStorage {
   private conversations: Map<number, Conversation>;
   private reviews: Map<number, Review>;
   private transcripts: Map<number, Transcript>;
-  private improvements: Map<number, Improvement>;
   private currentUserId: number;
   private currentConversationId: number;
   private currentReviewId: number;
   private currentTranscriptId: number;
-  private currentImprovementId: number;
 
   constructor() {
     this.users = new Map();
     this.conversations = new Map();
     this.reviews = new Map();
     this.transcripts = new Map();
-    this.improvements = new Map();
     this.currentUserId = 1;
     this.currentConversationId = 1;
     this.currentReviewId = 1;
     this.currentTranscriptId = 1;
-    this.currentImprovementId = 1;
 
     // Create a demo user for testing
     this.createUser({
@@ -182,23 +169,22 @@ export class MemStorage implements IStorage {
 
   async updateConversationFromWebhook(
     id: number, 
-    transcriptContent: string, 
+    transcriptData: TranscriptObject[], 
     audioUrl: string | null, 
     metadata: any
   ): Promise<Conversation | undefined> {
     const conversation = this.conversations.get(id);
     if (!conversation) return undefined;
 
-    // Create or update transcript
+    // Create or update transcript with new data structure
     let transcriptId = conversation.transcriptId;
-    if (transcriptContent && !transcriptId) {
+    if (transcriptData && transcriptData.length > 0 && !transcriptId) {
       const transcript = await this.createTranscript({
-        fileLocation: `data/transcripts/${id}-${Date.now()}.json`,
-        content: transcriptContent
+        transcriptData: transcriptData
       });
       transcriptId = transcript.id;
-    } else if (transcriptContent && transcriptId) {
-      await this.updateTranscript(transcriptId, { content: transcriptContent });
+    } else if (transcriptData && transcriptData.length > 0 && transcriptId) {
+      await this.updateTranscript(transcriptId, { transcriptData: transcriptData });
     }
 
     // Merge webhook metadata with existing metadata
@@ -259,43 +245,6 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
-  // Improvement operations
-  async getImprovement(id: number): Promise<Improvement | undefined> {
-    return this.improvements.get(id);
-  }
-
-  async getImprovementsByReviewId(reviewId: number): Promise<Improvement[]> {
-    return Array.from(this.improvements.values())
-      .filter(improvement => improvement.reviewId === reviewId)
-      .sort((a, b) => a.transcriptSectionStart - b.transcriptSectionStart);
-  }
-
-  async createImprovement(insertImprovement: InsertImprovement): Promise<Improvement> {
-    const id = this.currentImprovementId++;
-    const now = new Date();
-    const improvement: Improvement = {
-      ...insertImprovement,
-      priority: insertImprovement.priority || "medium",
-      category: insertImprovement.category || null,
-      id,
-      createdAt: now
-    };
-    this.improvements.set(id, improvement);
-    return improvement;
-  }
-
-  async updateImprovement(id: number, updates: Partial<Improvement>): Promise<Improvement | undefined> {
-    const improvement = this.improvements.get(id);
-    if (!improvement) return undefined;
-
-    const updated = { ...improvement, ...updates };
-    this.improvements.set(id, updated);
-    return updated;
-  }
-
-  async deleteImprovement(id: number): Promise<boolean> {
-    return this.improvements.delete(id);
-  }
 }
 
 // Import database storage implementation

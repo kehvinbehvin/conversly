@@ -5,10 +5,9 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
 import { analyzeConversation } from "./services/braintrust";
-import { createReviewWithImprovements } from "./services/reviewAnalyzer";
-import { fileStore, cloudStorage, type TranscriptData } from "./services/fileStore";
+import { createReviewWithTranscripts } from "./services/reviewAnalyzer";
+import type { TranscriptObject } from "@shared/schema";
 import * as transcriptRoutes from "./routes/transcripts";
-import * as improvementRoutes from "./routes/improvements";
 import * as reviewRoutes from "./routes/reviews";
 import { z } from "zod";
 import bodyParser from "body-parser";
@@ -361,13 +360,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           conversation_id,
         );
 
-        // Convert transcript array to readable string with validation
-        let transcriptText = "";
+        // Extract and format transcript data with new structure
+        let transcriptData: TranscriptObject[] = [];
         if (transcriptArray && Array.isArray(transcriptArray)) {
-          transcriptText = transcriptArray
+          transcriptData = transcriptArray
             .filter((turn) => turn && typeof turn === 'object' && turn.role && turn.message)
-            .map((turn) => `${turn.role}: ${turn.message}`)
-            .join("\n");
+            .map((turn, index) => ({
+              index: index,
+              role: turn.role === 'agent' ? 'agent' : 'user',
+              message: turn.message,
+              time_in_call_secs: turn.time_in_call_secs || 0
+            }));
         }
 
         // Extract audio URL from metadata if available (not present in current payload structure)
@@ -376,8 +379,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("📝 Processed transcript:", {
           originalFormat: "array",
           turnsCount: transcriptArray?.length || 0,
-          validTurns: transcriptArray?.filter(turn => turn && turn.role && turn.message)?.length || 0,
-          processedLength: transcriptText.length,
+          validTurns: transcriptData.length,
           hasAudioUrl: !!audio_url,
         });
 
@@ -397,16 +399,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
 
         console.log("📊 Call metadata:", callMetadata);
-
-        // Prepare transcript data
-        const transcriptFileData: TranscriptData = {
-          conversationId: "", // Will be set after finding/creating conversation
-          elevenlabsId: conversation_id,
-          transcript: webhookData.data?.transcript,
-          metadata: webhookData.data?.metadata,
-          analysis: webhookData.data?.analysis,
-          timestamp: Date.now(),
-        };
 
         // Find conversation by ElevenLabs ID
         let conversation;
@@ -445,32 +437,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
         }
 
-        // Update transcript data with conversation ID and save to cloud storage
-        transcriptFileData.conversationId = conversation.id.toString();
-        await cloudStorage.saveTranscript(transcriptFileData);
-        console.log("💾 Transcript saved to cloud storage for ElevenLabs ID:", conversation_id);
-
         console.log("✅ Found conversation:", {
           id: conversation.id,
           status: conversation.status,
-          hasTranscript: !!conversation.transcript,
+          hasTranscriptId: !!conversation.transcriptId,
           hasAudioUrl: !!conversation.audioUrl,
         });
 
         // Log what we're updating
         console.log("📝 Updating conversation with:", {
-          hasTranscript: !!(transcriptText && transcriptText.trim()),
-          transcriptLength: transcriptText.length,
+          hasTranscriptData: transcriptData.length > 0,
+          transcriptTurns: transcriptData.length,
           hasAudioUrl: !!audio_url,
           audioUrl: audio_url ? audio_url.substring(0, 50) + "..." : null,
           metadata: callMetadata,
         });
 
-        // Update conversation with transcript, audio, and metadata using webhook-specific method
+        // Update conversation with transcript data, audio, and metadata using webhook-specific method
         try {
           await storage.updateConversationFromWebhook(
             conversation.id,
-            transcriptText || "",
+            transcriptData,
             audio_url,
             callMetadata
           );
@@ -482,39 +469,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             .json({ message: "Failed to update conversation" });
         }
 
-        // Analyze conversation with OpenAI if transcript is available
-        if (transcriptText && transcriptText.trim()) {
+        // Analyze conversation with LLM if transcript data is available
+        if (transcriptData && transcriptData.length > 0) {
           console.log(
-            "🧠 Starting AI analysis for transcript (length:",
-            transcriptText.length,
-            "chars)",
+            "🧠 Starting AI analysis for transcript (turns:",
+            transcriptData.length,
+            ")",
           );
 
           try {
-            const review = await createReviewWithImprovements(conversation.id, transcriptText);
+            const review = await createReviewWithTranscripts(conversation.id, transcriptData);
             if (review) {
-              console.log("✅ Review with improvements created successfully:", review.id);
+              console.log("✅ Review with transcript analysis created successfully:", review.id);
               
-              // Update conversation status to analyzed
+              // Update conversation status to completed
               await storage.updateConversation(conversation.id, {
-                status: "analyzed",
+                status: "completed",
               });
-              console.log("✅ Conversation status updated to 'analyzed'");
+              console.log("✅ Conversation status updated to 'completed'");
             } else {
-              console.error("❌ Failed to create review with improvements");
-            }
-
-            try {
-              await storage.updateConversation(conversation.id, {
-                status: "analyzed",
-              });
-              console.log("✅ Conversation status updated to 'analyzed'");
-            } catch (statusError) {
-              console.error(
-                "❌ Error updating conversation status:",
-                statusError,
-              );
-              throw statusError;
+              console.error("❌ Failed to create review with transcript analysis");
             }
 
             console.log(
@@ -531,7 +505,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
                   ? analysisError.stack
                   : undefined,
               conversationId: conversation.id,
-              transcriptLength: transcriptText.length,
+              transcriptTurns: transcriptData.length,
             });
 
             // Try to update status to indicate analysis failed
@@ -555,11 +529,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
             );
           }
         } else {
-          console.log("⚠️ No transcript available for analysis:", {
-            transcriptExists: !!transcriptText,
-            transcriptLength: transcriptText.length,
-            transcriptTrimmed: transcriptText.trim().length,
-            originalArrayLength: transcriptArray?.length || 0,
+          console.log("⚠️ No transcript data available for analysis:", {
+            transcriptDataExists: !!transcriptData,
+            transcriptTurns: transcriptData ? transcriptData.length : 0,
+            originalTranscriptLength: transcriptArray?.length || 0,
           });
         }
 
@@ -571,9 +544,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
           processingTime: processingTime,
           conversationId: conversation.id,
           elevenlabsId: conversation_id,
-          transcriptSaved: true,
-          analysisPerformed: !!(transcriptText && transcriptText.trim()),
-          transcriptTurns: transcriptArray?.length || 0,
+          transcriptSaved: transcriptData.length > 0,
+          analysisPerformed: transcriptData.length > 0,
+          transcriptTurns: transcriptData.length,
           callDuration: callMetadata.duration,
         });
       } catch (error) {
@@ -585,21 +558,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
           processingTime,
         });
 
-        // Still try to save raw webhook data even if processing fails
-        try {
-          const rawTranscriptData: TranscriptData = {
-            conversationId: "error",
-            elevenlabsId: req.body?.data?.conversation_id || "unknown",
-            transcript: req.body?.data?.transcript,
-            metadata: req.body?.data?.metadata,
-            analysis: req.body?.data?.analysis,
-            timestamp: Date.now(),
-          };
-          await cloudStorage.saveTranscript(rawTranscriptData);
-          console.log("💾 Raw webhook data saved despite processing error");
-        } catch (saveError) {
-          console.error("❌ Failed to save raw webhook data:", saveError);
-        }
+        // Log error details for debugging
+        console.error("❌ Error details logged for debugging");
 
         res.status(500).json({
           message: "Failed to process webhook",
@@ -620,48 +580,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/reviews", express.json(), reviewRoutes.createReview);
   app.patch("/api/reviews/:id", express.json(), reviewRoutes.updateReview);
 
-  // Improvement routes
-  app.get("/api/improvements/:id", improvementRoutes.getImprovement);
-  app.get("/api/reviews/:reviewId/improvements", improvementRoutes.getImprovementsByReviewId);
-  app.post("/api/improvements", express.json(), improvementRoutes.createImprovement);
-  app.patch("/api/improvements/:id", express.json(), improvementRoutes.updateImprovement);
-  app.delete("/api/improvements/:id", improvementRoutes.deleteImprovement);
 
-  // API endpoint to list saved transcript files (legacy support)
-  app.get(
-    "/api/transcript-files",
-    express.json(),
-    express.urlencoded({ extended: false }),
-    async (req, res) => {
-      try {
-        const files = await cloudStorage.listTranscripts();
-        res.json({ transcripts: files });
-      } catch (error) {
-        res.status(500).json({ message: "Failed to list transcripts" });
-      }
-    },
-  );
 
-  // API endpoint to get a specific transcript file (legacy support)
-  app.get(
-    "/api/transcript-files/:elevenlabsId",
-    express.json(),
-    express.urlencoded({ extended: false }),
-    async (req, res) => {
-      try {
-        const { elevenlabsId } = req.params;
-        const transcript = await cloudStorage.getTranscript(elevenlabsId);
-        
-        if (!transcript) {
-          return res.status(404).json({ message: "Transcript not found" });
-        }
-        
-        res.json(transcript);
-      } catch (error) {
-        res.status(500).json({ message: "Failed to get transcript" });
-      }
-    },
-  );
+
 
   // API endpoint to get cloud storage status and configuration
   app.get(

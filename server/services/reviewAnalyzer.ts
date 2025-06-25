@@ -1,52 +1,58 @@
-import { analyzeConversation } from "./braintrust";
+import { analyzeConversationWithBraintrust } from "./braintrust";
 import { storage } from "../storage";
-import type { Conversation, Review } from "@shared/schema";
+import type { Conversation, Review, TranscriptObject, ReviewObject, TranscriptWithReview } from "@shared/schema";
 
-export async function createReviewWithImprovements(conversationId: number, transcriptContent: string): Promise<Review | null> {
+export async function createReviewWithTranscripts(conversationId: number, transcriptData: TranscriptObject[]): Promise<Review | null> {
   try {
-    // Run AI analysis
-    const analysis = await analyzeConversation(transcriptContent);
+    // Convert transcript data to string format for LLM analysis
+    const transcriptString = JSON.stringify(transcriptData);
     
-    // Create review record
+    // Run AI analysis with new input format
+    const braintrustResponse = await analyzeConversationWithBraintrust(transcriptString);
+    
+    // Extract review objects from Braintrust response
+    const reviewObjects: ReviewObject[] = braintrustResponse.reviews || [];
+    
+    // Merge transcript data with review data based on index
+    const transcriptWithReviews: TranscriptWithReview[] = transcriptData.map(transcriptItem => {
+      const matchingReview = reviewObjects.find(review => review.index === transcriptItem.index);
+      return {
+        ...transcriptItem,
+        review: matchingReview?.review || null
+      };
+    });
+    
+    // Generate summary and rating
+    const reviewCount = reviewObjects.length;
+    const summary = reviewCount > 0 
+      ? `Analysis completed with ${reviewCount} review items for conversation turns.`
+      : "Conversation practice session completed successfully.";
+    const overallRating = Math.max(1, Math.min(5, 4 - Math.floor(reviewCount / 5)));
+
+    // Create review record with merged transcript and review data
     const review = await storage.createReview({
       conversationId,
-      summary: analysis.summary,
-      overallRating: analysis.overallRating
+      summary,
+      overallRating,
+      transcriptWithReviews: transcriptWithReviews
     });
-
-    // Create improvement records for each improvement
-    for (const improvement of analysis.improvements) {
-      await storage.createImprovement({
-        reviewId: review.id,
-        transcriptSectionStart: improvement.transcriptSectionStart,
-        transcriptSectionEnd: improvement.transcriptSectionEnd,
-        feedbackText: improvement.feedbackText,
-        improvementType: improvement.improvementType,
-        priority: improvement.priority || "medium",
-        category: improvement.category || null
-      });
-    }
 
     return review;
   } catch (error) {
-    console.error("Error creating review with improvements:", error);
+    console.error("Error creating review with transcripts:", error);
     return null;
   }
 }
 
-export async function getReviewWithImprovements(reviewId: number) {
+export async function getReviewWithTranscripts(reviewId: number) {
   try {
     const review = await storage.getReview(reviewId);
     if (!review) return null;
 
-    const improvements = await storage.getImprovementsByReviewId(reviewId);
-    
-    return {
-      ...review,
-      improvements
-    };
+    // The transcriptWithReviews data is already stored in the review record
+    return review;
   } catch (error) {
-    console.error("Error fetching review with improvements:", error);
+    console.error("Error getting review with transcripts:", error);
     return null;
   }
 }

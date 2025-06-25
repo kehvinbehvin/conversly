@@ -25,8 +25,7 @@ export const conversations = pgTable("conversations", {
 
 export const transcripts = pgTable("transcripts", {
   id: serial("id").primaryKey(),
-  fileLocation: text("file_location").notNull(),
-  content: text("content"), // Full transcript text
+  transcriptData: jsonb("transcript_data").notNull(), // Array of transcript objects
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
@@ -35,20 +34,11 @@ export const reviews = pgTable("reviews", {
   conversationId: integer("conversation_id").notNull(),
   summary: text("summary").notNull(),
   overallRating: integer("overall_rating"), // 1-5 scale
+  transcriptWithReviews: jsonb("transcript_with_reviews").notNull(), // Merged transcript and review data
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
-export const improvements = pgTable("improvements", {
-  id: serial("id").primaryKey(),
-  reviewId: integer("review_id").notNull(),
-  transcriptSectionStart: integer("transcript_section_start").notNull(), // Character position start
-  transcriptSectionEnd: integer("transcript_section_end").notNull(), // Character position end
-  feedbackText: text("feedback_text").notNull(),
-  improvementType: text("improvement_type").notNull(), // "positive" | "improvement" | "neutral"
-  priority: text("priority").notNull().default("medium"), // "high" | "medium" | "low"
-  category: text("category"), // e.g., "tone", "clarity", "engagement"
-  createdAt: timestamp("created_at").notNull().defaultNow(),
-});
+
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -71,11 +61,6 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
   createdAt: true,
 });
 
-export const insertImprovementSchema = createInsertSchema(improvements).omit({
-  id: true,
-  createdAt: true,
-});
-
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertConversation = z.infer<typeof insertConversationSchema>;
@@ -84,8 +69,23 @@ export type InsertTranscript = z.infer<typeof insertTranscriptSchema>;
 export type Transcript = typeof transcripts.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
-export type InsertImprovement = z.infer<typeof insertImprovementSchema>;
-export type Improvement = typeof improvements.$inferSelect;
+
+// New data structures as per requirements
+export type TranscriptObject = {
+  index: number;
+  role: "agent" | "user";
+  message: string;
+  time_in_call_secs: number;
+};
+
+export type ReviewObject = {
+  index: number;
+  review: string;
+};
+
+export type TranscriptWithReview = TranscriptObject & {
+  review?: string | null;
+};
 
 // Extended types for API responses
 export type ConversationWithReview = Conversation & {
@@ -93,15 +93,7 @@ export type ConversationWithReview = Conversation & {
   transcript?: Transcript;
 };
 
-export type ReviewWithImprovements = Review & {
-  improvements: Improvement[];
-};
-
-export type ConversationWithReviewAndImprovements = Conversation & {
-  review?: ReviewWithImprovements;
-  transcript?: Transcript;
-};
-
+// Legacy types for backward compatibility
 export type ReviewHighlight = {
   text: string;
   feedback: string;
@@ -130,18 +122,13 @@ export const usersRelations = relations(users, ({ many }) => ({
 export const conversationsRelations = relations(conversations, ({ one, many }) => ({
   user: one(users, { fields: [conversations.userId], references: [users.id] }),
   transcript: one(transcripts, { fields: [conversations.transcriptId], references: [transcripts.id] }),
-  reviews: many(reviews),
+  review: one(reviews, { fields: [conversations.id], references: [reviews.conversationId] }),
 }));
 
 export const transcriptsRelations = relations(transcripts, ({ many }) => ({
   conversations: many(conversations),
 }));
 
-export const reviewsRelations = relations(reviews, ({ one, many }) => ({
+export const reviewsRelations = relations(reviews, ({ one }) => ({
   conversation: one(conversations, { fields: [reviews.conversationId], references: [conversations.id] }),
-  improvements: many(improvements),
-}));
-
-export const improvementsRelations = relations(improvements, ({ one }) => ({
-  review: one(reviews, { fields: [improvements.reviewId], references: [reviews.id] }),
 }));
