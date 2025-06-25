@@ -100,7 +100,7 @@ export default function ConversationEndModal({
               </div>
               
               <div className="flex flex-col w-full space-y-3">
-                <Link href={`/conversation/${conversation.id}`}>
+                <Link href={`/conversation/${conversation?.id}`}>
                   <Button 
                     className="w-full bg-coral-500 hover:bg-coral-600 text-white"
                     onClick={onClose}

@@ -32,10 +32,6 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <ConversationProvider
-        onConversationEnd={(conversationId) => {
-          // Navigate to review page
-          window.location.href = `/conversation/${conversationId}`;
-        }}
         onError={(error) => {
           console.error("Conversation error:", error);
         }}

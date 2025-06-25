@@ -131,7 +131,7 @@ export function ConversationProvider({
       if (conversationId) {
         console.log("🔔 Setting showEndModal to true for conversation:", conversationId);
         setShowEndModal(true);
-        callbacksRef.current.onConversationEnd?.(conversationId);
+        // Don't call onConversationEnd callback here - let modal handle navigation
       } else {
         console.log("⚠️ No conversation ID found, modal will not show");
       }
