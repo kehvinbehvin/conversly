@@ -17,6 +17,8 @@ export default function ConversationEndModal({
   conversationId 
 }: ConversationEndModalProps) {
   const [showCTA, setShowCTA] = useState(false);
+  
+  console.log("🔔 ConversationEndModal render - isOpen:", isOpen, "conversationId:", conversationId);
 
   // Poll for conversation existence using conversationId from ElevenLabs
   const { data: conversations } = useQuery({

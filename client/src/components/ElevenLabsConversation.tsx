@@ -75,6 +75,7 @@ export default function ElevenLabsConversation({
       </div>
 
       {/* Conversation End Modal */}
+      {console.log("🔍 Modal debug - showEndModal:", showEndModal, "conversationId:", currentConversationId)}
       <ConversationEndModal
         isOpen={showEndModal}
         onClose={closeEndModal}

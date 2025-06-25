@@ -114,19 +114,28 @@ export function ConversationProvider({
     },
     onDisconnect: (details: any) => {
       console.log("❌ Disconnected from ElevenLabs conversation:", details);
+      console.log("🔍 Current conversation ID:", currentConversationId);
+      console.log("🔍 Details conversation ID:", details?.conversationId);
       setIsConnecting(false);
+      
+      const conversationId = details?.conversationId || currentConversationId;
+      console.log("🔍 Final conversation ID to use:", conversationId);
+      
+      // Show modal BEFORE clearing state
+      if (conversationId) {
+        console.log("🔔 Setting showEndModal to true for conversation:", conversationId);
+        setShowEndModal(true);
+        callbacksRef.current.onConversationEnd?.(conversationId);
+      } else {
+        console.log("⚠️ No conversation ID found, modal will not show");
+      }
       
       // Clear tracking when conversation ends
       if (currentConversationId) {
         createdConversationsRef.current.delete(currentConversationId);
       }
       
-      const conversationId = details?.conversationId || currentConversationId;
-      if (conversationId) {
-        // Show modal when conversation ends
-        setShowEndModal(true);
-        callbacksRef.current.onConversationEnd?.(conversationId);
-      }
+      // Clear currentConversationId AFTER using it for modal
       setCurrentConversationId(null);
     },
     onError: (error: string) => {
