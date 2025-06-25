@@ -5,7 +5,10 @@ import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
 import { analyzeConversation } from "./services/openai";
+import { createReviewWithImprovements } from "./services/reviewAnalyzer";
 import { fileStore, cloudStorage, type TranscriptData } from "./services/fileStore";
+import * as transcriptRoutes from "./routes/transcripts";
+import * as improvementRoutes from "./routes/improvements";
 import { z } from "zod";
 import bodyParser from "body-parser";
 
@@ -473,28 +476,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
 
           try {
-            const analysis = await analyzeConversation(transcriptText);
-            console.log("✅ AI analysis completed:", {
-              highlightsCount: analysis.highlights?.length || 0,
-              summaryLength: analysis.summary?.length || 0,
-              overallRating: analysis.overallRating,
-              suggestionsCount: analysis.suggestions?.length || 0,
-              strengthsCount: analysis.strengths?.length || 0,
-            });
-
-            try {
-              await storage.createReview({
-                conversationId: conversation.id,
-                highlights: analysis.highlights,
-                summary: analysis.summary,
-                overallRating: analysis.overallRating,
-                suggestions: analysis.suggestions,
-                strengths: analysis.strengths,
+            const review = await createReviewWithImprovements(conversation.id, transcriptText);
+            if (review) {
+              console.log("✅ Review with improvements created successfully:", review.id);
+              
+              // Update conversation status to analyzed
+              await storage.updateConversation(conversation.id, {
+                status: "analyzed",
               });
-              console.log("✅ Review created successfully");
-            } catch (reviewError) {
-              console.error("❌ Error creating review:", reviewError);
-              throw reviewError;
+              console.log("✅ Conversation status updated to 'analyzed'");
+            } else {
+              console.error("❌ Failed to create review with improvements");
             }
 
             try {
@@ -602,9 +594,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-  // API endpoint to list saved transcripts
+  // Transcript routes
+  app.get("/api/transcripts/:id", transcriptRoutes.getTranscript);
+  app.post("/api/transcripts", express.json(), transcriptRoutes.createTranscript);
+  app.patch("/api/transcripts/:id", express.json(), transcriptRoutes.updateTranscript);
+
+  // Improvement routes
+  app.get("/api/improvements/:id", improvementRoutes.getImprovement);
+  app.get("/api/reviews/:reviewId/improvements", improvementRoutes.getImprovementsByReviewId);
+  app.post("/api/improvements", express.json(), improvementRoutes.createImprovement);
+  app.patch("/api/improvements/:id", express.json(), improvementRoutes.updateImprovement);
+  app.delete("/api/improvements/:id", improvementRoutes.deleteImprovement);
+
+  // API endpoint to list saved transcript files (legacy support)
   app.get(
-    "/api/transcripts",
+    "/api/transcript-files",
     express.json(),
     express.urlencoded({ extended: false }),
     async (req, res) => {
@@ -617,9 +621,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-  // API endpoint to get a specific transcript
+  // API endpoint to get a specific transcript file (legacy support)
   app.get(
-    "/api/transcripts/:elevenlabsId",
+    "/api/transcript-files/:elevenlabsId",
     express.json(),
     express.urlencoded({ extended: false }),
     async (req, res) => {

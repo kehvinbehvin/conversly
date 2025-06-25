@@ -91,6 +91,15 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 25, 2025: Implemented persistent database storage with comprehensive data model
+  - Added transcripts table with file_location and content fields
+  - Created improvements table for granular feedback tied to transcript sections
+  - Built complete API endpoints for transcripts and improvements management
+  - Designed schema supporting inline highlighting with character position tracking
+  - Added database relations between users, conversations, transcripts, reviews, and improvements
+  - Created both memory storage (development) and database storage (production) implementations
+  - Updated OpenAI service to generate improvements with character-level positioning
+  - Built InlineHighlighter component for frontend transcript annotation display
 - June 25, 2025: Simplified storage to local-only file system
   - Removed all Replit Object Storage components due to persistent API retrieval issues
   - Uninstalled @replit/object-storage package and cleaned up related code

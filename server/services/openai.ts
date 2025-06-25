@@ -1,5 +1,6 @@
 import OpenAI from "openai";
-import type { ReviewHighlight, ReviewSuggestion, ReviewStrength } from "@shared/schema";
+import type { ReviewHighlight, ReviewSuggestion, ReviewStrength, Improvement } from "@shared/schema";
+import { storage } from "../storage";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({ 
@@ -12,6 +13,7 @@ export interface ConversationAnalysis {
   overallRating: number;
   suggestions: ReviewSuggestion[];
   strengths: ReviewStrength[];
+  improvements: Improvement[];
 }
 
 export async function analyzeConversation(transcript: string): Promise<ConversationAnalysis> {
@@ -57,6 +59,16 @@ export async function analyzeConversation(transcript: string): Promise<Conversat
                 "description": "what they did well",
                 "examples": ["specific examples from conversation"]
               }
+            ],
+            "improvements": [
+              {
+                "transcriptSectionStart": 0,
+                "transcriptSectionEnd": 50,
+                "feedbackText": "specific improvement feedback",
+                "improvementType": "positive|improvement|neutral",
+                "priority": "high|medium|low",
+                "category": "tone|clarity|engagement|timing"
+              }
             ]
           }`
         },
@@ -77,7 +89,8 @@ export async function analyzeConversation(transcript: string): Promise<Conversat
       summary: result.summary || "Analysis completed.",
       overallRating: Math.max(1, Math.min(5, Math.round(result.overallRating || 3))),
       suggestions: result.suggestions || [],
-      strengths: result.strengths || []
+      strengths: result.strengths || [],
+      improvements: result.improvements || []
     };
   } catch (error) {
     console.error("OpenAI analysis error:", error);
