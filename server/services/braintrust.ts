@@ -154,13 +154,27 @@ Focus only on Individual B's responses and provide specific, actionable feedback
       throw new Error(`Failed to parse OpenAI response as JSON: ${parseError.message}`);
     }
     
-    // Validate the response structure
-    if (!result.improvements || !Array.isArray(result.improvements)) {
+    // Handle different response formats from Braintrust prompt
+    let improvements;
+    if (result.improvements && Array.isArray(result.improvements)) {
+      // Expected format: {"improvements": [...]}
+      improvements = result.improvements;
+    } else if (result.location && result.improvement) {
+      // Single improvement object format
+      improvements = [result];
+    } else if (Array.isArray(result)) {
+      // Direct array format
+      improvements = result;
+    } else {
+      console.error("Unexpected response structure:", result);
+      console.error("Expected format: {improvements: [...]} or single improvement object");
       throw new Error("Invalid response structure from Braintrust analysis");
     }
 
+    console.log(`Successfully parsed ${improvements.length} improvements from Braintrust response`);
+
     // Validate each improvement item
-    const validatedImprovements = result.improvements.map((item: any, index: number) => {
+    const validatedImprovements = improvements.map((item: any, index: number) => {
       if (!item.location || !item.improvement || !item.reasoning) {
         console.warn(`Skipping invalid improvement item at index ${index}:`, item);
         return null;
