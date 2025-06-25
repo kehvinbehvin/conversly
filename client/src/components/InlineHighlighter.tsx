@@ -72,8 +72,6 @@ export default function InlineHighlighter({
           onClick={() => setFocusedImprovement(
             focusedImprovement === span.improvement.id ? null : span.improvement.id
           )}
-          onMouseEnter={() => setFocusedImprovement(span.improvement.id)}
-          onMouseLeave={() => setFocusedImprovement(null)}
           title={span.improvement.feedbackText}
         >
           {content.slice(span.start, span.end)}
