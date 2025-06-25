@@ -1,4 +1,4 @@
-import { wrapOpenAI } from "braintrust";
+import { wrapOpenAI, loadPrompt } from "braintrust";
 import { OpenAI } from "openai";
 import type { Improvement } from "@shared/schema";
 
@@ -32,14 +32,30 @@ export interface ConversationAnalysis {
 
 export async function analyzeConversationWithBraintrust(transcript: string): Promise<BraintrustResponse> {
   try {
-    // For now, use direct OpenAI call with embedded prompt until Braintrust prompt loading is configured
-    // This maintains the same interface while we set up Braintrust properly
-    
     // Convert transcript to the expected format for Individual A and B
     const formattedTranscript = formatTranscriptForAnalysis(transcript);
     const transcriptString = formattedTranscript.join('\n');
 
-    const systemPrompt = `You are an expert conversation coach analyzing a practice conversation about "How was your weekend?"
+    let messages;
+    let model = "gpt-4o";
+    let temperature = 0.7;
+
+    try {
+      // Load prompt from Braintrust instead of using hardcoded system prompt
+      const prompt = await loadPrompt({
+        projectName: process.env.BRAINTRUST_PROJECT_NAME || "Conversly",
+        slug: "conversation-analysis"
+      });
+
+      // Build messages using the Braintrust prompt with transcript data
+      messages = prompt.build({ transcript: transcriptString });
+      model = prompt.defaults?.model || "gpt-4o";
+      temperature = prompt.defaults?.temperature || 0.7;
+    } catch (promptError) {
+      console.warn("Failed to load prompt from Braintrust, using fallback:", promptError);
+      
+      // Fallback to hardcoded prompt if Braintrust is unavailable
+      const systemPrompt = `You are an expert conversation coach analyzing a practice conversation about "How was your weekend?"
 
 Your role is to provide constructive, encouraging feedback that helps socially self-aware individuals improve their interpersonal communication skills, specifically focusing on Individual B's responses.
 
@@ -68,16 +84,23 @@ Respond with JSON in this exact format:
 
 Focus only on Individual B's responses and provide specific, actionable feedback that will help them become a more engaging conversationalist.`;
 
-    // Call OpenAI through Braintrust wrapper
-    const completion = await openai.chat.completions.create({
-      messages: [
+      messages = [
         { role: "system", content: systemPrompt },
         { role: "user", content: `Transcript:\n${transcriptString}` }
-      ],
-      model: "gpt-4o",
-      temperature: 0.7,
+      ];
+    }
+
+    // Call OpenAI through Braintrust wrapper using prompt defaults
+    const completion = await openai.chat.completions.create({
+      messages,
+      model,
+      temperature,
       response_format: { type: "json_object" }
     });
+
+    if (!completion?.choices?.[0]?.message?.content) {
+      throw new Error("Invalid response from OpenAI API");
+    }
 
     const result = JSON.parse(completion.choices[0].message.content || "{}");
     
