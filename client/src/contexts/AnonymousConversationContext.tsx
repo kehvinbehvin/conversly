@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useRef, useMemo, ReactNode } from "react";
 import { useConversation } from "@elevenlabs/react";
-import { useSSE } from "@/hooks/useWebSocket";
+import { useSSE } from "@/hooks/useSSE";
 import { useQuery } from "@tanstack/react-query";
 import type { ConversationWithReview } from "@shared/schema";
 

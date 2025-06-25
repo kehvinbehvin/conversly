@@ -93,11 +93,13 @@ Conversly is a conversational practice application designed to help users improv
 ## Recent Changes  
 - June 25, 2025: **ANONYMOUS CONVERSATION TOOL IMPLEMENTED** - Free-to-use practice tool on landing page
   - **Side-by-side Layout**: Conversation tool and review panel positioned above the fold
-  - **WebSocket Architecture**: Real-time notifications when AI reviews are ready, registration occurs only after conversation ID is available
+  - **SSE Architecture**: Server-Sent Events for real-time notifications, avoiding WebSocket conflicts with Vite HMR
+  - **Single Port Design**: All communication on port 5000 (HTTP + SSE) for Replit compatibility
+  - **Client Identification**: SSE endpoint `/api/events/:conversationId` uses ElevenLabs conversation ID for unique client identification
   - **Anonymous User System**: Conversations saved under anonymous@conversly.com for usage analytics
   - **Session Storage**: Maintains conversation state until page refresh for anonymous users
   - **Component Reuse**: Leveraged existing ElevenLabs components and conversation workflow
-  - **Proper Timing**: WebSocket registration happens in onConnect callback when conversation ID is known, not on page load
+  - **Proper Timing**: SSE registration happens in onConnect callback when conversation ID is known, not on page load
 - June 25, 2025: **TECH DEBT CLEANUP COMPLETED** - Comprehensive codebase cleanup and optimization
   - **TypeScript Improvements**: Removed 100+ `any` types, added proper type annotations for API responses and webhook data
   - **Import Optimization**: Cleaned up unused imports, removed duplicate dependencies, added centralized UI component exports

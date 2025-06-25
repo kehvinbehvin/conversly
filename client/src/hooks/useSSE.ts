@@ -75,5 +75,4 @@ export function useSSE(options: UseSSEOptions = {}) {
   };
 }
 
-// Backward compatibility alias
-export const useWebSocket = useSSE;
+// Export useSSE as primary interface
