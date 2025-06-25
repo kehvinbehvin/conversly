@@ -1,0 +1,91 @@
+{
+  "conversationId": "51",
+  "elevenlabsId": "conv_01jyj93pated6b0qk3qq1p002g",
+  "transcript": [
+    {
+      "role": "agent",
+      "message": "Hey, how have you been? How was your weekend?",
+      "tool_calls": [],
+      "tool_results": [],
+      "feedback": null,
+      "llm_override": null,
+      "time_in_call_secs": 0,
+      "conversation_turn_metrics": null,
+      "rag_retrieval_info": null,
+      "llm_usage": null,
+      "interrupted": false,
+      "original_message": null,
+      "source_medium": null
+    }
+  ],
+  "metadata": {
+    "start_time_unix_secs": 1750812711,
+    "accepted_time_unix_secs": 1750812711,
+    "call_duration_secs": 5,
+    "cost": 58,
+    "deletion_settings": {
+      "deletion_time_unix_secs": null,
+      "deleted_logs_at_time_unix_secs": null,
+      "deleted_audio_at_time_unix_secs": null,
+      "deleted_transcript_at_time_unix_secs": null,
+      "delete_transcript_and_pii": false,
+      "delete_audio": false
+    },
+    "feedback": {
+      "overall_score": null,
+      "likes": 0,
+      "dislikes": 0
+    },
+    "authorization_method": "signed_url",
+    "charging": {
+      "dev_discount": false,
+      "is_burst": false,
+      "tier": "free",
+      "llm_usage": {
+        "irreversible_generation": {
+          "model_usage": {}
+        },
+        "initiated_generation": {
+          "model_usage": {}
+        }
+      },
+      "llm_price": 0,
+      "llm_charge": 0,
+      "call_charge": 58
+    },
+    "phone_call": null,
+    "batch_call": null,
+    "termination_reason": "Client disconnected",
+    "error": null,
+    "main_language": "en",
+    "rag_usage": null,
+    "text_only": false,
+    "features_usage": {
+      "language_detection": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_agent": {
+        "enabled": false,
+        "used": false
+      },
+      "transfer_to_number": {
+        "enabled": false,
+        "used": false
+      },
+      "multivoice": {
+        "enabled": false,
+        "used": false
+      },
+      "pii_zrm_workspace": false,
+      "pii_zrm_agent": false
+    }
+  },
+  "analysis": {
+    "evaluation_criteria_results": {},
+    "data_collection_results": {},
+    "call_successful": "success",
+    "transcript_summary": "The agent initiated the conversation with a casual greeting, inquiring about the user's well-being and weekend.\n"
+  },
+  "timestamp": 1750812717995
+}

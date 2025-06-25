@@ -30,7 +30,7 @@ export default function History() {
     return date.includes(searchLower) || status.includes(searchLower);
   }) || [];
 
-  const completedConversations = conversations?.filter(c => c.status === "completed") || [];
+  const completedConversations = conversations?.filter(c => c.status === "completed" || c.status === "analyzed") || [];
   const averageRating = completedConversations.length > 0 
     ? completedConversations.reduce((sum, c) => sum + (c.review?.overallRating || 0), 0) / completedConversations.length
     : 0;
@@ -204,15 +204,15 @@ export default function History() {
                       )}
                       
                       <Badge 
-                        variant={conversation.status === "completed" ? "default" : "secondary"}
-                        className={conversation.status === "completed" ? "bg-sage-100 text-sage-700" : ""}
+                        variant={conversation.status === "completed" || conversation.status === "analyzed" ? "default" : "secondary"}
+                        className={conversation.status === "completed" || conversation.status === "analyzed" ? "bg-sage-100 text-sage-700" : ""}
                       >
-                        {conversation.status === "completed" ? "Reviewed" : conversation.status}
+                        {conversation.status === "completed" || conversation.status === "analyzed" ? "Reviewed" : conversation.status}
                       </Badge>
                     </div>
                     
                     <div className="flex-shrink-0">
-                      {conversation.status === "completed" ? (
+                      {conversation.status === "completed" || conversation.status === "analyzed" ? (
                         <Link href={`/conversation/${conversation.id}`}>
                           <Button variant="outline" size="sm">
                             View Review

@@ -60,6 +60,13 @@ export default function Review() {
   }
 
   const review = conversation.review;
+  
+  // Group improvements by type for better display
+  const positiveImprovements = improvements?.filter(imp => imp.improvementType === 'positive') || [];
+  const improvementSuggestions = improvements?.filter(imp => imp.improvementType === 'improvement') || [];
+  const neutralImprovements = improvements?.filter(imp => imp.improvementType === 'neutral') || [];
+  
+  // Legacy highlights and suggestions (fallback if no improvements)
   const highlights = (review?.highlights as ReviewHighlight[]) || [];
   const suggestions = (review?.suggestions as ReviewSuggestion[]) || [];
   const strengths = (review?.strengths as ReviewStrength[]) || [];
@@ -96,10 +103,10 @@ export default function Review() {
                 </div>
               )}
               <Badge 
-                variant={conversation.status === "completed" ? "default" : "secondary"}
-                className={conversation.status === "completed" ? "bg-sage-100 text-sage-700" : ""}
+                variant={conversation.status === "analyzed" || conversation.status === "completed" ? "default" : "secondary"}
+                className={conversation.status === "analyzed" || conversation.status === "completed" ? "bg-sage-100 text-sage-700" : ""}
               >
-                {conversation.status === "completed" ? "Analysis Complete" : conversation.status}
+                {conversation.status === "analyzed" || conversation.status === "completed" ? "Analysis Complete" : conversation.status}
               </Badge>
             </div>
           </div>
@@ -127,7 +134,10 @@ export default function Review() {
             {conversation.transcript?.content && improvements && improvements.length > 0 && (
               <Card>
                 <CardHeader>
-                  <CardTitle>Transcript with Feedback</CardTitle>
+                  <CardTitle>Transcript with Interactive Feedback</CardTitle>
+                  <p className="text-sm text-warm-brown-600">
+                    Click on highlighted sections to see detailed feedback
+                  </p>
                 </CardHeader>
                 <CardContent>
                   <InlineHighlighter 
@@ -137,6 +147,85 @@ export default function Review() {
                   />
                 </CardContent>
               </Card>
+            )}
+
+            {/* Improvement Summary Cards */}
+            {improvements && improvements.length > 0 && (
+              <div className="grid md:grid-cols-2 gap-6">
+                {/* Strengths */}
+                {positiveImprovements.length > 0 && (
+                  <Card className="border-green-200 bg-green-50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2 text-green-800">
+                        <TrendingUp className="w-5 h-5" />
+                        <span>What You Did Well</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {positiveImprovements.map((improvement) => (
+                          <div key={improvement.id} className="p-3 bg-white rounded-lg border border-green-200">
+                            <div className="flex items-center justify-between mb-2">
+                              {improvement.category && (
+                                <Badge variant="outline" className="text-xs text-green-700 border-green-300">
+                                  {improvement.category}
+                                </Badge>
+                              )}
+                            </div>
+                            <p className="text-sm text-green-800">
+                              {improvement.feedbackText}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Areas for Improvement */}
+                {improvementSuggestions.length > 0 && (
+                  <Card className="border-coral-200 bg-coral-50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center space-x-2 text-coral-800">
+                        <CheckCircle className="w-5 h-5" />
+                        <span>Areas to Improve</span>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-3">
+                        {improvementSuggestions.map((improvement) => (
+                          <div key={improvement.id} className="p-3 bg-white rounded-lg border border-coral-200">
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center space-x-2">
+                                {improvement.category && (
+                                  <Badge variant="outline" className="text-xs text-coral-700 border-coral-300">
+                                    {improvement.category}
+                                  </Badge>
+                                )}
+                                <Badge 
+                                  variant="outline" 
+                                  className={`text-xs ${
+                                    improvement.priority === "high" 
+                                      ? "border-red-500 text-red-700" 
+                                      : improvement.priority === "medium"
+                                      ? "border-yellow-500 text-yellow-700"
+                                      : "border-blue-500 text-blue-700"
+                                  }`}
+                                >
+                                  {improvement.priority}
+                                </Badge>
+                              </div>
+                            </div>
+                            <p className="text-sm text-coral-800">
+                              {improvement.feedbackText}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </div>
             )}
 
             {/* Highlights and Feedback */}
