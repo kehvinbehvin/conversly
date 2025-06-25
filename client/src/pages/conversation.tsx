@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Star, AlertCircle } from "lucide-react";
 import ElevenLabsConversation from "@/components/ElevenLabsConversation";
 import ChatThread from "@/components/ChatThread";
+import { ErrorBoundary } from "@/components/ErrorBoundary";
 import type { ConversationWithReview, TranscriptWithReview } from "@shared/schema";
 
 export default function Conversation() {
@@ -173,10 +174,12 @@ export default function Conversation() {
 
         <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">
           {/* Chat Thread */}
-          <ChatThread 
-            messages={transcriptWithReviews}
-            className="lg:col-span-2"
-          />
+          <ErrorBoundary>
+            <ChatThread 
+              messages={transcriptWithReviews}
+              className="lg:col-span-2"
+            />
+          </ErrorBoundary>
 
           {/* Review Summary */}
           {review && (

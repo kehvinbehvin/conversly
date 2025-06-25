@@ -1,6 +1,5 @@
 import { useEffect, useRef } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ScrollArea } from "@/components/ui";
 import { MessageCircle, Clock } from "lucide-react";
 import ChatMessage from "./ChatMessage";
 import type { TranscriptWithReview } from "@shared/schema";
@@ -21,7 +20,10 @@ export default function ChatThread({ messages, className }: ChatThreadProps) {
     }
   }, [messages.length]);
 
-  const formatTimestamp = (timeInSecs: number) => {
+  const formatTimestamp = (timeInSecs: number | undefined) => {
+    if (typeof timeInSecs !== 'number' || isNaN(timeInSecs)) {
+      return '0:00';
+    }
     const minutes = Math.floor(timeInSecs / 60);
     const seconds = Math.floor(timeInSecs % 60);
     return `${minutes}:${seconds.toString().padStart(2, '0')}`;
@@ -62,18 +64,23 @@ export default function ChatThread({ messages, className }: ChatThreadProps) {
         </CardTitle>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="h-96 px-4 sm:px-6 pb-6" ref={scrollAreaRef}>
+        <div className="h-96 overflow-y-auto px-4 sm:px-6 pb-6" ref={scrollAreaRef}>
           <div className="space-y-4 sm:space-y-6">
-            {messages.map((message, index) => (
-              <ChatMessage
-                key={`${message.index}-${index}`}
-                message={message}
-                timestamp={formatTimestamp(message.time_in_call_secs)}
-              />
-            ))}
+            {messages.map((message, index) => {
+              if (!message || typeof message !== 'object') {
+                return null;
+              }
+              return (
+                <ChatMessage
+                  key={`message-${index}`}
+                  message={message}
+                  timestamp={formatTimestamp(message.time_in_call_secs)}
+                />
+              );
+            })}
             <div ref={bottomRef} />
           </div>
-        </ScrollArea>
+        </div>
       </CardContent>
     </Card>
   );
