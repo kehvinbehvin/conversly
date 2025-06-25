@@ -77,10 +77,16 @@ export function ConversationProvider({
       // Create database conversation record with the correct ElevenLabs ID
       try {
         console.log("🔄 Creating database conversation for ID:", props.conversationId);
+        
+        // Get the demo user ID first
+        const userResponse = await fetch("/api/user");
+        const user = await userResponse.json();
+        
         const response = await fetch("/api/conversations", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            userId: user.id,
             elevenlabsConversationId: props.conversationId,
             metadata: { topic: "How was your weekend?" },
           }),

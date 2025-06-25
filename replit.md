@@ -91,6 +91,13 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes
+- June 25, 2025: Fixed frontend-backend integration issues
+  - Corrected POST /api/conversations to include required userId parameter
+  - Updated conversation status filtering from "analyzed" to "completed" across all frontend pages
+  - Integrated InlineHighlighter component with improvements API for transcript annotation
+  - Updated storage page to reflect current database storage architecture
+  - Fixed routing for review page navigation
+  - Added proper error handling and user fetching in ConversationContext
 - June 25, 2025: Fixed and validated complete test suite
   - All 30 tests now passing (conversations: 9, transcripts: 8, improvements: 10, integration: 3)
   - Fixed API endpoint status codes (201 for POST requests, proper 400 validation)

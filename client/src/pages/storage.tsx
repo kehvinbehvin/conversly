@@ -128,25 +128,7 @@ export default function Storage() {
               </div>
             </div>
 
-            {status?.config && (
-              <div className="space-y-2 pt-4 border-t">
-                <h4 className="font-medium text-sm">Configuration</h4>
-                <div className="grid grid-cols-2 gap-4 text-sm">
-                  {status.config.bucketId && (
-                    <div>
-                      <span className="text-muted-foreground">Bucket ID:</span>
-                      <span className="ml-2 font-mono text-xs">{status.config.bucketId}</span>
-                    </div>
-                  )}
-                  {status.config.bucketName && (
-                    <div>
-                      <span className="text-muted-foreground">Bucket:</span>
-                      <span className="ml-2 font-mono">{status.config.bucketName}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
+
 
             <div className="flex gap-2 pt-4">
               <Button onClick={() => refetch()} variant="outline" size="sm">
@@ -162,16 +144,16 @@ export default function Storage() {
         {/* Setup Instructions */}
         <Card>
           <CardHeader>
-            <CardTitle>Replit Object Storage</CardTitle>
+            <CardTitle>Database Storage</CardTitle>
             <CardDescription>
-              Your transcripts are automatically stored using Replit's built-in object storage
+              Your transcripts and conversation data are stored in PostgreSQL database
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Alert>
-              <Cloud className="h-4 w-4" />
+              <CheckCircle className="h-4 w-4" />
               <AlertDescription>
-                Hybrid storage system: Tries Replit Object Storage first, automatically falls back to local storage if needed.
+                All conversation data is persisted in a PostgreSQL database with full CRUD operations.
               </AlertDescription>
             </Alert>
 
@@ -179,11 +161,11 @@ export default function Storage() {
               <div>
                 <h4 className="font-medium mb-2">Features</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
-                  <li>Hybrid storage: Cloud first, local fallback</li>
-                  <li>Automatic backup and redundancy</li>
-                  <li>Scalable storage with high availability</li>
-                  <li>Integrated with your Replit environment</li>
-                  <li>No external configuration needed</li>
+                  <li>Persistent PostgreSQL database storage</li>
+                  <li>Complete data relationships and referential integrity</li>
+                  <li>Character-level positioning for inline highlighting</li>
+                  <li>Comprehensive transcript and improvement tracking</li>
+                  <li>Automatic data persistence across deployments</li>
                 </ul>
               </div>
 
@@ -193,19 +175,15 @@ export default function Storage() {
                   <div className="space-y-1">
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Provider:</span>
-                      <span className="font-mono">Hybrid (Cloud + Local)</span>
+                      <span className="font-mono">PostgreSQL Database</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-muted-foreground">Primary:</span>
-                      <span className="font-mono">Replit Object Storage</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-muted-foreground">Fallback:</span>
-                      <span className="font-mono">Local File System</span>
+                      <span className="text-muted-foreground">Backup:</span>
+                      <span className="font-mono">File System Fallback</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-muted-foreground">Data Format:</span>
-                      <span className="font-mono">JSON</span>
+                      <span className="font-mono">Structured Tables</span>
                     </div>
                   </div>
                 </div>
@@ -220,18 +198,18 @@ export default function Storage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <HardDrive className="h-4 w-4" />
-                Local Storage
+                File System Backup
               </CardTitle>
               <CardDescription>
-                Currently using local file system storage
+                Legacy transcript files stored locally as backup
               </CardDescription>
             </CardHeader>
             <CardContent>
               <Alert>
                 <AlertTriangle className="h-4 w-4" />
                 <AlertDescription>
-                  Local storage works for development but may not persist across deployments. 
-                  Consider setting up cloud storage for production use.
+                  This shows legacy file storage. Primary data is now stored in the database 
+                  which persists across deployments.
                 </AlertDescription>
               </Alert>
             </CardContent>

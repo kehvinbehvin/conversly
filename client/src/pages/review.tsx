@@ -5,7 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ArrowLeft, Star, TrendingUp, CheckCircle, AlertCircle, Clock } from "lucide-react";
-import type { ConversationWithReview, ReviewHighlight, ReviewSuggestion, ReviewStrength } from "@shared/schema";
+import InlineHighlighter from "@/components/InlineHighlighter";
+import type { ConversationWithReview, ReviewHighlight, ReviewSuggestion, ReviewStrength, Improvement } from "@shared/schema";
 
 export default function Review() {
   const { id } = useParams();
@@ -13,6 +14,11 @@ export default function Review() {
   const { data: conversation, isLoading, error } = useQuery<ConversationWithReview>({
     queryKey: [`/api/conversations/${id}`],
     enabled: !!id,
+  });
+
+  const { data: improvements } = useQuery<Improvement[]>({
+    queryKey: [`/api/reviews/${conversation?.review?.id}/improvements`],
+    enabled: !!conversation?.review?.id,
   });
 
   if (isLoading) {
@@ -90,10 +96,10 @@ export default function Review() {
                 </div>
               )}
               <Badge 
-                variant={conversation.status === "analyzed" ? "default" : "secondary"}
-                className={conversation.status === "analyzed" ? "bg-sage-100 text-sage-700" : ""}
+                variant={conversation.status === "completed" ? "default" : "secondary"}
+                className={conversation.status === "completed" ? "bg-sage-100 text-sage-700" : ""}
               >
-                {conversation.status === "analyzed" ? "Analysis Complete" : conversation.status}
+                {conversation.status === "completed" ? "Analysis Complete" : conversation.status}
               </Badge>
             </div>
           </div>
@@ -116,6 +122,22 @@ export default function Review() {
                 </p>
               </CardContent>
             </Card>
+
+            {/* Transcript with Inline Feedback */}
+            {conversation.transcript?.content && improvements && improvements.length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle>Transcript with Feedback</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <InlineHighlighter 
+                    content={conversation.transcript.content}
+                    improvements={improvements}
+                    className="text-warm-brown-700 leading-relaxed"
+                  />
+                </CardContent>
+              </Card>
+            )}
 
             {/* Highlights and Feedback */}
             {highlights.length > 0 && (

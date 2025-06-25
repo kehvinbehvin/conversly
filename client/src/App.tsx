@@ -33,7 +33,7 @@ function App() {
       <ConversationProvider
         onConversationEnd={(conversationId) => {
           // Navigate to review page
-          window.location.href = `/review/${conversationId}`;
+          window.location.href = `/conversation/${conversationId}`;
         }}
         onError={(error) => {
           console.error("Conversation error:", error);

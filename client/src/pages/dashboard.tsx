@@ -24,7 +24,7 @@ export default function Dashboard() {
   }, [refetch]);
 
   const recentConversations = conversations?.slice(0, 3) || [];
-  const completedConversations = conversations?.filter(c => c.status === "analyzed") || [];
+  const completedConversations = conversations?.filter(c => c.status === "completed") || [];
   const averageRating = completedConversations.length > 0 
     ? completedConversations.reduce((sum, c) => sum + (c.review?.overallRating || 0), 0) / completedConversations.length
     : 0;
@@ -197,10 +197,10 @@ export default function Dashboard() {
                               </div>
                             )}
                             <Badge 
-                              variant={conversation.status === "analyzed" ? "default" : "secondary"}
-                              className={conversation.status === "analyzed" ? "bg-sage-100 text-sage-700" : ""}
+                              variant={conversation.status === "completed" ? "default" : "secondary"}
+                              className={conversation.status === "completed" ? "bg-sage-100 text-sage-700" : ""}
                             >
-                              {conversation.status === "analyzed" ? "Reviewed" : conversation.status}
+                              {conversation.status === "completed" ? "Reviewed" : conversation.status}
                             </Badge>
                           </div>
                         </div>
