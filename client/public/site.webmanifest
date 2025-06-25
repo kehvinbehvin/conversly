@@ -1,0 +1,26 @@
+{
+  "name": "Conversly",
+  "short_name": "Conversly",
+  "description": "AI-Powered Conversation Practice",
+  "icons": [
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    }
+  ],
+  "theme_color": "#D4A574",
+  "background_color": "#FFF8F3",
+  "display": "standalone",
+  "start_url": "/"
+}
