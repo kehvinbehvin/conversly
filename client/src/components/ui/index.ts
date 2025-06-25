@@ -9,6 +9,7 @@ export { Toaster } from "./toaster";
 export { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./tooltip";
 export { Alert, AlertDescription, AlertTitle } from "./alert";
 export { Badge } from "./badge";
+export { ScrollArea, ScrollBar } from "./scroll-area";
 export { Checkbox } from "./checkbox";
 export { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "./form";
 export { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./select";

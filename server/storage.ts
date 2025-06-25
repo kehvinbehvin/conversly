@@ -125,7 +125,6 @@ export class MemStorage implements IStorage {
     const now = new Date();
     const transcript: Transcript = {
       ...insertTranscript,
-      content: insertTranscript.content || null,
       id,
       createdAt: now
     };
@@ -202,7 +201,7 @@ export class MemStorage implements IStorage {
       ...conversation, 
       transcriptId,
       audioUrl: audioUrl || conversation.audioUrl,
-      status: transcriptContent ? "completed" : conversation.status,
+      status: transcriptData ? "completed" : conversation.status,
       metadata: mergedMetadata
     };
     

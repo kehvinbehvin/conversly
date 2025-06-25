@@ -1,5 +1,6 @@
 import type { Express, Request, Response, NextFunction } from "express";
 import express from "express";
+import bodyParser from "body-parser";
 import { createServer, type Server } from "http";
 import { createHmac, timingSafeEqual } from "crypto";
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
@@ -8,6 +9,7 @@ import { analyzeConversationWithBraintrust } from "./services/braintrust";
 import type { TranscriptObject } from "@shared/schema";
 import * as transcriptRoutes from "./routes/transcripts";
 import * as reviewRoutes from "./routes/reviews";
+import { createReviewWithTranscripts } from "./services/reviewAnalyzer";
 import { z } from "zod";
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -461,7 +463,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("📝 Updating conversation with:", {
           transcriptTurns: transcriptData.length,
           hasAudioUrl: !!audio_url,
-          audioUrl: audio_url && typeof audio_url === 'string' ? audio_url.substring(0, 50) + "..." : null,
+          audioUrl: audio_url && typeof audio_url === 'string' ? String(audio_url).substring(0, 50) + "..." : null,
           metadata: callMetadata,
         });
 

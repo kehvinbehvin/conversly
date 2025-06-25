@@ -4,6 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle, X } from "lucide-react";
 import { Link } from "wouter";
+import { ConversationWithReview } from "@shared/schema";
 
 interface ConversationEndModalProps {
   isOpen: boolean;

@@ -120,9 +120,9 @@ export default function Storage() {
                 <Badge variant={status?.isWorking ? 'default' : 'destructive'}>
                   {status?.provider?.toUpperCase() || 'UNKNOWN'}
                 </Badge>
-                {status?.fileCount !== undefined && (
+                {status?.conversationCount !== undefined && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    {status.fileCount} files stored
+                    {status.conversationCount} conversations stored
                   </p>
                 )}
               </div>
@@ -192,8 +192,8 @@ export default function Storage() {
           </CardContent>
         </Card>
 
-        {/* Local Storage Info */}
-        {status?.provider === 'local' && (
+        {/* Database Storage Info */}
+        {status?.provider === 'database' && (
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
