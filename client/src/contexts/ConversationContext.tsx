@@ -48,6 +48,18 @@ export function ConversationProvider({
   
   // Track conversation creation to prevent duplicates
   const createdConversationsRef = useRef<Set<string>>(new Set());
+  
+  // Store callback refs to avoid dependency changes
+  const onConversationStartRef = useRef(onConversationStart);
+  const onConversationEndRef = useRef(onConversationEnd);
+  const onErrorRef = useRef(onError);
+  
+  // Update refs when props change
+  useEffect(() => {
+    onConversationStartRef.current = onConversationStart;
+    onConversationEndRef.current = onConversationEnd;
+    onErrorRef.current = onError;
+  });
 
   // Create stable callback functions using useCallback to prevent hook order violations
   const handleConnect = useCallback(async (props: { conversationId: string }) => {
@@ -58,7 +70,7 @@ export function ConversationProvider({
     // Prevent duplicate conversation creation
     if (createdConversationsRef.current.has(props.conversationId)) {
       console.log("🚫 Conversation already created for ID:", props.conversationId);
-      onConversationStart?.(props.conversationId);
+      onConversationStartRef.current?.(props.conversationId);
       return;
     }
     
@@ -98,8 +110,8 @@ export function ConversationProvider({
       createdConversationsRef.current.delete(props.conversationId);
     }
     
-    onConversationStart?.(props.conversationId);
-  }, [onConversationStart]);
+    onConversationStartRef.current?.(props.conversationId);
+  }, []);
 
   const handleDisconnect = useCallback((details: { conversationId?: string; reason?: string }) => {
     setIsConnecting(false);
@@ -123,8 +135,8 @@ export function ConversationProvider({
 
   const handleError = useCallback((error: string) => {
     setIsConnecting(false);
-    onError?.(new Error(error));
-  }, [onError]);
+    onErrorRef.current?.(new Error(error));
+  }, []);
 
   // Use ElevenLabs SDK with stable callbacks
   const conversation = useElevenLabsConversation({
