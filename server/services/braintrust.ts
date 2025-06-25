@@ -42,13 +42,53 @@ export async function analyzeConversationWithBraintrust(transcript: string): Pro
 
     try {
       // Load prompt from Braintrust instead of using hardcoded system prompt
-      const prompt = await loadPrompt({
-        projectName: process.env.BRAINTRUST_PROJECT_NAME || "Conversly",
-        slug: "conversation-analysis"
-      });
+      // Use the correct project name from discovery
+      let prompt;
+      const projectsToTry = [
+        "Yappy-first-project" // Use the correct project name from Braintrust UI
+      ];
+      
+      let promptError;
+      for (const projectName of projectsToTry) {
+        try {
+          prompt = await loadPrompt({
+            projectName,
+            slug: "conversation-consultant-7a00"
+          });
+          console.log(`Successfully loaded prompt from project: ${projectName}`);
+          break;
+        } catch (error) {
+          promptError = error;
+          console.log(`Failed to load prompt from ${projectName}:`, error.message);
+        }
+      }
+      
+      if (!prompt) {
+        throw promptError || new Error("Failed to load prompt from any project");
+      }
 
       // Build messages using the Braintrust prompt with transcript data
-      messages = prompt.build({ transcript: transcriptString });
+      const promptOutput = prompt.build({ transcript: transcriptString });
+      
+      // Handle different prompt output formats
+      if (Array.isArray(promptOutput)) {
+        messages = promptOutput;
+      } else if (promptOutput && typeof promptOutput === 'object' && promptOutput.messages) {
+        messages = promptOutput.messages;
+      } else if (promptOutput && typeof promptOutput === 'object' && promptOutput.prompt) {
+        // Handle legacy prompt format
+        messages = [
+          { role: "system", content: promptOutput.prompt },
+          { role: "user", content: `Transcript:\n${transcriptString}` }
+        ];
+      } else {
+        // Fallback: treat as system message
+        messages = [
+          { role: "system", content: String(promptOutput) },
+          { role: "user", content: `Transcript:\n${transcriptString}` }
+        ];
+      }
+      
       model = prompt.defaults?.model || "gpt-4o";
       temperature = prompt.defaults?.temperature || 0.7;
     } catch (promptError) {
@@ -102,7 +142,17 @@ Focus only on Individual B's responses and provide specific, actionable feedback
       throw new Error("Invalid response from OpenAI API");
     }
 
-    const result = JSON.parse(completion.choices[0].message.content || "{}");
+    const rawContent = completion.choices[0].message.content;
+    console.log("Raw OpenAI response content:", rawContent.substring(0, 200) + "...");
+    
+    let result;
+    try {
+      result = JSON.parse(rawContent);
+    } catch (parseError) {
+      console.error("JSON parse error:", parseError);
+      console.error("Response content that failed to parse:", rawContent);
+      throw new Error(`Failed to parse OpenAI response as JSON: ${parseError.message}`);
+    }
     
     // Validate the response structure
     if (!result.improvements || !Array.isArray(result.improvements)) {

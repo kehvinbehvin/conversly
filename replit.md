@@ -92,11 +92,12 @@ Conversly is a conversational practice application designed to help users improv
 
 ## Recent Changes
 - June 25, 2025: Implemented Braintrust prompt management system
-  - Replaced hardcoded system prompts with pre-configured prompts from Braintrust
-  - Created `prompts/conversation-analysis.mustache` template with centralized prompt management
-  - Added `braintrust.config.json` configuration for project settings and defaults
-  - Implemented fallback mechanism when Braintrust prompts are unavailable
-  - All conversation analysis now uses Braintrust-managed prompts with version control
+  - Replaced hardcoded system prompts with pre-configured prompt `conversation-consultant-7a00` from Braintrust UI
+  - Updated service to use `loadPrompt()` from project "Yappy-first-project" 
+  - Added `braintrust.config.json` configuration pointing to correct project
+  - Implemented robust fallback mechanism when Braintrust prompts are unavailable
+  - Added prompt output format handling for different Braintrust response structures
+  - All conversation analysis now uses Braintrust-managed prompts with centralized version control
 - June 25, 2025: Integrated Braintrust SDK for conversation analysis
   - Replaced direct OpenAI calls with Braintrust wrapOpenAI for monitoring and prompt management
   - Updated analysis to focus on Individual B's responses matching client's JSON schema requirements
