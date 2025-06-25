@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useRef, useEffect, useState, ReactNode, useCallback } from "react";
 import { useConversation as useElevenLabsConversation } from "@elevenlabs/react";
 
 interface ConversationContextType {
@@ -43,103 +43,94 @@ export function ConversationProvider({
   const [modalConversationId, setModalConversationId] = useState<string | null>(null);
   const [showEndModal, setShowEndModal] = useState(false);
   
-  // Use refs to store stable references that persist across re-renders
-  const callbacksRef = useRef({
-    onConversationStart,
-    onConversationEnd,
-    onError,
-  });
-
   // Store conversation ID in ref to persist through state changes
   const conversationIdRef = useRef<string | null>(null);
-
-  // Update callbacks without causing re-renders
-  useEffect(() => {
-    callbacksRef.current = {
-      onConversationStart,
-      onConversationEnd,
-      onError,
-    };
-  }, [onConversationStart, onConversationEnd, onError]);
-
+  
   // Track conversation creation to prevent duplicates
   const createdConversationsRef = useRef<Set<string>>(new Set());
 
-  // Use ElevenLabs SDK with stable callbacks
-  const conversation = useElevenLabsConversation({
-    onConnect: async (props: { conversationId: string }) => {
-      setIsConnecting(false);
-      setCurrentConversationId(props.conversationId);
-      conversationIdRef.current = props.conversationId;
+  // Create stable callback functions using useCallback to prevent hook order violations
+  const handleConnect = useCallback(async (props: { conversationId: string }) => {
+    setIsConnecting(false);
+    setCurrentConversationId(props.conversationId);
+    conversationIdRef.current = props.conversationId;
+    
+    // Prevent duplicate conversation creation
+    if (createdConversationsRef.current.has(props.conversationId)) {
+      console.log("🚫 Conversation already created for ID:", props.conversationId);
+      onConversationStart?.(props.conversationId);
+      return;
+    }
+    
+    // Mark as being created to prevent duplicates
+    createdConversationsRef.current.add(props.conversationId);
+    
+    // Create database conversation record with the correct ElevenLabs ID
+    try {
+      console.log("🔄 Creating database conversation for ID:", props.conversationId);
       
-      // Prevent duplicate conversation creation
-      if (createdConversationsRef.current.has(props.conversationId)) {
-        console.log("🚫 Conversation already created for ID:", props.conversationId);
-        callbacksRef.current.onConversationStart?.(props.conversationId);
-        return;
-      }
+      // Get the demo user ID first
+      const userResponse = await fetch("/api/user");
+      const user = await userResponse.json();
       
-      // Mark as being created to prevent duplicates
-      createdConversationsRef.current.add(props.conversationId);
+      const response = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId: user.id,
+          elevenlabsConversationId: props.conversationId,
+          metadata: { topic: "How was your weekend?" },
+        }),
+      });
       
-      // Create database conversation record with the correct ElevenLabs ID
-      try {
-        console.log("🔄 Creating database conversation for ID:", props.conversationId);
-        
-        // Get the demo user ID first
-        const userResponse = await fetch("/api/user");
-        const user = await userResponse.json();
-        
-        const response = await fetch("/api/conversations", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            userId: user.id,
-            elevenlabsConversationId: props.conversationId,
-            metadata: { topic: "How was your weekend?" },
-          }),
-        });
-        
-        if (response.ok) {
-          const conversation = await response.json();
-          console.log("Database conversation created:", conversation.id, "for ElevenLabs ID:", props.conversationId);
-        } else {
-          const errorText = await response.text();
-          console.log("Database conversation creation response:", response.status, errorText);
-          // Remove from tracking if creation failed
-          createdConversationsRef.current.delete(props.conversationId);
-        }
-      } catch (error) {
-        console.error("Error creating database conversation:", error);
+      if (response.ok) {
+        const conversation = await response.json();
+        console.log("Database conversation created:", conversation.id, "for ElevenLabs ID:", props.conversationId);
+      } else {
+        const errorText = await response.text();
+        console.log("Database conversation creation response:", response.status, errorText);
         // Remove from tracking if creation failed
         createdConversationsRef.current.delete(props.conversationId);
       }
-      
-      callbacksRef.current.onConversationStart?.(props.conversationId);
-    },
-    onDisconnect: (details: { conversationId?: string; reason?: string }) => {
-      setIsConnecting(false);
-      
-      const conversationId = details?.conversationId || conversationIdRef.current;
-      
-      if (conversationId) {
-        setModalConversationId(conversationId);
-        setShowEndModal(true);
-      }
-      
-      // Clear tracking when conversation ends
-      if (conversationIdRef.current) {
-        createdConversationsRef.current.delete(conversationIdRef.current);
-      }
-      
-      // Clear conversation ID from both state and ref
-      setCurrentConversationId(null);
-      conversationIdRef.current = null;
-    },
-    onError: (error: string) => {
-      setIsConnecting(false);
-      callbacksRef.current.onError?.(new Error(error));
-    },
+    } catch (error) {
+      console.error("Error creating database conversation:", error);
+      // Remove from tracking if creation failed
+      createdConversationsRef.current.delete(props.conversationId);
+    }
+    
+    onConversationStart?.(props.conversationId);
+  }, [onConversationStart]);
+
+  const handleDisconnect = useCallback((details: { conversationId?: string; reason?: string }) => {
+    setIsConnecting(false);
+    
+    const conversationId = details?.conversationId || conversationIdRef.current;
+    
+    if (conversationId) {
+      setModalConversationId(conversationId);
+      setShowEndModal(true);
+    }
+    
+    // Clear tracking when conversation ends
+    if (conversationIdRef.current) {
+      createdConversationsRef.current.delete(conversationIdRef.current);
+    }
+    
+    // Clear conversation ID from both state and ref
+    setCurrentConversationId(null);
+    conversationIdRef.current = null;
+  }, []);
+
+  const handleError = useCallback((error: string) => {
+    setIsConnecting(false);
+    onError?.(new Error(error));
+  }, [onError]);
+
+  // Use ElevenLabs SDK with stable callbacks
+  const conversation = useElevenLabsConversation({
+    onConnect: handleConnect,
+    onDisconnect: handleDisconnect,
+    onError: handleError,
   });
 
   const startConversation = async (agentId: string) => {
@@ -164,7 +155,7 @@ export function ConversationProvider({
       } catch (micError) {
         console.error("❌ Microphone permission denied:", micError);
         setIsConnecting(false);
-        callbacksRef.current.onError?.(new Error("Microphone permission required"));
+        onError?.(new Error("Microphone permission required"));
         return;
       }
 
@@ -181,37 +172,32 @@ export function ConversationProvider({
       const response = await fetch("/api/elevenlabs/signed-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ agentId }),
+        body: JSON.stringify({ agent_id: agentId }),
       });
 
-      const data = await response.json();
-      if (!data.signedUrl) {
-        throw new Error("Failed to get signed URL");
+      if (!response.ok) {
+        throw new Error(`Failed to get signed URL: ${response.statusText}`);
       }
 
-      console.log("📝 Received signed URL:", data.signedUrl);
-      
-      console.log("🚀 Starting conversation session...");
-      await conversation.startSession({
-        signedUrl: data.signedUrl,
-      });
+      const { signed_url } = await response.json();
+      console.log("📝 Received signed URL:", signed_url);
 
+      // Start conversation session with signed URL
+      console.log("🚀 Starting conversation session...");
+      await conversation.startSession({ signedUrl: signed_url });
     } catch (error) {
       console.error("❌ Failed to start conversation:", error);
       setIsConnecting(false);
-      callbacksRef.current.onError?.(error as Error);
+      onError?.(error as Error);
     }
   };
 
-  const endConversation = async () => {
-    try {
-      if (conversation.status === "connected") {
-        await conversation.endSession();
-      }
-      setIsConnecting(false);
-    } catch (error) {
-      console.error("Failed to end conversation:", error);
+  const endConversation = () => {
+    if (conversation.status === "connected") {
+      console.log("🛑 Ending conversation...");
+      conversation.endSession();
     }
+    setIsConnecting(false);
   };
 
   const closeEndModal = () => {
