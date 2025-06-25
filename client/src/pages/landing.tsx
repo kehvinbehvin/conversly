@@ -55,69 +55,61 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative warm-gradient min-h-screen flex items-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div className="space-y-8">
-              <div className="space-y-6">
-                <h1 className="text-5xl lg:text-6xl font-bold leading-tight">
-                  <span className="text-warm-brown-800">
-                    Practice conversations.
-                  </span>
-                  <span className="text-coral-500 block">
-                    Build confidence.
-                  </span>
-                </h1>
-                <p className="text-xl text-warm-brown-600 leading-relaxed max-w-2xl">
-                  Safe, AI-powered conversation practice designed for socially
-                  self-aware individuals who want to improve their interpersonal
-                  connections through guided voice conversations.
-                </p>
+      <section className="relative warm-gradient min-h-screen">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20">
+          {/* Compact Header */}
+          <div className="text-center mb-12">
+            <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-4">
+              <span className="text-warm-brown-800">Practice conversations. </span>
+              <span className="text-coral-500">Build confidence.</span>
+            </h1>
+            <p className="text-lg text-warm-brown-600 max-w-3xl mx-auto mb-6">
+              AI-powered conversation practice with instant feedback
+            </p>
+            <div className="flex justify-center items-center space-x-6 text-sm text-warm-brown-600">
+              <div className="flex items-center space-x-2">
+                <Check className="w-4 h-4 text-sage-500" />
+                <span>Free to try</span>
               </div>
-
-              <div className="space-y-6">
-                <Link href="/dashboard">
-                  <Button className="bg-coral-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-                    Start Your First Conversation
-                  </Button>
-                </Link>
-
-                <div className="flex items-center space-x-8 text-warm-brown-600">
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-5 h-5 text-sage-500" />
-                    <span>5-minute practice sessions</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-5 h-5 text-sage-500" />
-                    <span>Personalized feedback</span>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Check className="w-5 h-5 text-sage-500" />
-                    <span>Always improving</span>
-                  </div>
-                </div>
+              <div className="flex items-center space-x-2">
+                <Check className="w-4 h-4 text-sage-500" />
+                <span>Instant feedback</span>
               </div>
-            </div>
-
-            <div className="relative">
-              {/* Free Practice Tool - Above the Fold */}
-              <AnonymousConversationProvider>
-                <div className="grid lg:grid-cols-2 gap-6 mb-8">
-                  <div className="h-96">
-                    <AnonymousConversationTool agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
-                  </div>
-                  <div className="h-96">
-                    <AnonymousReviewPanel />
-                  </div>
-                </div>
-              </AnonymousConversationProvider>
-
-              {/* Floating elements */}
-              <div className="absolute -top-4 -right-4 w-20 h-20 coral-gradient rounded-full opacity-60"></div>
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 sage-gradient rounded-full opacity-60"></div>
+              <div className="flex items-center space-x-2">
+                <Check className="w-4 h-4 text-sage-500" />
+                <span>No signup required</span>
+              </div>
             </div>
           </div>
+
+          {/* Free Practice Tool - Hero Element */}
+          <AnonymousConversationProvider>
+            <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+              <div className="h-[500px]">
+                <AnonymousConversationTool agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
+              </div>
+              <div className="h-[500px]">
+                <AnonymousReviewPanel />
+              </div>
+            </div>
+          </AnonymousConversationProvider>
+
+          {/* Upgrade CTA */}
+          <div className="text-center mt-12">
+            <Link href="/dashboard">
+              <Button className="bg-coral-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
+                Create Account to Track Progress
+              </Button>
+            </Link>
+            <p className="text-sm text-warm-brown-500 mt-3">
+              Save your conversations and see improvement over time
+            </p>
+          </div>
         </div>
+
+        {/* Floating elements */}
+        <div className="absolute top-20 right-8 w-16 h-16 coral-gradient rounded-full opacity-40"></div>
+        <div className="absolute bottom-32 left-8 w-12 h-12 sage-gradient rounded-full opacity-40"></div>
       </section>
 
       {/* How It Works Section */}
