@@ -42,21 +42,30 @@ Conversly is a conversational practice application designed to help users improv
 - **Storage Layer**: Abstracted interface supporting both memory and database implementations
 
 ### Frontend Pages
-- **Landing Page**: Marketing and feature overview
+- **Landing Page**: Marketing and feature overview with integrated avatar selection
 - **Dashboard**: User overview with conversation statistics and quick actions
 - **Conversation**: Voice practice interface with recording controls
 - **Review**: Detailed feedback display with highlights and suggestions
 - **History**: Complete conversation history with search and filtering
 
+### Avatar Selection System
+- **Multi-Agent Support**: 4 unique conversation partners with distinct personalities
+- **Avatar Profiles**: Jessie (barista), Shawn (party friend), Maya (cycling enthusiast), Sam (dinner +1)
+- **Responsive Interface**: 2x2 grid on desktop/tablet, vertical stack on mobile
+- **ElevenLabs Integration**: Each avatar maps to unique agent_id for personalized voice interactions
+- **State Management**: Selected avatar persists throughout conversation lifecycle
+- **Visual Design**: Card-based selection with coral/sage highlighting and media object layout
+
 ## Data Flow
 
 1. **User Registration**: Demo user system for MVP (demo@conversly.com)
-2. **Conversation Creation**: User initiates practice session, creates conversation record
-3. **Voice Interaction**: Integration with ElevenLabs for real-time voice conversation
-4. **Transcript Processing**: Voice data converted to text transcript
-5. **AI Analysis**: OpenAI GPT-4o analyzes transcript for communication patterns
-6. **Review Generation**: Structured feedback with highlights, suggestions, and ratings
-7. **Progress Tracking**: Historical data for user improvement tracking
+2. **Avatar Selection**: User chooses from 4 conversation partners with unique personalities
+3. **Conversation Creation**: User initiates practice session with selected avatar's agent_id
+4. **Voice Interaction**: Integration with ElevenLabs for real-time voice conversation using specific agent
+5. **Transcript Processing**: Voice data converted to text transcript with avatar context
+6. **AI Analysis**: OpenAI GPT-4o analyzes transcript for communication patterns
+7. **Review Generation**: Structured feedback with highlights, suggestions, and ratings
+8. **Progress Tracking**: Historical data for user improvement tracking across different avatars
 
 ## External Dependencies
 
@@ -91,6 +100,13 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 26, 2025: **AVATAR SELECTION FEATURE COMPLETED** - Multi-agent conversation system with user choice
+  - **Agent Selection Interface**: 2x2 grid layout (desktop/tablet) and vertical stack (mobile) for 4 conversation avatars
+  - **Dynamic Agent Integration**: Each avatar maps to unique ElevenLabs agent_id for personalized conversations
+  - **State Management**: Avatar selection state with proper logging and error handling throughout conversation flow
+  - **Responsive Design**: Clean card-based selection with coral/sage highlighting for selected avatar
+  - **Data Validation**: Comprehensive test suite (13 tests) validates avatar data integrity and ElevenLabs integration
+  - **Conversation Context**: Selected avatar persists through entire conversation lifecycle from start to review
 - June 26, 2025: **MOBILE REVIEW STATE OVERFLOW FIX COMPLETED** - Eliminated unwanted scrolling in top section of review state
   - **Mobile Overflow Resolution**: Removed height constraints and overflow-y-auto from review top section on mobile/tablet
   - **Natural Content Display**: Top section now expands to fit all rating and summary content without scrolling

@@ -10,6 +10,16 @@ export default function AvatarSelection({
   selectedAvatar,
   onAvatarSelect,
 }: AvatarSelectionProps) {
+  // Validate avatars data
+  if (!AVATARS || AVATARS.length === 0) {
+    console.error("❌ No avatars available for selection");
+    return (
+      <div className="text-center text-warm-brown-600">
+        <p>No conversation partners available</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
       <h3 className="text-heading-2 text-warm-brown-800 text-center">

@@ -27,6 +27,12 @@ export default function UnifiedConversationInterface({
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
   
+  // Log avatar selection for debugging
+  const handleAvatarSelect = (avatar: Avatar) => {
+    console.log(`👤 Avatar selected: ${avatar.name} (${avatar.agent_id})`);
+    setSelectedAvatar(avatar);
+  };
+  
   const {
     isConnecting,
     isConnected,
@@ -93,7 +99,10 @@ export default function UnifiedConversationInterface({
 
   const handleStartConversation = () => {
     if (selectedAvatar?.agent_id) {
+      console.log(`🚀 Starting conversation with ${selectedAvatar.name} (${selectedAvatar.agent_id})`);
       startConversation(selectedAvatar.agent_id);
+    } else {
+      console.error("❌ No avatar selected or invalid agent_id");
     }
   };
 
@@ -177,7 +186,7 @@ export default function UnifiedConversationInterface({
           <div className="space-y-6">
             <AvatarSelection
               selectedAvatar={selectedAvatar}
-              onAvatarSelect={setSelectedAvatar}
+              onAvatarSelect={handleAvatarSelect}
             />
             <div className="text-center">
               <Button

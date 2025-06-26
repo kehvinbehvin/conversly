@@ -100,6 +100,16 @@ export type Avatar = {
   agent_id: string;
 };
 
+// Avatar validation schema
+export const avatarSchema = z.object({
+  name: z.string().min(1, "Avatar name is required"),
+  description: z.string().min(1, "Avatar description is required"),
+  agent_id: z.string().regex(/^agent_[a-z0-9]{26}$/, "Invalid ElevenLabs agent ID format"),
+});
+
+// Type for validated avatar
+export type ValidatedAvatar = z.infer<typeof avatarSchema>;
+
 // Avatar data definitions
 export const AVATARS: Avatar[] = [
   {
