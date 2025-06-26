@@ -186,7 +186,37 @@ export default function UnifiedConversationInterface({
 
   const renderConnectingState = () => (
     <div className="h-full flex p-8">
-      <div className="w-full flex items-center justify-center">
+      {/* Left side - Placeholder to maintain layout */}
+      <div className="w-1/2 pr-8 flex flex-col justify-center">
+        <div className="space-y-6 opacity-30">
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+            <span className="text-warm-brown-800">
+              Practice conversations.{" "}
+            </span>
+            <span className="text-coral-500">Build confidence.</span>
+          </h1>
+          <p className="text-lg text-warm-brown-600">
+            AI-powered conversation practice with instant feedback
+          </p>
+          <div className="space-y-3 text-sm text-warm-brown-600">
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Free to try</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Instant feedback</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>No signup required</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Active content */}
+      <div className="w-1/2 pl-8 flex flex-col justify-center border-l border-warm-brown-200">
         <div className="text-center space-y-8">
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
@@ -204,7 +234,37 @@ export default function UnifiedConversationInterface({
 
   const renderActiveState = () => (
     <div className="h-full flex p-8">
-      <div className="w-full flex items-center justify-center">
+      {/* Left side - Placeholder to maintain layout */}
+      <div className="w-1/2 pr-8 flex flex-col justify-center">
+        <div className="space-y-6 opacity-30">
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+            <span className="text-warm-brown-800">
+              Practice conversations.{" "}
+            </span>
+            <span className="text-coral-500">Build confidence.</span>
+          </h1>
+          <p className="text-lg text-warm-brown-600">
+            AI-powered conversation practice with instant feedback
+          </p>
+          <div className="space-y-3 text-sm text-warm-brown-600">
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Free to try</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Instant feedback</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>No signup required</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Active content */}
+      <div className="w-1/2 pl-8 flex flex-col justify-center border-l border-warm-brown-200">
         <div className="text-center space-y-8">
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
@@ -229,7 +289,37 @@ export default function UnifiedConversationInterface({
 
   const renderProcessingState = () => (
     <div className="h-full flex p-8">
-      <div className="w-full flex items-center justify-center">
+      {/* Left side - Placeholder to maintain layout */}
+      <div className="w-1/2 pr-8 flex flex-col justify-center">
+        <div className="space-y-6 opacity-30">
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+            <span className="text-warm-brown-800">
+              Practice conversations.{" "}
+            </span>
+            <span className="text-coral-500">Build confidence.</span>
+          </h1>
+          <p className="text-lg text-warm-brown-600">
+            AI-powered conversation practice with instant feedback
+          </p>
+          <div className="space-y-3 text-sm text-warm-brown-600">
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Free to try</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Instant feedback</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>No signup required</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Active content */}
+      <div className="w-1/2 pl-8 flex flex-col justify-center border-l border-warm-brown-200">
         <div className="text-center space-y-8">
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
@@ -250,7 +340,37 @@ export default function UnifiedConversationInterface({
 
   const renderErrorState = () => (
     <div className="h-full flex p-8">
-      <div className="w-full flex items-center justify-center">
+      {/* Left side - Placeholder to maintain layout */}
+      <div className="w-1/2 pr-8 flex flex-col justify-center">
+        <div className="space-y-6 opacity-30">
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+            <span className="text-warm-brown-800">
+              Practice conversations.{" "}
+            </span>
+            <span className="text-coral-500">Build confidence.</span>
+          </h1>
+          <p className="text-lg text-warm-brown-600">
+            AI-powered conversation practice with instant feedback
+          </p>
+          <div className="space-y-3 text-sm text-warm-brown-600">
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Free to try</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Instant feedback</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>No signup required</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Right side - Active content */}
+      <div className="w-1/2 pl-8 flex flex-col justify-center border-l border-warm-brown-200">
         <div className="text-center space-y-8 max-w-md mx-auto">
           <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
             <AlertCircle className="w-16 h-16 text-red-500" />
