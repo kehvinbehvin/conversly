@@ -170,16 +170,16 @@ export default function UnifiedConversationInterface({
 
   const renderProcessingState = () => (
     <div className="flex items-center justify-center h-full">
-      <div className="text-center space-y-6">
-        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sage-100 to-coral-100 flex items-center justify-center shadow-2xl mx-auto">
+      <div className="text-center space-y-8">
+        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sage-100 to-coral-100 flex items-center justify-center shadow-lg mx-auto">
           <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-sage-500"></div>
         </div>
         <div className="space-y-3">
-          <p className="text-xl font-semibold text-warm-brown-700">
-            AI Coach Analyzing...
-          </p>
-          <p className="text-base text-warm-brown-600">
-            Creating your personalized feedback
+          <h3 className="text-heading-2 text-warm-brown-800">
+            Processing your conversation...
+          </h3>
+          <p className="text-body text-warm-brown-600 max-w-md mx-auto">
+            Our AI is analyzing your conversation and preparing detailed feedback
           </p>
         </div>
       </div>
@@ -225,10 +225,10 @@ export default function UnifiedConversationInterface({
     if (!review) return renderProcessingState();
 
     return (
-      <div className="h-full flex">
+      <div className="h-full flex overflow-hidden">
         {/* Left side - Rating and Review Info */}
-        <div className="w-1/2 p-8 border-r border-warm-brown-200">
-          <div className="space-y-8">
+        <div className="w-1/2 p-8 border-r border-warm-brown-200 flex flex-col">
+          <div className="flex-1 overflow-y-auto space-y-8">
             {/* Rating */}
             <div className="text-center">
               <h3 className="text-heading-1 text-warm-brown-800 mb-6">Your Rating</h3>
@@ -260,17 +260,17 @@ export default function UnifiedConversationInterface({
                 </div>
               </div>
             )}
-
-            {/* Start New Conversation Button */}
-            <div className="pt-8">
-              <Button
-                onClick={handleStartNewConversation}
-                size="lg"
-                className="btn-primary w-full py-4 text-heading-3"
-              >
-                Start New Conversation
-              </Button>
-            </div>
+          </div>
+          
+          {/* Start New Conversation Button - Fixed at bottom */}
+          <div className="pt-8">
+            <Button
+              onClick={handleStartNewConversation}
+              size="lg"
+              className="btn-primary w-full py-4 text-heading-3"
+            >
+              Start New Conversation
+            </Button>
           </div>
         </div>
 
@@ -308,29 +308,20 @@ export default function UnifiedConversationInterface({
 
   return (
     <Card className="card-surface w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
-      <CardHeader className="text-center pb-6">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-display-2 text-warm-brown-800">
-            {state === 'review' ? 'Your Review' : 'AI Conversation Practice'}
-          </CardTitle>
-          {state === 'review' && (
+      {state === 'review' && (
+        <CardHeader className="text-center pb-4">
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-display-2 text-warm-brown-800">
+              Your Review
+            </CardTitle>
             <Badge variant="secondary" className="bg-green-100 text-green-800 text-body-small px-3 py-1 rounded-lg">
               ✓ Complete
             </Badge>
-          )}
-        </div>
-        {state !== 'review' && (
-          <p className="text-body text-warm-brown-600 mt-3">
-            {state === 'idle' && 'Click to start your free practice session'}
-            {state === 'connecting' && 'Establishing connection...'}
-            {state === 'active' && 'Conversation in progress'}
-            {state === 'processing' && 'Analyzing your conversation...'}
-            {state === 'error' && 'Connection failed - please try again'}
-          </p>
-        )}
-      </CardHeader>
+          </div>
+        </CardHeader>
+      )}
       
-      <CardContent className="flex-1 flex flex-col">
+      <CardContent className={`${state === 'review' ? 'flex-1' : 'h-full'} flex flex-col`}>
         {renderCurrentState()}
       </CardContent>
     </Card>
