@@ -64,9 +64,7 @@ export default function Landing() {
           </AnonymousConversationProvider>
         </div>
 
-        {/* Floating elements */}
-        <div className="absolute top-20 right-8 w-16 h-16 coral-gradient rounded-full opacity-40"></div>
-        <div className="absolute bottom-32 left-8 w-12 h-12 sage-gradient rounded-full opacity-40"></div>
+        
       </section>
 
       {/* How It Works Section */}
