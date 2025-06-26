@@ -91,10 +91,11 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
-- June 26, 2025: **CHAT THREAD HEIGHT OPTIMIZATION COMPLETED** - Added maximum height constraint to chat thread in review state
-  - **Mobile/Tablet Constraint**: Set chat thread maximum height to 75% of viewport (max-h-[75vh]) on mobile and tablet only
-  - **Desktop Preservation**: Desktop maintains unlimited height (lg:max-h-none) for existing layout behavior
-  - **Responsive Implementation**: Uses responsive classes to apply constraint only where needed
+- June 26, 2025: **MOBILE REVIEW LAYOUT SPACE ALLOCATION FIX COMPLETED** - Balanced height distribution between rating and chat sections
+  - **Top Section Constraint**: Limited rating/summary section to 40% viewport height (max-h-[40vh]) on mobile/tablet
+  - **Bottom Section Guarantee**: Ensured chat thread gets minimum 50% viewport height (min-h-[50vh]) on mobile/tablet
+  - **Scroll Behavior**: Added overflow-y-auto to top section for longer content, maintained scrolling in chat thread
+  - **Desktop Preservation**: Desktop layout remains unchanged with unlimited heights
 - June 26, 2025: **MOBILE REVIEW STATE OVERFLOW FIX COMPLETED** - Eliminated unwanted scrolling in top section of review state
   - **Mobile Overflow Resolution**: Removed height constraints and overflow-y-auto from review top section on mobile/tablet
   - **Natural Content Display**: Top section now expands to fit all rating and summary content without scrolling
