@@ -385,7 +385,7 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="flex flex-col flex-1 min-h-0 min-h-full lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
+    <Card className="flex flex-col flex-1 min-h-0 min-h-[600px] lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
       <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center justify-center">
         {renderCurrentState()}
       </CardContent>
