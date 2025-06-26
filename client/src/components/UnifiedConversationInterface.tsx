@@ -185,82 +185,90 @@ export default function UnifiedConversationInterface({
   );
 
   const renderConnectingState = () => (
-    <div className="flex items-center justify-center h-full p-6">
-      <div className="text-center space-y-8">
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
-        </div>
-        <div className="space-y-2">
-          <h3 className="text-heading-2 text-warm-brown-800">Connecting...</h3>
-          <p className="text-body text-warm-brown-600">
-            Setting up your AI conversation coach
-          </p>
+    <div className="h-full flex p-8">
+      <div className="w-full flex items-center justify-center">
+        <div className="text-center space-y-8">
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-heading-2 text-warm-brown-800">Connecting...</h3>
+            <p className="text-body text-warm-brown-600">
+              Setting up your AI conversation coach
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 
   const renderActiveState = () => (
-    <div className="flex items-center justify-center h-full p-6">
-      <div className="text-center space-y-8">
-        <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
+    <div className="h-full flex p-8">
+      <div className="w-full flex items-center justify-center">
+        <div className="text-center space-y-8">
+          <div className="flex justify-center">
+            <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-heading-1 text-warm-brown-800">Connected!</h3>
+            <p className="text-body-large text-warm-brown-700">
+              Speak naturally - the AI is listening
+            </p>
+          </div>
+          <Button
+            onClick={handleEndConversation}
+            size="lg"
+            className="btn-primary px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            Stop Conversation
+          </Button>
         </div>
-        <div className="space-y-3">
-          <h3 className="text-heading-1 text-warm-brown-800">Connected!</h3>
-          <p className="text-body-large text-warm-brown-700">
-            Speak naturally - the AI is listening
-          </p>
-        </div>
-        <Button
-          onClick={handleEndConversation}
-          size="lg"
-          className="btn-primary px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
-        >
-          Stop Conversation
-        </Button>
       </div>
     </div>
   );
 
   const renderProcessingState = () => (
-    <div className="flex items-center justify-center h-full p-6">
-      <div className="text-center space-y-8">
-        <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
-        </div>
-        <div className="space-y-3">
-          <h3 className="text-heading-2 text-warm-brown-800">
-            Processing your conversation...
-          </h3>
-          <p className="text-body text-warm-brown-600 max-w-md mx-auto">
-            Our AI is analyzing your conversation and preparing detailed
-            feedback
-          </p>
+    <div className="h-full flex p-8">
+      <div className="w-full flex items-center justify-center">
+        <div className="text-center space-y-8">
+          <div className="flex justify-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
+          </div>
+          <div className="space-y-3">
+            <h3 className="text-heading-2 text-warm-brown-800">
+              Processing your conversation...
+            </h3>
+            <p className="text-body text-warm-brown-600 max-w-md mx-auto">
+              Our AI is analyzing your conversation and preparing detailed
+              feedback
+            </p>
+          </div>
         </div>
       </div>
     </div>
   );
 
   const renderErrorState = () => (
-    <div className="flex items-center justify-center h-full p-6">
-      <div className="text-center space-y-8 max-w-md mx-auto">
-        <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
-          <AlertCircle className="w-16 h-16 text-red-500" />
-        </div>
-        <div className="space-y-4">
-          <h3 className="text-heading-1 text-red-700">Connection Error</h3>
-          <p className="text-body text-warm-brown-600">
-            {error || "Unable to start conversation. Please try again."}
-          </p>
-        </div>
-        <div className="space-y-4">
-          <Button onClick={handleRetry} className="btn-primary w-full">
-            Try Again
-          </Button>
-          <Button onClick={clearError} className="btn-secondary w-full">
-            Back to Start
-          </Button>
+    <div className="h-full flex p-8">
+      <div className="w-full flex items-center justify-center">
+        <div className="text-center space-y-8 max-w-md mx-auto">
+          <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
+            <AlertCircle className="w-16 h-16 text-red-500" />
+          </div>
+          <div className="space-y-4">
+            <h3 className="text-heading-1 text-red-700">Connection Error</h3>
+            <p className="text-body text-warm-brown-600">
+              {error || "Unable to start conversation. Please try again."}
+            </p>
+          </div>
+          <div className="space-y-4">
+            <Button onClick={handleRetry} className="btn-primary w-full">
+              Try Again
+            </Button>
+            <Button onClick={clearError} className="btn-secondary w-full">
+              Back to Start
+            </Button>
+          </div>
         </div>
       </div>
     </div>
