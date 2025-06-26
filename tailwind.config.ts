@@ -130,8 +130,8 @@ export default {
       },
       width: {
         'conversation': '1152px', // 72rem - desktop fixed width
-        'conversation-md': '90vw',  // 90% viewport width for tablet 
-        'conversation-sm': '95vw',  // 95% viewport width for mobile
+        'conversation-md': '100%',  // 100% of available container width for tablet 
+        'conversation-sm': '100%',  // 100% of available container width for mobile
       },
       keyframes: {
         "accordion-down": {
