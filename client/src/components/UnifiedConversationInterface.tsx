@@ -210,9 +210,9 @@ export default function UnifiedConversationInterface({
   );
 
   const renderActiveState = () => (
-    <div className="h-full flex p-4 sm:p-6 lg:p-8">
+    <div className="flex p-4 sm:p-6 lg:p-8 min-h-[400px]">
       <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto">
-        <div className="h-full flex items-center justify-center">
+        <div className="flex items-center justify-center h-full">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
