@@ -126,8 +126,8 @@ export default function UnifiedConversationInterface({
   const renderConnectingState = () => (
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
-        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-coral-100 to-sage-100 flex items-center justify-center shadow-lg mx-auto">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-coral-500"></div>
+        <div className="mx-auto">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
         </div>
         <div className="space-y-2">
           <h3 className="text-heading-2 text-warm-brown-800">Connecting...</h3>
@@ -140,8 +140,8 @@ export default function UnifiedConversationInterface({
   const renderActiveState = () => (
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
-        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-100 to-sage-200 flex items-center justify-center shadow-lg border-4 border-green-200 animate-pulse mx-auto">
-          <div className="w-6 h-6 rounded-full bg-green-600 animate-pulse"></div>
+        <div className="mx-auto">
+          <div className="w-16 h-16 rounded-full bg-green-500 animate-pulse shadow-lg"></div>
         </div>
         <div className="space-y-3">
           <h3 className="text-heading-1 text-green-700">Connected!</h3>
@@ -152,8 +152,7 @@ export default function UnifiedConversationInterface({
         <Button
           onClick={handleEndConversation}
           size="lg"
-          variant="destructive"
-          className="px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
+          className="bg-red-600 text-white hover:bg-red-700 px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
         >
           Stop Conversation
         </Button>
@@ -164,8 +163,8 @@ export default function UnifiedConversationInterface({
   const renderProcessingState = () => (
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
-        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sage-100 to-coral-100 flex items-center justify-center shadow-lg mx-auto">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-sage-500"></div>
+        <div className="mx-auto">
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-sage-200 border-t-sage-600"></div>
         </div>
         <div className="space-y-3">
           <h3 className="text-heading-2 text-warm-brown-800">
