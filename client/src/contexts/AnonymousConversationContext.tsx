@@ -14,6 +14,7 @@ interface AnonymousConversationContextType {
   startConversation: (agentId: string) => Promise<void>;
   endConversation: () => void;
   clearError: () => void;
+  resetForNewConversation: () => void;
   onError?: (error: Error) => void;
 }
 
@@ -46,6 +47,15 @@ export function AnonymousConversationProvider({
 
   const clearError = () => setError(null);
 
+  const resetForNewConversation = () => {
+    console.log("🔄 Resetting state for new conversation");
+    setCurrentConversationId(null);
+    setConversationData(null);
+    setIsReviewReady(false);
+    setError(null);
+    conversationIdRef.current = null;
+  };
+
   // SSE connection for real-time notifications
   const { isConnected: sseConnected, registerForConversation } = useSSE({
     onMessage: (message: any) => {
@@ -57,6 +67,7 @@ export function AnonymousConversationProvider({
         
         if (message.conversationId === conversationIdRef.current) {
           console.log('📡 Conversation ID matches - setting review ready');
+          console.log('📡 Setting isReviewReady to true');
           setIsReviewReady(true);
           
           // Refetch conversation data to get the latest review
@@ -81,10 +92,18 @@ export function AnonymousConversationProvider({
 
   const fetchConversationData = async (dbConversationId: number) => {
     try {
+      console.log('📡 Fetching conversation data from API for ID:', dbConversationId);
       const response = await fetch(`/api/conversations/${dbConversationId}`);
+      console.log('📡 API response status:', response.status);
+      
       if (response.ok) {
         const data = await response.json();
+        console.log('📡 Received conversation data:', data);
+        console.log('📡 Has review data:', !!data.review);
         storeConversationData(data);
+        console.log('📡 Stored conversation data in state');
+      } else {
+        console.error('❌ API response not ok:', response.status, response.statusText);
       }
     } catch (error) {
       console.error('❌ Failed to fetch conversation data:', error);
@@ -189,10 +208,10 @@ export function AnonymousConversationProvider({
       conversation.endSession();
     }
     setIsConnecting(false);
-    // Clear current conversation state to reset to idle
-    setCurrentConversationId(null);
     setIsReviewReady(false);
-    conversationIdRef.current = null;
+    // Keep conversation ID and current conversation state to receive webhook notification
+    console.log("📡 Keeping conversation ID for webhook notification:", conversationIdRef.current);
+    console.log("📡 Current conversation data:", conversationData?.id);
   };
 
   const value: AnonymousConversationContextType = {
@@ -205,7 +224,7 @@ export function AnonymousConversationProvider({
     startConversation,
     endConversation,
     clearError,
-    onError,
+    resetForNewConversation,
   };
 
   return (

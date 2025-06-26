@@ -25,16 +25,25 @@ export default function UnifiedConversationInterface({
     startConversation,
     endConversation,
     clearError,
+    resetForNewConversation,
   } = useAnonymousConversation();
 
   // Determine current state
   const getState = (): ConversationState => {
+    console.log('🔍 State check - error:', !!error, 'isReviewReady:', isReviewReady, 'hasConversationData:', !!conversationData, 'hasReview:', !!conversationData?.review, 'conversationStatus:', conversationData?.status, 'isConnected:', isConnected, 'isConnecting:', isConnecting, 'currentConversationId:', !!currentConversationId);
+    
     // Error state takes priority
     if (error) return 'error';
     // Check for review state first - review is ready if we have both the flag and the data
-    if (isReviewReady && conversationData?.review) return 'review';
+    if (isReviewReady && conversationData?.review) {
+      console.log('🔍 Review state: isReviewReady=true AND hasReview=true');
+      return 'review';
+    }
     // Alternative review check - if conversation is completed and has review, show review
-    if (conversationData?.status === 'completed' && conversationData?.review) return 'review';
+    if (conversationData?.status === 'completed' && conversationData?.review) {
+      console.log('🔍 Review state: conversation completed AND hasReview=true');
+      return 'review';
+    }
     // Active state - currently connected to ElevenLabs
     if (isConnected) return 'active';
     // Connecting state
