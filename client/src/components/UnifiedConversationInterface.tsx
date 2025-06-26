@@ -132,7 +132,7 @@ export default function UnifiedConversationInterface({
 
   const renderIdleState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex flex-col lg:flex-row">
+      <div className="w-full max-w-conversation-xs sm:max-w-conversation-sm lg:max-w-conversation mx-auto flex flex-col lg:flex-row">
         {/* Left side - Marketing content */}
         <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0">
           <div className="space-y-6">
@@ -189,7 +189,7 @@ export default function UnifiedConversationInterface({
 
   const renderConnectingState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
+      <div className="w-full max-w-conversation-xs sm:max-w-conversation-sm lg:max-w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -211,7 +211,7 @@ export default function UnifiedConversationInterface({
 
   const renderActiveState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
+      <div className="w-full max-w-conversation-xs sm:max-w-conversation-sm lg:max-w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -238,7 +238,7 @@ export default function UnifiedConversationInterface({
 
   const renderProcessingState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
+      <div className="w-full max-w-conversation-xs sm:max-w-conversation-sm lg:max-w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -261,7 +261,7 @@ export default function UnifiedConversationInterface({
 
   const renderErrorState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
+      <div className="w-full max-w-conversation-xs sm:max-w-conversation-sm lg:max-w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
@@ -295,7 +295,7 @@ export default function UnifiedConversationInterface({
 
     return (
       <div className="h-full flex overflow-hidden p-4 sm:p-6 lg:p-8">
-        <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex flex-col lg:flex-row min-h-0">
+        <div className="w-full max-w-conversation-xs sm:max-w-conversation-sm lg:max-w-conversation mx-auto flex flex-col lg:flex-row min-h-0">
           {/* Left side - Rating and Review Info */}
           <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
             <div className="flex-1 overflow-y-auto space-y-4 pr-2">
