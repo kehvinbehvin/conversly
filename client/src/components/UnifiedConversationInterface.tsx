@@ -144,15 +144,15 @@ export default function UnifiedConversationInterface({
           <div className="w-16 h-16 rounded-full bg-sage-500 shadow-lg"></div>
         </div>
         <div className="space-y-3">
-          <h3 className="text-heading-1 text-sage-700">Connected!</h3>
-          <p className="text-body-large text-sage-600">
+          <h3 className="text-heading-1 text-warm-brown-800">Connected!</h3>
+          <p className="text-body-large text-warm-brown-700">
             Speak naturally - the AI is listening
           </p>
         </div>
         <Button
           onClick={handleEndConversation}
           size="lg"
-          className="bg-red-600 text-white hover:bg-red-700 px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
+          className="bg-red-600 hover:bg-red-700 text-white px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200 border-0"
         >
           Stop Conversation
         </Button>
