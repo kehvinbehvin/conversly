@@ -66,8 +66,7 @@ export default function UnifiedConversationInterface({
 
   const handleStartNewConversation = () => {
     // Reset to idle state without auto-starting
-    clearError();
-    endConversation();
+    resetForNewConversation();
   };
 
   const handleRetry = () => {
