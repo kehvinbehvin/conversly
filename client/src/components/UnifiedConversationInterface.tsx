@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mic, MicOff, MessageCircle, Star, AlertCircle } from "lucide-react";
+import { MessageCircle, Star, AlertCircle } from "lucide-react";
 import { useAnonymousConversation } from "@/contexts/AnonymousConversationContext";
 import ChatThread from "@/components/ChatThread";
 import type { TranscriptWithReview } from "@shared/schema";
@@ -104,9 +104,6 @@ export default function UnifiedConversationInterface({
   const renderIdleState = () => (
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
-        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sage-100 to-coral-100 flex items-center justify-center shadow-lg mx-auto">
-          <Mic className="w-16 h-16 text-warm-brown-600" />
-        </div>
         <div className="space-y-4">
           <h3 className="text-heading-1 text-warm-brown-800">
             Ready to practice?
@@ -144,7 +141,7 @@ export default function UnifiedConversationInterface({
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
         <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-100 to-sage-200 flex items-center justify-center shadow-lg border-4 border-green-200 animate-pulse mx-auto">
-          <Mic className="w-16 h-16 text-green-600 animate-pulse" />
+          <div className="w-6 h-6 rounded-full bg-green-600 animate-pulse"></div>
         </div>
         <div className="space-y-3">
           <h3 className="text-heading-1 text-green-700">Connected!</h3>
