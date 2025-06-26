@@ -91,6 +91,11 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 26, 2025: **RESPONSIVE WIDTH CONSISTENCY IMPLEMENTED** - Fixed viewport-responsive widths with consistent sizing across all states
+  - **Technical Solution**: Replaced max-width approach with viewport-aware fixed widths (95vw mobile, 90vw tablet, 1152px desktop)
+  - **Consistency Achieved**: All conversation states now use identical width classes ensuring uniform appearance per breakpoint
+  - **Mobile Optimization**: Prevents horizontal overflow while maintaining proper stacking for Idle/Review states
+  - **Engineering Approach**: Systematic state-by-state updates with proper width inheritance patterns
 - June 26, 2025: **CRITICAL BUG RESOLUTION** - User manually fixed missing renderIdleState function that broke component
   - **Root Cause**: Missing function definition caused "renderIdle is not defined" runtime error
   - **Cascade Effect**: Runtime error led to JSX syntax corruption and component failure

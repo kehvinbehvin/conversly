@@ -129,14 +129,9 @@ export default {
         'shadow-xl': 'var(--shadow-xl)',
       },
       width: {
-        'conversation': '1152px', // 72rem - desktop max width
-        'conversation-sm': '896px', // 56rem - tablet max width  
-        'conversation-xs': '672px', // 42rem - small tablet max width
-      },
-      maxWidth: {
-        'conversation': '1152px', // 72rem - desktop
-        'conversation-sm': '896px', // 56rem - tablet
-        'conversation-xs': '672px', // 42rem - small tablet
+        'conversation': '1152px', // 72rem - desktop fixed width
+        'conversation-md': '90vw',  // 90% viewport width for tablet 
+        'conversation-sm': '95vw',  // 95% viewport width for mobile
       },
       keyframes: {
         "accordion-down": {
