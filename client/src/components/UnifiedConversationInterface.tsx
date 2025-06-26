@@ -303,7 +303,7 @@ export default function UnifiedConversationInterface({
                 <h3 className="text-heading-3 text-warm-brown-800 mb-3">
                   Your Rating
                 </h3>
-              <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
+                <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
                 <div className="flex items-center justify-center space-x-1 mb-2">
                   {[...Array(5)].map((_, i) => (
                     <Star
