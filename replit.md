@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 26, 2025: **UI/UX DESIGN REFINEMENTS COMPLETED** - Active conversation state now fully aligned with warm color palette
+  - **Color Consistency**: Updated active state from generic green to sage palette (sage-500, sage-700, sage-600)
+  - **Complete Badge Update**: Review completion badge now uses sage-100/sage-800 instead of generic green
+  - **Design System Integrity**: All visual elements now consistently use warm-brown/coral/sage color scheme
+  - **Clean Visual Elements**: Removed pulsation effects, fixed spinner alignment using flex layout
+  - **Material Design Spinners**: Simplified progress indicators with border-based animation
 - June 26, 2025: **COMPREHENSIVE SYSTEM ANALYSIS COMPLETED** - Full frontend-to-backend validation with critical fixes
   - **Color System Fixed**: Added missing custom color classes (warm-brown, coral, sage) to Tailwind configuration
   - **State Machine Enhanced**: Improved processing state detection and added error state handling

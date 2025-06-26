@@ -141,11 +141,11 @@ export default function UnifiedConversationInterface({
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-green-500 shadow-lg"></div>
+          <div className="w-16 h-16 rounded-full bg-sage-500 shadow-lg"></div>
         </div>
         <div className="space-y-3">
-          <h3 className="text-heading-1 text-green-700">Connected!</h3>
-          <p className="text-body-large text-green-700">
+          <h3 className="text-heading-1 text-sage-700">Connected!</h3>
+          <p className="text-body-large text-sage-600">
             Speak naturally - the AI is listening
           </p>
         </div>
@@ -306,7 +306,7 @@ export default function UnifiedConversationInterface({
             <CardTitle className="text-heading-2 text-warm-brown-800">
               Your Review
             </CardTitle>
-            <Badge variant="secondary" className="bg-green-100 text-green-800 text-caption px-2 py-1 rounded-lg">
+            <Badge variant="secondary" className="bg-sage-100 text-sage-800 text-caption px-2 py-1 rounded-lg">
               ✓ Complete
             </Badge>
           </div>
