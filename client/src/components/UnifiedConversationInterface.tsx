@@ -187,7 +187,7 @@ export default function UnifiedConversationInterface({
   const renderConnectingState = () => (
     <div className="h-full flex p-8">
       <div className="w-full flex items-center justify-center">
-        <div className="text-center space-y-8 max-w-md">
+        <div className="text-center space-y-8 w-full max-w-6xl">
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
           </div>
@@ -205,7 +205,7 @@ export default function UnifiedConversationInterface({
   const renderActiveState = () => (
     <div className="h-full flex p-8">
       <div className="w-full flex items-center justify-center">
-        <div className="text-center space-y-8 max-w-md">
+        <div className="text-center space-y-8 w-full max-w-6xl">
           <div className="flex justify-center">
             <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
           </div>
@@ -230,7 +230,7 @@ export default function UnifiedConversationInterface({
   const renderProcessingState = () => (
     <div className="h-full flex p-8">
       <div className="w-full flex items-center justify-center">
-        <div className="text-center space-y-8 max-w-md">
+        <div className="text-center space-y-8 w-full max-w-6xl">
           <div className="flex justify-center">
             <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
           </div>
@@ -251,7 +251,7 @@ export default function UnifiedConversationInterface({
   const renderErrorState = () => (
     <div className="h-full flex p-8">
       <div className="w-full flex items-center justify-center">
-        <div className="text-center space-y-8 max-w-md">
+        <div className="text-center space-y-8 w-full max-w-6xl">
           <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
             <AlertCircle className="w-16 h-16 text-red-500" />
           </div>
@@ -261,7 +261,7 @@ export default function UnifiedConversationInterface({
               {error || "Unable to start conversation. Please try again."}
             </p>
           </div>
-          <div className="space-y-4">
+          <div className="space-y-4 max-w-md mx-auto">
             <Button onClick={handleRetry} className="btn-primary w-full">
               Try Again
             </Button>
