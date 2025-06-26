@@ -49,11 +49,26 @@ export function AnonymousConversationProvider({
   // SSE connection for real-time notifications
   const { isConnected: sseConnected, registerForConversation } = useSSE({
     onMessage: (message: any) => {
-      if (message.type === 'review_ready' && message.conversationId === conversationIdRef.current) {
-        setIsReviewReady(true);
-        // Refetch conversation data to get the latest review
-        if (message.dbConversationId) {
-          fetchConversationData(message.dbConversationId);
+      console.log('📡 SSE message received in context:', message);
+      console.log('📡 Current conversation ID ref:', conversationIdRef.current);
+      
+      if (message.type === 'review_ready') {
+        console.log('📡 Review ready message detected');
+        
+        if (message.conversationId === conversationIdRef.current) {
+          console.log('📡 Conversation ID matches - setting review ready');
+          setIsReviewReady(true);
+          
+          // Refetch conversation data to get the latest review
+          if (message.dbConversationId) {
+            console.log('📡 Fetching conversation data for ID:', message.dbConversationId);
+            fetchConversationData(message.dbConversationId);
+          }
+        } else {
+          console.log('📡 Conversation ID mismatch:', {
+            messageId: message.conversationId,
+            currentId: conversationIdRef.current
+          });
         }
       }
     }
@@ -84,9 +99,9 @@ export function AnonymousConversationProvider({
       setCurrentConversationId(props.conversationId);
       conversationIdRef.current = props.conversationId;
       
-      // Register for WebSocket notifications now that we have conversation ID
+      // Register for SSE notifications now that we have conversation ID
       registerForConversation(props.conversationId);
-      console.log('📡 Registered WebSocket for conversation:', props.conversationId);
+      console.log('📡 Registered SSE for conversation:', props.conversationId);
       
       // Prevent duplicate conversation creation
       if (createdConversationsRef.current.has(props.conversationId)) {
