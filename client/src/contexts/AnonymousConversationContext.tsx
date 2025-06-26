@@ -187,6 +187,10 @@ export function AnonymousConversationProvider({
       conversation.endSession();
     }
     setIsConnecting(false);
+    // Clear current conversation state to reset to idle
+    setCurrentConversationId(null);
+    setIsReviewReady(false);
+    conversationIdRef.current = null;
   };
 
   const value: AnonymousConversationContextType = {

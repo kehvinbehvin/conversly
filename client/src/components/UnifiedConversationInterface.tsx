@@ -27,14 +27,32 @@ export default function UnifiedConversationInterface({
 
   // Determine current state
   const getState = (): ConversationState => {
+    // Check for review state first - review is ready if we have both the flag and the data
     if (isReviewReady && conversationData?.review) return 'review';
-    if (currentConversationId && !isReviewReady) return 'processing';
+    // Alternative review check - if conversation is completed and has review, show review
+    if (conversationData?.status === 'completed' && conversationData?.review) return 'review';
+    // Active state - currently connected to ElevenLabs
     if (isConnected) return 'active';
+    // Connecting state
     if (isConnecting) return 'connecting';
+    // Processing state - only if we have an active conversation that's pending completion
+    if (currentConversationId && !isConnected && !isReviewReady && conversationData?.status === 'pending') return 'processing';
+    // Default idle state
     return 'idle';
   };
 
   const state = getState();
+  
+  // Debug logging to understand state transitions
+  console.log('🔍 State Debug:', {
+    state,
+    isReviewReady,
+    isConnected,
+    isConnecting,
+    currentConversationId,
+    conversationStatus: conversationData?.status,
+    hasReview: !!conversationData?.review
+  });
 
   const handleStartConversation = () => {
     startConversation(agentId);
@@ -47,6 +65,8 @@ export default function UnifiedConversationInterface({
   const handleStartNewConversation = () => {
     // Reset to idle state and start new conversation
     endConversation();
+    // Clear session storage to fully reset state
+    sessionStorage.removeItem('anonymous_conversation');
     setTimeout(() => {
       startConversation(agentId);
     }, 100);
@@ -129,15 +149,15 @@ export default function UnifiedConversationInterface({
 
   const renderProcessingState = () => (
     <div className="flex items-center justify-center h-full">
-      <div className="text-center space-y-8">
-        <div className="w-40 h-40 rounded-full bg-gradient-to-br from-sage-100 to-coral-100 flex items-center justify-center shadow-2xl">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-sage-500"></div>
+      <div className="text-center space-y-6">
+        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sage-100 to-coral-100 flex items-center justify-center shadow-2xl mx-auto">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-sage-500"></div>
         </div>
-        <div className="space-y-4">
-          <p className="text-2xl font-semibold text-warm-brown-700">
+        <div className="space-y-3">
+          <p className="text-xl font-semibold text-warm-brown-700">
             AI Coach Analyzing...
           </p>
-          <p className="text-lg text-warm-brown-600">
+          <p className="text-base text-warm-brown-600">
             Creating your personalized feedback
           </p>
         </div>
