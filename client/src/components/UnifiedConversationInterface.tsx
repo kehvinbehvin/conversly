@@ -295,10 +295,10 @@ export default function UnifiedConversationInterface({
 
     return (
       <div className="h-full flex overflow-hidden p-4 sm:p-6 lg:p-8">
-        <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row min-h-0">
+        <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row lg:min-h-0">
           {/* Left side - Rating and Review Info */}
-          <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
-            <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+          <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col lg:min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
+            <div className="flex-1 lg:overflow-y-auto space-y-4 pr-2">
               {/* Rating */}
               <div>
                 <h3 className="text-heading-3 text-warm-brown-800 mb-3">
