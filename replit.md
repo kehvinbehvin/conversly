@@ -91,6 +91,16 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 26, 2025: **CONVERSATION INTERFACE STATE CONSISTENCY FIXED** - Resolved width and overlay issues across all conversation states
+  - **Root Cause**: Side-by-side layout in idle state vs centered layout in other states caused width inconsistencies and transparent overlays
+  - **Solution**: Standardized all non-idle states to use centered, full-width layouts without background content
+  - **States Fixed**: Connecting, active, processing, and error states now properly center content and maintain consistent card width
+  - **User Experience**: Clean state transitions with no transparent backgrounds or misaligned content
+- June 26, 2025: **LANDING PAGE REDESIGN COMPLETED** - Marketing content moved into conversation interface for unified experience
+  - **Layout Change**: Moved "Practice conversations. Build confidence." section into idle state left side
+  - **Action Section**: "Ready to practice?" section moved to idle state right side with side-by-side layout
+  - **Viewport Centering**: Interface now properly centered in screen for better visual balance
+  - **Content Consolidation**: Removed duplicate marketing content from landing page header
 - June 26, 2025: **CHAT THREAD OVERFLOW ISSUE RESOLVED** - Systematic fix for content containment in review state
   - **Root Cause Analysis**: Identified `.card-surface` class padding conflicting with flex layout constraints
   - **Height Flow Fix**: Removed problematic CSS class to allow proper height constraint propagation
