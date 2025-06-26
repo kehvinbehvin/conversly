@@ -12,8 +12,7 @@ import {
   Star,
 } from "lucide-react";
 import { AnonymousConversationProvider } from "@/contexts/AnonymousConversationContext";
-import AnonymousConversationTool from "@/components/AnonymousConversationTool";
-import AnonymousReviewPanel from "@/components/AnonymousReviewPanel";
+import UnifiedConversationInterface from "@/components/UnifiedConversationInterface";
 
 export default function Landing() {
   const scrollToSection = (id: string) => {
@@ -82,15 +81,10 @@ export default function Landing() {
             </div>
           </div>
 
-          {/* Free Practice Tool - Hero Element */}
+          {/* Unified Conversation Interface - Hero Element */}
           <AnonymousConversationProvider>
-            <div className="grid lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
-              <div className="h-[500px]">
-                <AnonymousConversationTool agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
-              </div>
-              <div className="h-[500px]">
-                <AnonymousReviewPanel />
-              </div>
+            <div className="h-[600px] max-w-6xl mx-auto">
+              <UnifiedConversationInterface agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
             </div>
           </AnonymousConversationProvider>
 
