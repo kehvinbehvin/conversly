@@ -54,7 +54,7 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative warm-gradient flex items-start lg:items-center justify-center py-8 lg:py-16">
+      <section className="relative warm-gradient min-h-screen flex items-start lg:items-center justify-center pt-8 lg:pt-0 pb-8">
         <div className="w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Unified Conversation Interface - Centered */}
           <AnonymousConversationProvider>
