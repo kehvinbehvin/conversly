@@ -349,7 +349,7 @@ export default function UnifiedConversationInterface({
           </div>
 
           {/* Right side - Chat Thread */}
-          <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col min-h-0 max-h-[75vh]">
+          <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col min-h-0 max-h-[75vh] lg:max-h-none">
             <h3 className="text-heading-3 text-warm-brown-800 mb-3">
               Conversation with Feedback
             </h3>
