@@ -11,12 +11,11 @@ interface ChatThreadProps {
 
 export default function ChatThread({ messages, className }: ChatThreadProps) {
   const scrollAreaRef = useRef<HTMLDivElement>(null);
-  const bottomRef = useRef<HTMLDivElement>(null);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Scroll to top when messages first load (review state)
   useEffect(() => {
-    if (bottomRef.current) {
-      bottomRef.current.scrollIntoView({ behavior: "smooth" });
+    if (scrollAreaRef.current && messages.length > 0) {
+      scrollAreaRef.current.scrollTop = 0;
     }
   }, [messages.length]);
 
@@ -78,7 +77,6 @@ export default function ChatThread({ messages, className }: ChatThreadProps) {
                 />
               );
             })}
-            <div ref={bottomRef} />
           </div>
         </div>
       </CardContent>
