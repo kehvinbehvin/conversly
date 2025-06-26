@@ -225,19 +225,19 @@ export default function UnifiedConversationInterface({
     if (!review) return renderProcessingState();
 
     return (
-      <div className="h-full flex overflow-hidden p-6">
+      <div className="h-full flex overflow-hidden p-4">
         {/* Left side - Rating and Review Info */}
-        <div className="w-1/2 pr-6 border-r border-warm-brown-200 flex flex-col">
-          <div className="flex-1 overflow-y-auto space-y-6">
+        <div className="w-1/2 pr-4 border-r border-warm-brown-200 flex flex-col min-h-0">
+          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             {/* Rating */}
             <div className="text-center">
-              <h3 className="text-heading-2 text-warm-brown-800 mb-4">Your Rating</h3>
-              <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-6 border border-coral-200 shadow-sm">
-                <div className="flex items-center justify-center space-x-1 mb-3">
+              <h3 className="text-heading-3 text-warm-brown-800 mb-3">Your Rating</h3>
+              <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
+                <div className="flex items-center justify-center space-x-1 mb-2">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-8 h-8 ${
+                      className={`w-6 h-6 ${
                         i < (review.overallRating || 0)
                           ? "text-coral-500 fill-current"
                           : "text-warm-brown-200"
@@ -245,7 +245,7 @@ export default function UnifiedConversationInterface({
                     />
                   ))}
                 </div>
-                <div className="text-heading-1 text-warm-brown-800">
+                <div className="text-heading-2 text-warm-brown-800">
                   {review.overallRating || 0}/5
                 </div>
               </div>
@@ -254,8 +254,8 @@ export default function UnifiedConversationInterface({
             {/* Summary if available */}
             {review.summary && (
               <div>
-                <h4 className="text-heading-3 text-warm-brown-800 mb-3">Summary</h4>
-                <div className="text-body text-warm-brown-700 bg-sage-50 p-4 rounded-xl border border-sage-200 shadow-sm">
+                <h4 className="text-body-large font-semibold text-warm-brown-800 mb-2">Summary</h4>
+                <div className="text-body text-warm-brown-700 bg-sage-50 p-3 rounded-xl border border-sage-200 shadow-sm">
                   {review.summary}
                 </div>
               </div>
@@ -263,11 +263,11 @@ export default function UnifiedConversationInterface({
           </div>
           
           {/* Start New Conversation Button - Fixed at bottom */}
-          <div className="pt-6">
+          <div className="pt-4 border-t border-warm-brown-100">
             <Button
               onClick={handleStartNewConversation}
               size="lg"
-              className="btn-primary w-full py-3 text-heading-3"
+              className="btn-primary w-full py-3 text-body-large font-semibold"
             >
               Start New Conversation
             </Button>
@@ -275,9 +275,9 @@ export default function UnifiedConversationInterface({
         </div>
 
         {/* Right side - Chat Thread */}
-        <div className="w-1/2 pl-6 flex flex-col">
-          <h3 className="text-heading-2 text-warm-brown-800 mb-4">Conversation with Feedback</h3>
-          <div className="flex-1 overflow-hidden border border-coral-200 rounded-xl shadow-sm">
+        <div className="w-1/2 pl-4 flex flex-col min-h-0">
+          <h3 className="text-heading-3 text-warm-brown-800 mb-3">Conversation with Feedback</h3>
+          <div className="flex-1 overflow-hidden border border-coral-200 rounded-xl shadow-sm min-h-0">
             <div className="h-full overflow-y-auto">
               <ChatThread messages={mergedTranscripts} />
             </div>
@@ -309,9 +309,9 @@ export default function UnifiedConversationInterface({
   return (
     <Card className="card-surface w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
       {state === 'review' && (
-        <CardHeader className="text-center pb-2 pt-4">
+        <CardHeader className="text-center py-3">
           <div className="flex items-center justify-between">
-            <CardTitle className="text-heading-1 text-warm-brown-800">
+            <CardTitle className="text-heading-2 text-warm-brown-800">
               Your Review
             </CardTitle>
             <Badge variant="secondary" className="bg-green-100 text-green-800 text-caption px-2 py-1 rounded-lg">
