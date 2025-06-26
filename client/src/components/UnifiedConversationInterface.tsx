@@ -132,9 +132,9 @@ export default function UnifiedConversationInterface({
 
   const renderIdleState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex">
+      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex flex-col lg:flex-row">
         {/* Left side - Marketing content */}
-        <div className="w-1/2 pr-4 sm:pr-6 lg:pr-8 flex flex-col justify-center">
+        <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0">
           <div className="space-y-6">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
               <span className="text-warm-brown-800">
@@ -163,7 +163,7 @@ export default function UnifiedConversationInterface({
         </div>
 
         {/* Right side - Action section */}
-        <div className="w-1/2 pl-4 sm:pl-6 lg:pl-8 flex flex-col justify-center border-l border-warm-brown-200">
+        <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-warm-brown-200 pt-8 lg:pt-0">
           <div className="text-center space-y-8">
             <div className="space-y-4">
               <h3 className="text-heading-1 text-warm-brown-800">
@@ -295,9 +295,9 @@ export default function UnifiedConversationInterface({
 
     return (
       <div className="h-full flex overflow-hidden p-4 sm:p-6 lg:p-8">
-        <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex">
+        <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex flex-col lg:flex-row min-h-0">
           {/* Left side - Rating and Review Info */}
-          <div className="w-1/2 pr-4 sm:pr-6 lg:pr-8 border-r border-warm-brown-200 flex flex-col min-h-0">
+          <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
             <div className="flex-1 overflow-y-auto space-y-4 pr-2">
               {/* Rating */}
               <div>
@@ -349,7 +349,7 @@ export default function UnifiedConversationInterface({
           </div>
 
           {/* Right side - Chat Thread */}
-          <div className="w-1/2 pl-4 sm:pl-6 lg:pl-8 flex flex-col min-h-0">
+          <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col min-h-0">
             <h3 className="text-heading-3 text-warm-brown-800 mb-3">
               Conversation with Feedback
             </h3>
