@@ -132,7 +132,7 @@ export default function UnifiedConversationInterface({
 
   const renderIdleState = () => (
     <div className="h-full lg:h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row lg:h-full">
+      <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto flex flex-col lg:flex-row lg:h-full">
         {/* Left side - Marketing content */}
         <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0 lg:h-full">
           <div className="space-y-6">
@@ -189,7 +189,7 @@ export default function UnifiedConversationInterface({
 
   const renderConnectingState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto">
+      <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -200,7 +200,7 @@ export default function UnifiedConversationInterface({
                 Connecting...
               </h3>
               <p className="text-body text-warm-brown-600">
-                Setting up your AI conversation coach
+                Setting up your AI conversation coach. This will takes just a few seconds
               </p>
             </div>
           </div>
@@ -211,7 +211,7 @@ export default function UnifiedConversationInterface({
 
   const renderActiveState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto">
+      <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -220,7 +220,7 @@ export default function UnifiedConversationInterface({
             <div className="space-y-3">
               <h3 className="text-heading-1 text-warm-brown-800">Connected!</h3>
               <p className="text-body-large text-warm-brown-700">
-                Speak naturally - the AI is listening
+                Speak naturally and confidently into your microphone. The AI is listening!
               </p>
             </div>
             <Button
@@ -238,7 +238,7 @@ export default function UnifiedConversationInterface({
 
   const renderProcessingState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto">
+      <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -261,7 +261,7 @@ export default function UnifiedConversationInterface({
 
   const renderErrorState = () => (
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto">
+      <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
@@ -295,7 +295,7 @@ export default function UnifiedConversationInterface({
 
     return (
       <div className="lg:h-full flex overflow-hidden p-4 sm:p-6 lg:p-8">
-        <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row lg:min-h-0">
+        <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto flex flex-col lg:flex-row lg:min-h-0">
           {/* Left side - Rating and Review Info */}
           <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col lg:min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
             <div className="space-y-4 pr-2 lg:flex-1 lg:overflow-y-auto">
@@ -385,8 +385,8 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="flex flex-col flex-1 min-h-0 w-full lg:h-full md:min-h-full sm:min-h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
-      <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center sm:justify-center">
+    <Card className="flex flex-col flex-1 min-h-0 min-h-full lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
+      <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center justify-center">
         {renderCurrentState()}
       </CardContent>
     </Card>
