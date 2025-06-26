@@ -347,7 +347,7 @@ export default function UnifiedConversationInterface({
       )}
 
       <CardContent
-        className={`${state === "review" ? "flex-1" : "flex-1"} flex flex-col p-0`}
+        className={`${state === "review" ? "flex-1" : "flex-1 flex items-center justify-center"} flex flex-col p-0`}
       >
         {renderCurrentState()}
       </CardContent>
