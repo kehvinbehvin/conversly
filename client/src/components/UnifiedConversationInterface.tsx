@@ -81,10 +81,7 @@ export default function UnifiedConversationInterface({
 
   const renderIdleState = () => (
     <div className="flex items-center justify-center h-full">
-      <div className="text-center space-y-8">
-        <div className="w-40 h-40 rounded-full bg-gradient-to-br from-coral-100 to-sage-100 flex items-center justify-center shadow-2xl mx-auto">
-          <MicOff className="w-20 h-20 text-warm-brown-400" />
-        </div>
+      <div className="text-center">
         <Button
           onClick={handleStartConversation}
           size="lg"
@@ -110,10 +107,7 @@ export default function UnifiedConversationInterface({
   const renderActiveState = () => (
     <div className="flex items-center justify-center h-full">
       <div className="text-center space-y-8">
-        <div className="w-40 h-40 rounded-full bg-gradient-to-br from-coral-100 to-sage-100 flex items-center justify-center shadow-2xl">
-          <Mic className="w-20 h-20 text-coral-600 animate-pulse" />
-        </div>
-        <div className="bg-green-100 border border-green-300 rounded-xl p-8">
+        <div className="bg-green-100 border border-green-300 rounded-xl p-8 max-w-md">
           <p className="text-green-800 font-semibold text-2xl mb-2">
             🎙️ Conversation Active
           </p>
@@ -127,7 +121,7 @@ export default function UnifiedConversationInterface({
           variant="destructive"
           className="px-16 py-8 rounded-full text-2xl font-semibold"
         >
-          End Conversation
+          Stop Conversation
         </Button>
       </div>
     </div>
