@@ -42,10 +42,13 @@ export function useSSE(options: UseSSEOptions = {}) {
     eventSource.onmessage = (event) => {
       try {
         const message: SSEMessage = JSON.parse(event.data);
-        console.log('📨 SSE message received:', message);
+        console.log('📨 SSE message received in hook:', message);
+        console.log('📨 Event data raw:', event.data);
+        console.log('📨 Calling onMessage callback');
         optionsRef.current.onMessage?.(message);
       } catch (error) {
         console.error('❌ Error parsing SSE message:', error);
+        console.error('❌ Raw event data:', event.data);
       }
     };
 

@@ -44,12 +44,26 @@ export function AnonymousConversationProvider({
   // SSE connection for real-time notifications
   const { isConnected: sseConnected, registerForConversation } = useSSE({
     onMessage: (message: any) => {
-      if (message.type === 'review_ready' && message.conversationId === conversationIdRef.current) {
-        console.log('📡 Review ready notification received');
-        setIsReviewReady(true);
-        // Refetch conversation data to get the latest review
-        if (message.dbConversationId) {
-          fetchConversationData(message.dbConversationId);
+      console.log('📡 SSE message received in context:', message);
+      console.log('📡 Current conversation ID ref:', conversationIdRef.current);
+      
+      if (message.type === 'review_ready') {
+        console.log('📡 Review ready message type detected');
+        
+        if (message.conversationId === conversationIdRef.current) {
+          console.log('📡 Conversation ID matches - setting review ready');
+          setIsReviewReady(true);
+          
+          // Refetch conversation data to get the latest review
+          if (message.dbConversationId) {
+            console.log('📡 Fetching conversation data for ID:', message.dbConversationId);
+            fetchConversationData(message.dbConversationId);
+          }
+        } else {
+          console.log('📡 Conversation ID mismatch:', {
+            messageId: message.conversationId,
+            currentId: conversationIdRef.current
+          });
         }
       }
     }
@@ -65,13 +79,21 @@ export function AnonymousConversationProvider({
     const stored = sessionStorage.getItem('anonymous_conversation');
     if (stored) {
       const data = JSON.parse(stored) as ConversationWithReview;
-      setConversationData(data);
-      setCurrentConversationId(data.elevenlabsConversationId || null);
-      conversationIdRef.current = data.elevenlabsConversationId || null;
       
-      // Check if review is ready
+      // Only load if conversation is completed with review, otherwise clear stale data
       if (data.status === 'completed' && data.review) {
+        console.log('📡 Loading completed conversation from storage');
+        setConversationData(data);
+        setCurrentConversationId(data.elevenlabsConversationId || null);
+        conversationIdRef.current = data.elevenlabsConversationId || null;
         setIsReviewReady(true);
+      } else {
+        console.log('📡 Clearing stale conversation data from storage');
+        sessionStorage.removeItem('anonymous_conversation');
+        setConversationData(null);
+        setCurrentConversationId(null);
+        conversationIdRef.current = null;
+        setIsReviewReady(false);
       }
     }
   };

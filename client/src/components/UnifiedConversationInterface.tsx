@@ -42,17 +42,6 @@ export default function UnifiedConversationInterface({
   };
 
   const state = getState();
-  
-  // Debug logging to understand state transitions
-  console.log('🔍 State Debug:', {
-    state,
-    isReviewReady,
-    isConnected,
-    isConnecting,
-    currentConversationId,
-    conversationStatus: conversationData?.status,
-    hasReview: !!conversationData?.review
-  });
 
   const handleStartConversation = () => {
     startConversation(agentId);
