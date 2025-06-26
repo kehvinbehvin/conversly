@@ -34,7 +34,7 @@ export function useSSE(options: UseSSEOptions = {}) {
     eventSourceRef.current = eventSource;
 
     eventSource.onopen = () => {
-      console.log('✅ SSE connected');
+      console.log('✅ SSE connected for:', conversationId);
       setIsConnected(true);
       optionsRef.current.onConnect?.();
     };
@@ -52,9 +52,20 @@ export function useSSE(options: UseSSEOptions = {}) {
     };
 
     eventSource.onerror = (error) => {
-      console.error('❌ SSE error:', error);
+      console.error('❌ SSE error for conversation:', conversationId, error);
       setIsConnected(false);
       optionsRef.current.onDisconnect?.();
+      
+      // Auto-reconnect after a delay during development
+      if (process.env.NODE_ENV === 'development') {
+        console.log('🔄 Attempting SSE reconnection in 2 seconds...');
+        setTimeout(() => {
+          if (eventSourceRef.current?.readyState !== EventSource.OPEN) {
+            console.log('🔄 Reconnecting SSE for:', conversationId);
+            connectSSE(conversationId);
+          }
+        }, 2000);
+      }
     };
   };
 
