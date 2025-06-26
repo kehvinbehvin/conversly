@@ -65,12 +65,9 @@ export default function UnifiedConversationInterface({
   };
 
   const handleStartNewConversation = () => {
-    // Reset to idle state and start new conversation
+    // Reset to idle state without auto-starting
     clearError();
     endConversation();
-    setTimeout(() => {
-      startConversation(agentId);
-    }, 100);
   };
 
   const handleRetry = () => {
