@@ -10,8 +10,10 @@ interface AnonymousConversationContextType {
   currentConversationId: string | null;
   conversationData: ConversationWithReview | null;
   isReviewReady: boolean;
+  error: string | null;
   startConversation: (agentId: string) => Promise<void>;
   endConversation: () => void;
+  clearError: () => void;
   onError?: (error: Error) => void;
 }
 
@@ -38,8 +40,11 @@ export function AnonymousConversationProvider({
   const [currentConversationId, setCurrentConversationId] = useState<string | null>(null);
   const [conversationData, setConversationData] = useState<ConversationWithReview | null>(null);
   const [isReviewReady, setIsReviewReady] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const conversationIdRef = useRef<string | null>(null);
   const createdConversationsRef = useRef<Set<string>>(new Set());
+
+  const clearError = () => setError(null);
 
   // SSE connection for real-time notifications
   const { isConnected: sseConnected, registerForConversation } = useSSE({
@@ -136,6 +141,7 @@ export function AnonymousConversationProvider({
     
     setIsConnecting(true);
     setIsReviewReady(false);
+    setError(null); // Clear any previous errors
     
     try {
       console.log("🔑 Getting signed URL for anonymous conversation...");
@@ -157,6 +163,7 @@ export function AnonymousConversationProvider({
     } catch (error) {
       console.error("❌ Failed to start anonymous conversation:", error);
       setIsConnecting(false);
+      setError(error instanceof Error ? error.message : String(error));
       onError?.(error as Error);
     }
   };
@@ -179,8 +186,10 @@ export function AnonymousConversationProvider({
     currentConversationId,
     conversationData,
     isReviewReady,
+    error,
     startConversation,
     endConversation,
+    clearError,
     onError,
   };
 

@@ -10,7 +10,7 @@ interface UnifiedConversationInterfaceProps {
   agentId: string;
 }
 
-type ConversationState = 'idle' | 'connecting' | 'active' | 'processing' | 'review';
+type ConversationState = 'idle' | 'connecting' | 'active' | 'processing' | 'review' | 'error';
 
 export default function UnifiedConversationInterface({
   agentId,
@@ -21,12 +21,16 @@ export default function UnifiedConversationInterface({
     currentConversationId,
     conversationData,
     isReviewReady,
+    error,
     startConversation,
     endConversation,
+    clearError,
   } = useAnonymousConversation();
 
   // Determine current state
   const getState = (): ConversationState => {
+    // Error state takes priority
+    if (error) return 'error';
     // Check for review state first - review is ready if we have both the flag and the data
     if (isReviewReady && conversationData?.review) return 'review';
     // Alternative review check - if conversation is completed and has review, show review
@@ -35,8 +39,8 @@ export default function UnifiedConversationInterface({
     if (isConnected) return 'active';
     // Connecting state
     if (isConnecting) return 'connecting';
-    // Processing state - only if we have an active conversation that's pending completion
-    if (currentConversationId && !isConnected && !isReviewReady && conversationData?.status === 'pending') return 'processing';
+    // Processing state - conversation ended but review not ready yet
+    if (currentConversationId && !isConnected && !isConnecting && !isReviewReady) return 'processing';
     // Default idle state
     return 'idle';
   };
@@ -53,10 +57,16 @@ export default function UnifiedConversationInterface({
 
   const handleStartNewConversation = () => {
     // Reset to idle state and start new conversation
+    clearError();
     endConversation();
     setTimeout(() => {
       startConversation(agentId);
     }, 100);
+  };
+
+  const handleRetry = () => {
+    clearError();
+    startConversation(agentId);
   };
 
   // Parse transcript data and merge with reviews for review state
@@ -152,6 +162,31 @@ export default function UnifiedConversationInterface({
     </div>
   );
 
+  const renderErrorState = () => (
+    <div className="flex items-center justify-center h-full">
+      <div className="text-center space-y-6 max-w-md mx-auto">
+        <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-2xl mx-auto">
+          <div className="text-red-500 text-4xl">⚠️</div>
+        </div>
+        <div className="space-y-3">
+          <p className="text-xl font-semibold text-red-700">
+            Connection Error
+          </p>
+          <p className="text-base text-warm-brown-600">
+            {error || "Unable to start conversation. Please try again."}
+          </p>
+        </div>
+        <Button
+          onClick={handleRetry}
+          size="lg"
+          className="bg-coral-500 text-white px-12 py-6 rounded-full text-xl font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+        >
+          Try Again
+        </Button>
+      </div>
+    </div>
+  );
+
   const renderReviewState = () => {
     const mergedTranscripts = getMergedTranscripts();
     const review = conversationData?.review;
@@ -233,6 +268,8 @@ export default function UnifiedConversationInterface({
         return renderProcessingState();
       case 'review':
         return renderReviewState();
+      case 'error':
+        return renderErrorState();
       default:
         return renderIdleState();
     }
@@ -242,7 +279,7 @@ export default function UnifiedConversationInterface({
     <Card className="w-full h-full border-2 border-coral-200 shadow-xl bg-gradient-to-br from-white to-coral-50">
       <CardHeader className="text-center pb-4">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-3xl font-bold text-brown-800">
+          <CardTitle className="text-3xl font-bold text-warm-brown-800">
             {state === 'review' ? 'Your Review' : 'AI Conversation Practice'}
           </CardTitle>
           {state === 'review' && (
@@ -252,11 +289,12 @@ export default function UnifiedConversationInterface({
           )}
         </div>
         {state !== 'review' && (
-          <p className="text-brown-600 text-base">
+          <p className="text-warm-brown-600 text-base">
             {state === 'idle' && 'Click to start your free practice session'}
             {state === 'connecting' && 'Establishing connection...'}
             {state === 'active' && 'Conversation in progress'}
             {state === 'processing' && 'Analyzing your conversation...'}
+            {state === 'error' && 'Connection failed - please try again'}
           </p>
         )}
       </CardHeader>
