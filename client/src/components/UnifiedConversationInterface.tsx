@@ -131,10 +131,10 @@ export default function UnifiedConversationInterface({
   };
 
   const renderIdleState = () => (
-    <div className="flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row">
+    <div className="h-full lg:h-full flex p-4 sm:p-6 lg:p-8">
+      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row lg:h-full">
         {/* Left side - Marketing content */}
-        <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0">
+        <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0 lg:h-full">
           <div className="space-y-6">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
               <span className="text-warm-brown-800">
@@ -188,9 +188,9 @@ export default function UnifiedConversationInterface({
   );
 
   const renderConnectingState = () => (
-    <div className="flex p-4 sm:p-6 lg:p-8 min-h-[400px]">
+    <div className="h-full flex p-4 sm:p-6 lg:p-8">
       <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto">
-        <div className="flex items-center justify-center h-full">
+        <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
@@ -210,9 +210,9 @@ export default function UnifiedConversationInterface({
   );
 
   const renderActiveState = () => (
-    <div className="flex p-4 sm:p-6 lg:p-8 min-h-[400px]">
+    <div className="h-full flex p-4 sm:p-6 lg:p-8">
       <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto">
-        <div className="flex items-center justify-center h-full">
+        <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
               <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
@@ -385,8 +385,8 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="w-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
-      <CardContent className="p-0">
+    <Card className="flex flex-col flex-1 min-h-0 w-full lg:h-full md:min-h-full sm:min-h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
+      <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center sm:justify-center">
         {renderCurrentState()}
       </CardContent>
     </Card>
