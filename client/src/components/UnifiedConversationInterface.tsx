@@ -4,10 +4,13 @@ import { Badge } from "@/components/ui/badge";
 import { MessageCircle, Star, AlertCircle, Check } from "lucide-react";
 import { useAnonymousConversation } from "@/contexts/AnonymousConversationContext";
 import ChatThread from "@/components/ChatThread";
-import type { TranscriptWithReview } from "@shared/schema";
+import AvatarSelection from "@/components/AvatarSelection";
+import { AVATARS } from "@shared/schema";
+import type { TranscriptWithReview, Avatar } from "@shared/schema";
+import { useState } from "react";
 
 interface UnifiedConversationInterfaceProps {
-  agentId: string;
+  agentId?: string; // Made optional since we'll manage it internally
 }
 
 type ConversationState =
@@ -21,6 +24,9 @@ type ConversationState =
 export default function UnifiedConversationInterface({
   agentId,
 }: UnifiedConversationInterfaceProps) {
+  // Avatar selection state - default to first avatar
+  const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
+  
   const {
     isConnecting,
     isConnected,
@@ -86,7 +92,9 @@ export default function UnifiedConversationInterface({
   const state = getState();
 
   const handleStartConversation = () => {
-    startConversation(agentId);
+    if (selectedAvatar?.agent_id) {
+      startConversation(selectedAvatar.agent_id);
+    }
   };
 
   const handleEndConversation = () => {
@@ -100,7 +108,9 @@ export default function UnifiedConversationInterface({
 
   const handleRetry = () => {
     clearError();
-    startConversation(agentId);
+    if (selectedAvatar?.agent_id) {
+      startConversation(selectedAvatar.agent_id);
+    }
   };
 
   // Parse transcript data and merge with reviews for review state
@@ -164,23 +174,20 @@ export default function UnifiedConversationInterface({
 
         {/* Right side - Action section */}
         <div className="w-full lg:w-1/2 pl-0 lg:pl-8 flex flex-col justify-center border-t lg:border-t-0 lg:border-l border-warm-brown-200 pt-8 lg:pt-0">
-          <div className="text-center space-y-8">
-            <div className="space-y-4">
-              <h3 className="text-heading-1 text-warm-brown-800">
-                Ready to practice?
-              </h3>
-              <p className="text-body-large text-warm-brown-600 max-w-md mx-auto">
-                Click the button below to start your conversation practice
-                session
-              </p>
+          <div className="space-y-6">
+            <AvatarSelection
+              selectedAvatar={selectedAvatar}
+              onAvatarSelect={setSelectedAvatar}
+            />
+            <div className="text-center">
+              <Button
+                onClick={handleStartConversation}
+                size="lg"
+                className="btn-primary px-8 sm:px-12 lg:px-16 py-4 sm:py-5 lg:py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Start Conversation
+              </Button>
             </div>
-            <Button
-              onClick={handleStartConversation}
-              size="lg"
-              className="btn-primary px-8 sm:px-12 lg:px-16 py-4 sm:py-5 lg:py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
-            >
-              Start Conversation
-            </Button>
           </div>
         </div>
       </div>

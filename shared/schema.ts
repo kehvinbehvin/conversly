@@ -93,6 +93,37 @@ export type ConversationWithReview = Conversation & {
   transcript?: Transcript;
 };
 
+// Avatar type for conversation agent selection
+export type Avatar = {
+  name: string;
+  description: string;
+  agent_id: string;
+};
+
+// Avatar data definitions
+export const AVATARS: Avatar[] = [
+  {
+    name: "Jessie",
+    description: "Your local cafe barista",
+    agent_id: "agent_01jyfb9fh8f67agfzvv09tvg3t"
+  },
+  {
+    name: "Shawn", 
+    description: "A mutual friend at a house party",
+    agent_id: "agent_01jypzmj9heh3rhmn47anjbsr8"
+  },
+  {
+    name: "Maya",
+    description: "A cycling enthuiast at a cycling event", 
+    agent_id: "agent_01jyq00m9aev8rq8e6a040rjmv"
+  },
+  {
+    name: "Sam",
+    description: "Your friend's +1 at dinner",
+    agent_id: "agent_01jyq0j92gfxdrv3me49xygae1"
+  }
+];
+
 // Legacy types removed - no longer used after refactor
 
 // Database relations

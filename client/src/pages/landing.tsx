@@ -59,7 +59,7 @@ export default function Landing() {
           {/* Unified Conversation Interface - Centered */}
           <AnonymousConversationProvider>
             <div className="min-h-[600px] lg:h-[600px] w-7xl mx-auto">
-              <UnifiedConversationInterface agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
+              <UnifiedConversationInterface />
             </div>
           </AnonymousConversationProvider>
         </div>
