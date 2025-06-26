@@ -329,7 +329,7 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="card-surface w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
+    <Card className="card-surface flex flex-col w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
       {state === "review" && (
         <CardHeader className="text-center py-3">
           <div className="flex items-center justify-between">
@@ -347,7 +347,7 @@ export default function UnifiedConversationInterface({
       )}
 
       <CardContent
-        className={`${state === "review" ? "flex-1" : "flex-1 flex items-center justify-center"} flex flex-col p-0`}
+        className={`${state === "review" ? "flex-1" : "flex-1"} flex flex-col p-0`}
       >
         {renderCurrentState()}
       </CardContent>
