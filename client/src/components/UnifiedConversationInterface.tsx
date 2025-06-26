@@ -131,10 +131,10 @@ export default function UnifiedConversationInterface({
   };
 
   const renderIdleState = () => (
-    <div className="h-full flex p-4 sm:p-6 lg:p-8">
-      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row">
+    <div className="h-full lg:h-full flex p-4 sm:p-6 lg:p-8">
+      <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row lg:h-full">
         {/* Left side - Marketing content */}
-        <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0">
+        <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0 lg:h-full">
           <div className="space-y-6">
             <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
               <span className="text-warm-brown-800">
