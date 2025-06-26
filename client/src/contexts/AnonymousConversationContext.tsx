@@ -44,58 +44,19 @@ export function AnonymousConversationProvider({
   // SSE connection for real-time notifications
   const { isConnected: sseConnected, registerForConversation } = useSSE({
     onMessage: (message: any) => {
-      console.log('📡 SSE message received in context:', message);
-      console.log('📡 Current conversation ID ref:', conversationIdRef.current);
-      
-      if (message.type === 'review_ready') {
-        console.log('📡 Review ready message type detected');
-        
-        if (message.conversationId === conversationIdRef.current) {
-          console.log('📡 Conversation ID matches - setting review ready');
-          setIsReviewReady(true);
-          
-          // Refetch conversation data to get the latest review
-          if (message.dbConversationId) {
-            console.log('📡 Fetching conversation data for ID:', message.dbConversationId);
-            fetchConversationData(message.dbConversationId);
-          }
-        } else {
-          console.log('📡 Conversation ID mismatch:', {
-            messageId: message.conversationId,
-            currentId: conversationIdRef.current
-          });
+      if (message.type === 'review_ready' && message.conversationId === conversationIdRef.current) {
+        setIsReviewReady(true);
+        // Refetch conversation data to get the latest review
+        if (message.dbConversationId) {
+          fetchConversationData(message.dbConversationId);
         }
       }
     }
   });
 
-  // Store conversation data in session storage for persistence
+  // Store conversation data in memory only
   const storeConversationData = (data: ConversationWithReview) => {
-    sessionStorage.setItem('anonymous_conversation', JSON.stringify(data));
     setConversationData(data);
-  };
-
-  const loadConversationData = () => {
-    const stored = sessionStorage.getItem('anonymous_conversation');
-    if (stored) {
-      const data = JSON.parse(stored) as ConversationWithReview;
-      
-      // Only load if conversation is completed with review, otherwise clear stale data
-      if (data.status === 'completed' && data.review) {
-        console.log('📡 Loading completed conversation from storage');
-        setConversationData(data);
-        setCurrentConversationId(data.elevenlabsConversationId || null);
-        conversationIdRef.current = data.elevenlabsConversationId || null;
-        setIsReviewReady(true);
-      } else {
-        console.log('📡 Clearing stale conversation data from storage');
-        sessionStorage.removeItem('anonymous_conversation');
-        setConversationData(null);
-        setCurrentConversationId(null);
-        conversationIdRef.current = null;
-        setIsReviewReady(false);
-      }
-    }
   };
 
   const fetchConversationData = async (dbConversationId: number) => {
@@ -110,10 +71,7 @@ export function AnonymousConversationProvider({
     }
   };
 
-  // Initialize from session storage on mount
-  React.useEffect(() => {
-    loadConversationData();
-  }, []);
+  // No initialization needed for memory-only state
 
   const conversation = useConversation({
     onConnect: async (props: { conversationId: string }) => {

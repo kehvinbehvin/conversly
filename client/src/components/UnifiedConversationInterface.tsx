@@ -54,8 +54,6 @@ export default function UnifiedConversationInterface({
   const handleStartNewConversation = () => {
     // Reset to idle state and start new conversation
     endConversation();
-    // Clear session storage to fully reset state
-    sessionStorage.removeItem('anonymous_conversation');
     setTimeout(() => {
       startConversation(agentId);
     }, 100);
