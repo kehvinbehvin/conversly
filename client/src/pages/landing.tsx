@@ -55,10 +55,10 @@ export default function Landing() {
 
       {/* Hero Section */}
       <section className="relative warm-gradient min-h-screen flex items-center justify-center">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Unified Conversation Interface - Centered */}
           <AnonymousConversationProvider>
-            <div className="h-[600px] max-w-6xl mx-auto">
+            <div className="h-[600px] w-7xl mx-auto">
               <UnifiedConversationInterface agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
             </div>
           </AnonymousConversationProvider>

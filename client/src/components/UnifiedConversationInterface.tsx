@@ -131,69 +131,73 @@ export default function UnifiedConversationInterface({
   };
 
   const renderIdleState = () => (
-    <div className="h-full flex p-8">
-      {/* Left side - Marketing content */}
-      <div className="w-1/2 pr-8 flex flex-col justify-center">
-        <div className="space-y-6">
-          <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
-            <span className="text-warm-brown-800">
-              Practice conversations.{" "}
-            </span>
-            <span className="text-coral-500">Build confidence.</span>
-          </h1>
-          <p className="text-lg text-warm-brown-600">
-            AI-powered conversation practice with instant feedback
-          </p>
-          <div className="space-y-3 text-sm text-warm-brown-600">
-            <div className="flex items-center space-x-2">
-              <Check className="w-4 h-4 text-sage-500" />
-              <span>Free to try</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="w-4 h-4 text-sage-500" />
-              <span>Instant feedback</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <Check className="w-4 h-4 text-sage-500" />
-              <span>No signup required</span>
+    <div className="h-full flex p-4 sm:p-6 lg:p-8">
+      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex">
+        {/* Left side - Marketing content */}
+        <div className="w-1/2 pr-4 sm:pr-6 lg:pr-8 flex flex-col justify-center">
+          <div className="space-y-6">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+              <span className="text-warm-brown-800">
+                Practice conversations.{" "}
+              </span>
+              <span className="text-coral-500">Build confidence.</span>
+            </h1>
+            <p className="text-base sm:text-lg text-warm-brown-600">
+              AI-powered conversation practice with instant feedback
+            </p>
+            <div className="space-y-3 text-sm text-warm-brown-600">
+              <div className="flex items-center space-x-2">
+                <Check className="w-4 h-4 text-sage-500" />
+                <span>Free to try</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Check className="w-4 h-4 text-sage-500" />
+                <span>Instant feedback</span>
+              </div>
+              <div className="flex items-center space-x-2">
+                <Check className="w-4 h-4 text-sage-500" />
+                <span>No signup required</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right side - Action section */}
-      <div className="w-1/2 pl-8 flex flex-col justify-center border-l border-warm-brown-200">
-        <div className="text-center space-y-8">
-          <div className="space-y-4">
-            <h3 className="text-heading-1 text-warm-brown-800">
-              Ready to practice?
-            </h3>
-            <p className="text-body-large text-warm-brown-600 max-w-md mx-auto">
-              Click the button below to start your conversation practice session
-            </p>
+        {/* Right side - Action section */}
+        <div className="w-1/2 pl-4 sm:pl-6 lg:pl-8 flex flex-col justify-center border-l border-warm-brown-200">
+          <div className="text-center space-y-8">
+            <div className="space-y-4">
+              <h3 className="text-heading-1 text-warm-brown-800">
+                Ready to practice?
+              </h3>
+              <p className="text-body-large text-warm-brown-600 max-w-md mx-auto">
+                Click the button below to start your conversation practice session
+              </p>
+            </div>
+            <Button
+              onClick={handleStartConversation}
+              size="lg"
+              className="btn-primary px-8 sm:px-12 lg:px-16 py-4 sm:py-5 lg:py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
+            >
+              Start Conversation
+            </Button>
           </div>
-          <Button
-            onClick={handleStartConversation}
-            size="lg"
-            className="btn-primary px-16 py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
-          >
-            Start Conversation
-          </Button>
         </div>
       </div>
     </div>
   );
 
   const renderConnectingState = () => (
-    <div className="h-full flex p-8">
-      <div className="w-full">
+    <div className="h-full flex p-4 sm:p-6 lg:p-8">
+      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
             </div>
             <div className="space-y-2">
-              <h3 className="text-heading-2 text-warm-brown-800">Connecting...</h3>
+              <h3 className="text-heading-2 text-warm-brown-800">
+                Connecting...
+              </h3>
               <p className="text-body text-warm-brown-600">
                 Setting up your AI conversation coach
               </p>
@@ -205,8 +209,8 @@ export default function UnifiedConversationInterface({
   );
 
   const renderActiveState = () => (
-    <div className="h-full flex p-8">
-      <div className="w-full">
+    <div className="h-full flex p-4 sm:p-6 lg:p-8">
+      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -221,7 +225,7 @@ export default function UnifiedConversationInterface({
             <Button
               onClick={handleEndConversation}
               size="lg"
-              className="btn-primary px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
+              className="btn-primary px-8 sm:px-12 lg:px-16 py-4 sm:py-5 lg:py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
             >
               Stop Conversation
             </Button>
@@ -232,8 +236,8 @@ export default function UnifiedConversationInterface({
   );
 
   const renderProcessingState = () => (
-    <div className="h-full flex p-8">
-      <div className="w-full">
+    <div className="h-full flex p-4 sm:p-6 lg:p-8">
+      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="flex justify-center">
@@ -255,8 +259,8 @@ export default function UnifiedConversationInterface({
   );
 
   const renderErrorState = () => (
-    <div className="h-full flex p-8">
-      <div className="w-full">
+    <div className="h-full flex p-4 sm:p-6 lg:p-8">
+      <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
             <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
@@ -289,15 +293,16 @@ export default function UnifiedConversationInterface({
     if (!review) return renderProcessingState();
 
     return (
-      <div className="h-full flex overflow-hidden p-4">
-        {/* Left side - Rating and Review Info */}
-        <div className="w-1/2 pr-4 border-r border-warm-brown-200 flex flex-col min-h-0">
-          <div className="flex-1 overflow-y-auto space-y-4 pr-2">
-            {/* Rating */}
-            <div>
-              <h3 className="text-heading-3 text-warm-brown-800 mb-3">
-                Your Rating
-              </h3>
+      <div className="h-full flex overflow-hidden p-4 sm:p-6 lg:p-8">
+        <div className="w-conversation-xs sm:w-conversation-sm lg:w-conversation mx-auto flex">
+          {/* Left side - Rating and Review Info */}
+          <div className="w-1/2 pr-4 sm:pr-6 lg:pr-8 border-r border-warm-brown-200 flex flex-col min-h-0">
+            <div className="flex-1 overflow-y-auto space-y-4 pr-2">
+              {/* Rating */}
+              <div>
+                <h3 className="text-heading-3 text-warm-brown-800 mb-3">
+                  Your Rating
+                </h3>
               <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
                 <div className="flex items-center justify-center space-x-1 mb-2">
                   {[...Array(5)].map((_, i) => (
@@ -343,13 +348,17 @@ export default function UnifiedConversationInterface({
         </div>
 
         {/* Right side - Chat Thread */}
-        <div className="w-1/2 pl-4 flex flex-col min-h-0">
+        <div className="w-1/2 pl-4 sm:pl-6 lg:pl-8 flex flex-col min-h-0">
           <h3 className="text-heading-3 text-warm-brown-800 mb-3">
             Conversation with Feedback
           </h3>
           <div className="flex-1 min-h-0">
-            <ChatThread messages={mergedTranscripts} className="h-full border border-coral-200 rounded-xl shadow-sm" />
+            <ChatThread
+              messages={mergedTranscripts}
+              className="h-full border border-coral-200 rounded-xl shadow-sm"
+            />
           </div>
+        </div>
         </div>
       </div>
     );
@@ -358,7 +367,7 @@ export default function UnifiedConversationInterface({
   const renderCurrentState = () => {
     switch (state) {
       case "idle":
-        return renderIdleState();
+        return renderConnectingState();
       case "connecting":
         return renderConnectingState();
       case "active":
@@ -376,9 +385,7 @@ export default function UnifiedConversationInterface({
 
   return (
     <Card className="flex flex-col flex-1 min-h-0 w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
-      <CardContent
-        className="flex-1 min-h-0 overflow-hidden flex flex-col p-0"
-      >
+      <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0">
         {renderCurrentState()}
       </CardContent>
     </Card>

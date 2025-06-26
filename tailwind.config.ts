@@ -128,6 +128,11 @@ export default {
         'shadow-lg': 'var(--shadow-lg)',
         'shadow-xl': 'var(--shadow-xl)',
       },
+      width: {
+        'conversation': '1152px', // 72rem - fixed conversation width
+        'conversation-sm': '896px', // 56rem - smaller screens
+        'conversation-xs': '672px', // 42rem - mobile
+      },
       keyframes: {
         "accordion-down": {
           from: {
