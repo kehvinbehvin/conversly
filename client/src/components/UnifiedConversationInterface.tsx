@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Star, AlertCircle } from "lucide-react";
+import { MessageCircle, Star, AlertCircle, Check } from "lucide-react";
 import { useAnonymousConversation } from "@/contexts/AnonymousConversationContext";
 import ChatThread from "@/components/ChatThread";
 import type { TranscriptWithReview } from "@shared/schema";
@@ -131,23 +131,55 @@ export default function UnifiedConversationInterface({
   };
 
   const renderIdleState = () => (
-    <div className="flex items-center justify-center h-full p-6">
-      <div className="text-center space-y-8">
-        <div className="space-y-4">
-          <h3 className="text-heading-1 text-warm-brown-800">
-            Ready to practice?
-          </h3>
-          <p className="text-body-large text-warm-brown-600 max-w-md mx-auto">
-            Click the button below to start your conversation practice session
+    <div className="h-full flex p-8">
+      {/* Left side - Marketing content */}
+      <div className="w-1/2 pr-8 flex flex-col justify-center">
+        <div className="space-y-6">
+          <h1 className="text-4xl lg:text-5xl font-bold leading-tight">
+            <span className="text-warm-brown-800">
+              Practice conversations.{" "}
+            </span>
+            <span className="text-coral-500">Build confidence.</span>
+          </h1>
+          <p className="text-lg text-warm-brown-600">
+            AI-powered conversation practice with instant feedback
           </p>
+          <div className="space-y-3 text-sm text-warm-brown-600">
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Free to try</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>Instant feedback</span>
+            </div>
+            <div className="flex items-center space-x-2">
+              <Check className="w-4 h-4 text-sage-500" />
+              <span>No signup required</span>
+            </div>
+          </div>
         </div>
-        <Button
-          onClick={handleStartConversation}
-          size="lg"
-          className="btn-primary px-16 py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
-        >
-          Start Conversation
-        </Button>
+      </div>
+
+      {/* Right side - Action section */}
+      <div className="w-1/2 pl-8 flex flex-col justify-center border-l border-warm-brown-200">
+        <div className="text-center space-y-8">
+          <div className="space-y-4">
+            <h3 className="text-heading-1 text-warm-brown-800">
+              Ready to practice?
+            </h3>
+            <p className="text-body-large text-warm-brown-600 max-w-md mx-auto">
+              Click the button below to start your conversation practice session
+            </p>
+          </div>
+          <Button
+            onClick={handleStartConversation}
+            size="lg"
+            className="btn-primary px-16 py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
+          >
+            Start Conversation
+          </Button>
+        </div>
       </div>
     </div>
   );

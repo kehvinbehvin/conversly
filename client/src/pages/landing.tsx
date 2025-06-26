@@ -54,41 +54,12 @@ export default function Landing() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative warm-gradient min-h-screen">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-12 pb-20">
-          {/* Compact Header */}
-          <div className="text-center mb-12">
-            <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-4">
-              <span className="text-warm-brown-800">
-                Practice conversations.{" "}
-              </span>
-              <span className="text-coral-500">Build confidence.</span>
-            </h1>
-            <p className="text-lg text-warm-brown-600 max-w-3xl mx-auto mb-6">
-              AI-powered conversation practice with instant feedback
-            </p>
-            <div className="flex justify-center items-center space-x-6 text-sm text-warm-brown-600">
-              <div className="flex items-center space-x-2">
-                <Check className="w-4 h-4 text-sage-500" />
-                <span>Free to try</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Check className="w-4 h-4 text-sage-500" />
-                <span>Instant feedback</span>
-              </div>
-              <div className="flex items-center space-x-2">
-                <Check className="w-4 h-4 text-sage-500" />
-                <span>No signup required</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Unified Conversation Interface - Hero Element */}
+      <section className="relative warm-gradient min-h-screen flex items-center justify-center">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Unified Conversation Interface - Centered */}
           <AnonymousConversationProvider>
-            <div className="h-[600px] max-w-6xl mx-auto flex items-center justify-center">
-              <div className="w-full h-full">
-                <UnifiedConversationInterface agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
-              </div>
+            <div className="h-[600px] max-w-6xl mx-auto">
+              <UnifiedConversationInterface agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
             </div>
           </AnonymousConversationProvider>
         </div>
