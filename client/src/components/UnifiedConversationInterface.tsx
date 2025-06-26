@@ -48,8 +48,8 @@ export default function UnifiedConversationInterface({
     if (isConnected) return 'active';
     // Connecting state
     if (isConnecting) return 'connecting';
-    // Processing state - conversation ended but review not ready yet
-    if (currentConversationId && !isConnected && !isConnecting && !isReviewReady) return 'processing';
+    // Processing state - conversation ended but review not ready yet OR review is ready but data still loading
+    if (currentConversationId && !isConnected && !isConnecting && (!isReviewReady || !conversationData?.review)) return 'processing';
     // Default idle state
     return 'idle';
   };
