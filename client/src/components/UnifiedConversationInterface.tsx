@@ -294,7 +294,7 @@ export default function UnifiedConversationInterface({
     if (!review) return renderProcessingState();
 
     return (
-      <div className="h-full flex overflow-hidden p-4 sm:p-6 lg:p-8">
+      <div className="lg:h-full flex overflow-hidden p-4 sm:p-6 lg:p-8">
         <div className="w-conversation-sm md:w-conversation-md lg:w-conversation mx-auto flex flex-col lg:flex-row lg:min-h-0">
           {/* Left side - Rating and Review Info */}
           <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col lg:min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
@@ -385,8 +385,8 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="flex flex-col flex-1 min-h-0 w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
-      <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0">
+    <Card className="flex flex-col flex-1 min-h-0 w-full lg:h-full md:min-h-full sm:min-h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
+      <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center sm:justify-center">
         {renderCurrentState()}
       </CardContent>
     </Card>
