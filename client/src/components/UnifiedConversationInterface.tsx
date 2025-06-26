@@ -152,7 +152,7 @@ export default function UnifiedConversationInterface({
         <Button
           onClick={handleEndConversation}
           size="lg"
-          className="bg-red-600 hover:bg-red-700 text-white px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200 border-0"
+          className="btn-primary px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
         >
           Stop Conversation
         </Button>
