@@ -91,6 +91,11 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 26, 2025: **CRITICAL BUG RESOLUTION** - User manually fixed missing renderIdleState function that broke component
+  - **Root Cause**: Missing function definition caused "renderIdle is not defined" runtime error
+  - **Cascade Effect**: Runtime error led to JSX syntax corruption and component failure
+  - **Learning**: Always verify function dependencies exist before making structural component edits
+  - **Resolution**: User manually restored missing function, component now renders properly
 - June 26, 2025: **CONVERSATION INTERFACE STATE CONSISTENCY FIXED** - Resolved width and overlay issues across all conversation states
   - **Root Cause**: Side-by-side layout in idle state vs centered layout in other states caused width inconsistencies and transparent overlays
   - **Solution**: Standardized all non-idle states to use centered, full-width layouts without background content

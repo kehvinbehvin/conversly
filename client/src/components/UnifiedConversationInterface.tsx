@@ -170,7 +170,8 @@ export default function UnifiedConversationInterface({
                 Ready to practice?
               </h3>
               <p className="text-body-large text-warm-brown-600 max-w-md mx-auto">
-                Click the button below to start your conversation practice session
+                Click the button below to start your conversation practice
+                session
               </p>
             </div>
             <Button
@@ -304,61 +305,61 @@ export default function UnifiedConversationInterface({
                   Your Rating
                 </h3>
                 <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
-                <div className="flex items-center justify-center space-x-1 mb-2">
-                  {[...Array(5)].map((_, i) => (
-                    <Star
-                      key={i}
-                      className={`w-6 h-6 ${
-                        i < (review.overallRating || 0)
-                          ? "text-coral-500 fill-current"
-                          : "text-warm-brown-200"
-                      }`}
-                    />
-                  ))}
-                </div>
-                <div className="text-heading-2 text-warm-brown-800">
-                  {review.overallRating || 0}/5
+                  <div className="flex items-center justify-center space-x-1 mb-2">
+                    {[...Array(5)].map((_, i) => (
+                      <Star
+                        key={i}
+                        className={`w-6 h-6 ${
+                          i < (review.overallRating || 0)
+                            ? "text-coral-500 fill-current"
+                            : "text-warm-brown-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <div className="text-heading-2 text-warm-brown-800">
+                    {review.overallRating || 0}/5
+                  </div>
                 </div>
               </div>
+
+              {/* Summary if available */}
+              {review.summary && (
+                <div>
+                  <h4 className="text-body-large font-semibold text-warm-brown-800 mb-2">
+                    Summary
+                  </h4>
+                  <div className="text-body text-warm-brown-700 bg-sage-50 p-3 rounded-xl border border-sage-200 shadow-sm">
+                    {review.summary}
+                  </div>
+                </div>
+              )}
             </div>
 
-            {/* Summary if available */}
-            {review.summary && (
-              <div>
-                <h4 className="text-body-large font-semibold text-warm-brown-800 mb-2">
-                  Summary
-                </h4>
-                <div className="text-body text-warm-brown-700 bg-sage-50 p-3 rounded-xl border border-sage-200 shadow-sm">
-                  {review.summary}
-                </div>
-              </div>
-            )}
+            {/* Start New Conversation Button - Fixed at bottom */}
+            <div className="pt-4 border-t border-warm-brown-100">
+              <Button
+                onClick={handleStartNewConversation}
+                size="lg"
+                className="btn-primary w-full py-3 text-body-large font-semibold"
+              >
+                Start New Conversation
+              </Button>
+            </div>
           </div>
 
-          {/* Start New Conversation Button - Fixed at bottom */}
-          <div className="pt-4 border-t border-warm-brown-100">
-            <Button
-              onClick={handleStartNewConversation}
-              size="lg"
-              className="btn-primary w-full py-3 text-body-large font-semibold"
-            >
-              Start New Conversation
-            </Button>
+          {/* Right side - Chat Thread */}
+          <div className="w-1/2 pl-4 sm:pl-6 lg:pl-8 flex flex-col min-h-0">
+            <h3 className="text-heading-3 text-warm-brown-800 mb-3">
+              Conversation with Feedback
+            </h3>
+            <div className="flex-1 min-h-0">
+              <ChatThread
+                messages={mergedTranscripts}
+                className="h-full border border-coral-200 rounded-xl shadow-sm"
+              />
+            </div>
           </div>
-        </div>
-
-        {/* Right side - Chat Thread */}
-        <div className="w-1/2 pl-4 sm:pl-6 lg:pl-8 flex flex-col min-h-0">
-          <h3 className="text-heading-3 text-warm-brown-800 mb-3">
-            Conversation with Feedback
-          </h3>
-          <div className="flex-1 min-h-0">
-            <ChatThread
-              messages={mergedTranscripts}
-              className="h-full border border-coral-200 rounded-xl shadow-sm"
-            />
-          </div>
-        </div>
         </div>
       </div>
     );
@@ -367,7 +368,7 @@ export default function UnifiedConversationInterface({
   const renderCurrentState = () => {
     switch (state) {
       case "idle":
-        return renderConnectingState();
+        return renderIdleState();
       case "connecting":
         return renderConnectingState();
       case "active":
