@@ -10,7 +10,13 @@ interface UnifiedConversationInterfaceProps {
   agentId: string;
 }
 
-type ConversationState = 'idle' | 'connecting' | 'active' | 'processing' | 'review' | 'error';
+type ConversationState =
+  | "idle"
+  | "connecting"
+  | "active"
+  | "processing"
+  | "review"
+  | "error";
 
 export default function UnifiedConversationInterface({
   agentId,
@@ -30,28 +36,51 @@ export default function UnifiedConversationInterface({
 
   // Determine current state
   const getState = (): ConversationState => {
-    console.log('🔍 State check - error:', !!error, 'isReviewReady:', isReviewReady, 'hasConversationData:', !!conversationData, 'hasReview:', !!conversationData?.review, 'conversationStatus:', conversationData?.status, 'isConnected:', isConnected, 'isConnecting:', isConnecting, 'currentConversationId:', !!currentConversationId);
-    
+    console.log(
+      "🔍 State check - error:",
+      !!error,
+      "isReviewReady:",
+      isReviewReady,
+      "hasConversationData:",
+      !!conversationData,
+      "hasReview:",
+      !!conversationData?.review,
+      "conversationStatus:",
+      conversationData?.status,
+      "isConnected:",
+      isConnected,
+      "isConnecting:",
+      isConnecting,
+      "currentConversationId:",
+      !!currentConversationId,
+    );
+
     // Error state takes priority
-    if (error) return 'error';
+    if (error) return "error";
     // Check for review state first - review is ready if we have both the flag and the data
     if (isReviewReady && conversationData?.review) {
-      console.log('🔍 Review state: isReviewReady=true AND hasReview=true');
-      return 'review';
+      console.log("🔍 Review state: isReviewReady=true AND hasReview=true");
+      return "review";
     }
     // Alternative review check - if conversation is completed and has review, show review
-    if (conversationData?.status === 'completed' && conversationData?.review) {
-      console.log('🔍 Review state: conversation completed AND hasReview=true');
-      return 'review';
+    if (conversationData?.status === "completed" && conversationData?.review) {
+      console.log("🔍 Review state: conversation completed AND hasReview=true");
+      return "review";
     }
     // Active state - currently connected to ElevenLabs
-    if (isConnected) return 'active';
+    if (isConnected) return "active";
     // Connecting state
-    if (isConnecting) return 'connecting';
+    if (isConnecting) return "connecting";
     // Processing state - conversation ended but review not ready yet OR review is ready but data still loading
-    if (currentConversationId && !isConnected && !isConnecting && (!isReviewReady || !conversationData?.review)) return 'processing';
+    if (
+      currentConversationId &&
+      !isConnected &&
+      !isConnecting &&
+      (!isReviewReady || !conversationData?.review)
+    )
+      return "processing";
     // Default idle state
-    return 'idle';
+    return "idle";
   };
 
   const state = getState();
@@ -77,23 +106,23 @@ export default function UnifiedConversationInterface({
   // Parse transcript data and merge with reviews for review state
   const getMergedTranscripts = (): TranscriptWithReview[] => {
     if (!conversationData?.review || !conversationData?.transcript) return [];
-    
+
     try {
       const transcript = conversationData.transcript;
       const review = conversationData.review;
-      
-      const transcriptData = Array.isArray(transcript.transcriptData) 
-        ? transcript.transcriptData 
+
+      const transcriptData = Array.isArray(transcript.transcriptData)
+        ? transcript.transcriptData
         : JSON.parse(String(transcript.transcriptData));
-      const reviewData = review.transcriptWithReviews 
-        ? (Array.isArray(review.transcriptWithReviews) 
-           ? review.transcriptWithReviews 
-           : JSON.parse(String(review.transcriptWithReviews)))
+      const reviewData = review.transcriptWithReviews
+        ? Array.isArray(review.transcriptWithReviews)
+          ? review.transcriptWithReviews
+          : JSON.parse(String(review.transcriptWithReviews))
         : [];
-      
+
       return transcriptData.map((t: any, index: number) => ({
         ...t,
-        review: reviewData.find((r: any) => r.index === index)?.review || null
+        review: reviewData.find((r: any) => r.index === index)?.review || null,
       }));
     } catch (error) {
       console.error("Error parsing transcript/review data:", error);
@@ -131,7 +160,9 @@ export default function UnifiedConversationInterface({
         </div>
         <div className="space-y-2">
           <h3 className="text-heading-2 text-warm-brown-800">Connecting...</h3>
-          <p className="text-body text-warm-brown-600">Setting up your AI conversation coach</p>
+          <p className="text-body text-warm-brown-600">
+            Setting up your AI conversation coach
+          </p>
         </div>
       </div>
     </div>
@@ -164,14 +195,15 @@ export default function UnifiedConversationInterface({
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
         <div className="flex justify-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-4 border-sage-200 border-t-sage-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
         </div>
         <div className="space-y-3">
           <h3 className="text-heading-2 text-warm-brown-800">
             Processing your conversation...
           </h3>
           <p className="text-body text-warm-brown-600 max-w-md mx-auto">
-            Our AI is analyzing your conversation and preparing detailed feedback
+            Our AI is analyzing your conversation and preparing detailed
+            feedback
           </p>
         </div>
       </div>
@@ -185,24 +217,16 @@ export default function UnifiedConversationInterface({
           <AlertCircle className="w-16 h-16 text-red-500" />
         </div>
         <div className="space-y-4">
-          <h3 className="text-heading-1 text-red-700">
-            Connection Error
-          </h3>
+          <h3 className="text-heading-1 text-red-700">Connection Error</h3>
           <p className="text-body text-warm-brown-600">
             {error || "Unable to start conversation. Please try again."}
           </p>
         </div>
         <div className="space-y-4">
-          <Button
-            onClick={handleRetry}
-            className="btn-primary w-full"
-          >
+          <Button onClick={handleRetry} className="btn-primary w-full">
             Try Again
           </Button>
-          <Button
-            onClick={clearError}
-            className="btn-secondary w-full"
-          >
+          <Button onClick={clearError} className="btn-secondary w-full">
             Back to Start
           </Button>
         </div>
@@ -223,7 +247,9 @@ export default function UnifiedConversationInterface({
           <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             {/* Rating */}
             <div className="text-center">
-              <h3 className="text-heading-3 text-warm-brown-800 mb-3">Your Rating</h3>
+              <h3 className="text-heading-3 text-warm-brown-800 mb-3">
+                Your Rating
+              </h3>
               <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
                 <div className="flex items-center justify-center space-x-1 mb-2">
                   {[...Array(5)].map((_, i) => (
@@ -246,14 +272,16 @@ export default function UnifiedConversationInterface({
             {/* Summary if available */}
             {review.summary && (
               <div>
-                <h4 className="text-body-large font-semibold text-warm-brown-800 mb-2">Summary</h4>
+                <h4 className="text-body-large font-semibold text-warm-brown-800 mb-2">
+                  Summary
+                </h4>
                 <div className="text-body text-warm-brown-700 bg-sage-50 p-3 rounded-xl border border-sage-200 shadow-sm">
                   {review.summary}
                 </div>
               </div>
             )}
           </div>
-          
+
           {/* Start New Conversation Button - Fixed at bottom */}
           <div className="pt-4 border-t border-warm-brown-100">
             <Button
@@ -268,7 +296,9 @@ export default function UnifiedConversationInterface({
 
         {/* Right side - Chat Thread */}
         <div className="w-1/2 pl-4 flex flex-col min-h-0">
-          <h3 className="text-heading-3 text-warm-brown-800 mb-3">Conversation with Feedback</h3>
+          <h3 className="text-heading-3 text-warm-brown-800 mb-3">
+            Conversation with Feedback
+          </h3>
           <div className="flex-1 overflow-hidden border border-coral-200 rounded-xl shadow-sm min-h-0">
             <div className="h-full overflow-y-auto">
               <ChatThread messages={mergedTranscripts} />
@@ -281,17 +311,17 @@ export default function UnifiedConversationInterface({
 
   const renderCurrentState = () => {
     switch (state) {
-      case 'idle':
+      case "idle":
         return renderIdleState();
-      case 'connecting':
+      case "connecting":
         return renderConnectingState();
-      case 'active':
+      case "active":
         return renderActiveState();
-      case 'processing':
+      case "processing":
         return renderProcessingState();
-      case 'review':
+      case "review":
         return renderReviewState();
-      case 'error':
+      case "error":
         return renderErrorState();
       default:
         return renderIdleState();
@@ -300,20 +330,25 @@ export default function UnifiedConversationInterface({
 
   return (
     <Card className="card-surface w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
-      {state === 'review' && (
+      {state === "review" && (
         <CardHeader className="text-center py-3">
           <div className="flex items-center justify-between">
             <CardTitle className="text-heading-2 text-warm-brown-800">
               Your Review
             </CardTitle>
-            <Badge variant="secondary" className="bg-sage-100 text-sage-800 text-caption px-2 py-1 rounded-lg">
+            <Badge
+              variant="secondary"
+              className="bg-sage-100 text-sage-800 text-caption px-2 py-1 rounded-lg"
+            >
               ✓ Complete
             </Badge>
           </div>
         </CardHeader>
       )}
-      
-      <CardContent className={`${state === 'review' ? 'flex-1' : 'flex-1'} flex flex-col p-0`}>
+
+      <CardContent
+        className={`${state === "review" ? "flex-1" : "flex-1"} flex flex-col p-0`}
+      >
         {renderCurrentState()}
       </CardContent>
     </Card>

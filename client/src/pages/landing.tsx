@@ -83,8 +83,10 @@ export default function Landing() {
 
           {/* Unified Conversation Interface - Hero Element */}
           <AnonymousConversationProvider>
-            <div className="h-[600px] max-w-6xl mx-auto">
-              <UnifiedConversationInterface agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
+            <div className="h-[600px] max-w-6xl mx-auto flex items-center justify-center">
+              <div className="w-full h-full">
+                <UnifiedConversationInterface agentId="agent_01jyfb9fh8f67agfzvv09tvg3t" />
+              </div>
             </div>
           </AnonymousConversationProvider>
 
