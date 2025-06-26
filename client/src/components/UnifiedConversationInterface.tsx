@@ -369,7 +369,7 @@ export default function UnifiedConversationInterface({
   return (
     <Card className="flex flex-col flex-1 min-h-0 w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
       <CardContent
-        className={`${state === "review" ? "flex-1 min-h-0 overflow-hidden" : "flex-1 flex items-center justify-center"} flex flex-col p-0`}
+        className="flex-1 min-h-0 overflow-hidden flex flex-col p-0"
       >
         {renderCurrentState()}
       </CardContent>
