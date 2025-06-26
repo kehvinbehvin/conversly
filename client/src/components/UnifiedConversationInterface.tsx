@@ -126,7 +126,7 @@ export default function UnifiedConversationInterface({
   const renderConnectingState = () => (
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
-        <div className="mx-auto">
+        <div className="flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
         </div>
         <div className="space-y-2">
@@ -140,8 +140,8 @@ export default function UnifiedConversationInterface({
   const renderActiveState = () => (
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
-        <div className="mx-auto">
-          <div className="w-16 h-16 rounded-full bg-green-500 animate-pulse shadow-lg"></div>
+        <div className="flex justify-center">
+          <div className="w-16 h-16 rounded-full bg-green-500 shadow-lg"></div>
         </div>
         <div className="space-y-3">
           <h3 className="text-heading-1 text-green-700">Connected!</h3>
@@ -163,7 +163,7 @@ export default function UnifiedConversationInterface({
   const renderProcessingState = () => (
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
-        <div className="mx-auto">
+        <div className="flex justify-center">
           <div className="animate-spin rounded-full h-12 w-12 border-4 border-sage-200 border-t-sage-600"></div>
         </div>
         <div className="space-y-3">
