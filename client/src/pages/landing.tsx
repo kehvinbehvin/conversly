@@ -59,7 +59,9 @@ export default function Landing() {
           {/* Compact Header */}
           <div className="text-center mb-12">
             <h1 className="text-4xl lg:text-5xl font-bold leading-tight mb-4">
-              <span className="text-warm-brown-800">Practice conversations. </span>
+              <span className="text-warm-brown-800">
+                Practice conversations.{" "}
+              </span>
               <span className="text-coral-500">Build confidence.</span>
             </h1>
             <p className="text-lg text-warm-brown-600 max-w-3xl mx-auto mb-6">
@@ -89,18 +91,6 @@ export default function Landing() {
               </div>
             </div>
           </AnonymousConversationProvider>
-
-          {/* Upgrade CTA */}
-          <div className="text-center mt-12">
-            <Link href="/dashboard">
-              <Button className="bg-coral-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-                Create Account to Track Progress
-              </Button>
-            </Link>
-            <p className="text-sm text-warm-brown-500 mt-3">
-              Save your conversations and see improvement over time
-            </p>
-          </div>
         </div>
 
         {/* Floating elements */}

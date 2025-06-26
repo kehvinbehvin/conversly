@@ -172,7 +172,7 @@ export default function UnifiedConversationInterface({
     <div className="flex items-center justify-center h-full p-6">
       <div className="text-center space-y-8">
         <div className="flex justify-center">
-          <div className="w-16 h-16 rounded-full bg-sage-500 shadow-lg"></div>
+          <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
         </div>
         <div className="space-y-3">
           <h3 className="text-heading-1 text-warm-brown-800">Connected!</h3>
@@ -246,7 +246,7 @@ export default function UnifiedConversationInterface({
         <div className="w-1/2 pr-4 border-r border-warm-brown-200 flex flex-col min-h-0">
           <div className="flex-1 overflow-y-auto space-y-4 pr-2">
             {/* Rating */}
-            <div className="text-center">
+            <div>
               <h3 className="text-heading-3 text-warm-brown-800 mb-3">
                 Your Rating
               </h3>
@@ -299,10 +299,8 @@ export default function UnifiedConversationInterface({
           <h3 className="text-heading-3 text-warm-brown-800 mb-3">
             Conversation with Feedback
           </h3>
-          <div className="flex-1 overflow-hidden border border-coral-200 rounded-xl shadow-sm min-h-0">
-            <div className="h-full overflow-y-auto">
-              <ChatThread messages={mergedTranscripts} />
-            </div>
+          <div className="flex-1 min-h-0">
+            <ChatThread messages={mergedTranscripts} className="h-full border border-coral-200 rounded-xl shadow-sm" />
           </div>
         </div>
       </div>
@@ -329,23 +327,7 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="card-surface flex flex-col w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
-      {state === "review" && (
-        <CardHeader className="text-center py-3">
-          <div className="flex items-center justify-between">
-            <CardTitle className="text-heading-2 text-warm-brown-800">
-              Your Review
-            </CardTitle>
-            <Badge
-              variant="secondary"
-              className="bg-sage-100 text-sage-800 text-caption px-2 py-1 rounded-lg"
-            >
-              ✓ Complete
-            </Badge>
-          </div>
-        </CardHeader>
-      )}
-
+    <Card className="card-surface flex flex-col flex-1 min-h-0 w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
       <CardContent
         className={`${state === "review" ? "flex-1" : "flex-1"} flex flex-col p-0`}
       >

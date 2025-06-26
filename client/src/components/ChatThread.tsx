@@ -48,8 +48,8 @@ export default function ChatThread({ messages, className }: ChatThreadProps) {
   }
 
   return (
-    <Card className={className}>
-      <CardHeader className="pb-3">
+    <Card className={`${className} flex flex-col`}>
+      <CardHeader className="pb-3 flex-shrink-0">
         <CardTitle className="flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <MessageCircle className="w-5 h-5 text-warm-brown-600" />
@@ -62,8 +62,8 @@ export default function ChatThread({ messages, className }: ChatThreadProps) {
           </div>
         </CardTitle>
       </CardHeader>
-      <CardContent className="p-0">
-        <div className="h-96 overflow-y-auto px-4 sm:px-6 pb-6" ref={scrollAreaRef}>
+      <CardContent className="p-0 flex-1 min-h-0 overflow-hidden">
+        <div className="h-full overflow-y-auto px-4 sm:px-6 pb-6" ref={scrollAreaRef}>
           <div className="space-y-4 sm:space-y-6">
             {messages.map((message, index) => {
               if (!message || typeof message !== 'object') {
