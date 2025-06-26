@@ -91,6 +91,12 @@ Conversly is a conversational practice application designed to help users improv
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
 
 ## Recent Changes  
+- June 26, 2025: **CHAT THREAD OVERFLOW ISSUE RESOLVED** - Systematic fix for content containment in review state
+  - **Root Cause Analysis**: Identified `.card-surface` class padding conflicting with flex layout constraints
+  - **Height Flow Fix**: Removed problematic CSS class to allow proper height constraint propagation
+  - **Flex Layout Chain**: Ensured proper height flow from Card → CardContent → Review layout → ChatThread
+  - **Scrolling Behavior**: Chat thread now properly contains content with internal scrolling only
+  - **Layout Integrity**: Maintained visual styling while fixing structural layout issues
 - June 26, 2025: **UI/UX DESIGN REFINEMENTS COMPLETED** - Active conversation state now fully aligned with warm color palette
   - **Color Consistency**: Updated active state from generic green to sage palette (sage-500, sage-700, sage-600)
   - **Complete Badge Update**: Review completion badge now uses sage-100/sage-800 instead of generic green
