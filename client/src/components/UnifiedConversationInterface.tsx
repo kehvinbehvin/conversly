@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Mic, MicOff, MessageCircle, Star } from "lucide-react";
+import { Mic, MicOff, MessageCircle, Star, AlertCircle } from "lucide-react";
 import { useAnonymousConversation } from "@/contexts/AnonymousConversationContext";
 import ChatThread from "@/components/ChatThread";
 import type { TranscriptWithReview } from "@shared/schema";
@@ -107,11 +107,22 @@ export default function UnifiedConversationInterface({
 
   const renderIdleState = () => (
     <div className="flex items-center justify-center h-full">
-      <div className="text-center">
+      <div className="text-center space-y-8">
+        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-sage-100 to-coral-100 flex items-center justify-center shadow-lg mx-auto">
+          <Mic className="w-16 h-16 text-warm-brown-600" />
+        </div>
+        <div className="space-y-4">
+          <h3 className="text-heading-1 text-warm-brown-800">
+            Ready to practice?
+          </h3>
+          <p className="text-body-large text-warm-brown-600 max-w-md mx-auto">
+            Click the button below to start your conversation practice session
+          </p>
+        </div>
         <Button
           onClick={handleStartConversation}
           size="lg"
-          className="bg-coral-500 text-white px-16 py-8 rounded-full text-3xl font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
+          className="btn-primary px-16 py-6 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
         >
           Start Conversation
         </Button>
@@ -122,10 +133,13 @@ export default function UnifiedConversationInterface({
   const renderConnectingState = () => (
     <div className="flex items-center justify-center h-full">
       <div className="text-center space-y-8">
-        <div className="w-40 h-40 rounded-full bg-gradient-to-br from-coral-100 to-sage-100 flex items-center justify-center shadow-2xl">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-coral-500"></div>
+        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-coral-100 to-sage-100 flex items-center justify-center shadow-lg">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-4 border-coral-500"></div>
         </div>
-        <p className="text-2xl text-warm-brown-600 font-medium">Connecting to AI coach...</p>
+        <div className="space-y-2">
+          <h3 className="text-heading-2 text-warm-brown-800">Connecting...</h3>
+          <p className="text-body text-warm-brown-600">Setting up your AI conversation coach</p>
+        </div>
       </div>
     </div>
   );
@@ -133,11 +147,12 @@ export default function UnifiedConversationInterface({
   const renderActiveState = () => (
     <div className="flex items-center justify-center h-full">
       <div className="text-center space-y-8">
-        <div className="bg-green-100 border border-green-300 rounded-xl p-8 max-w-md">
-          <p className="text-green-800 font-semibold text-2xl mb-2">
-            🎙️ Conversation Active
-          </p>
-          <p className="text-green-700 text-lg">
+        <div className="w-32 h-32 rounded-full bg-gradient-to-br from-green-100 to-sage-200 flex items-center justify-center shadow-lg border-4 border-green-200 animate-pulse">
+          <Mic className="w-16 h-16 text-green-600 animate-pulse" />
+        </div>
+        <div className="space-y-3">
+          <h3 className="text-heading-1 text-green-700">Connected!</h3>
+          <p className="text-body-large text-green-700">
             Speak naturally - the AI is listening
           </p>
         </div>
@@ -145,7 +160,7 @@ export default function UnifiedConversationInterface({
           onClick={handleEndConversation}
           size="lg"
           variant="destructive"
-          className="px-16 py-8 rounded-full text-2xl font-semibold"
+          className="px-16 py-4 text-heading-3 shadow-lg hover:shadow-xl transition-all duration-200"
         >
           Stop Conversation
         </Button>
@@ -173,25 +188,32 @@ export default function UnifiedConversationInterface({
 
   const renderErrorState = () => (
     <div className="flex items-center justify-center h-full">
-      <div className="text-center space-y-6 max-w-md mx-auto">
-        <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-2xl mx-auto">
-          <div className="text-red-500 text-4xl">⚠️</div>
+      <div className="text-center space-y-8 max-w-md mx-auto">
+        <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
+          <AlertCircle className="w-16 h-16 text-red-500" />
         </div>
-        <div className="space-y-3">
-          <p className="text-xl font-semibold text-red-700">
+        <div className="space-y-4">
+          <h3 className="text-heading-1 text-red-700">
             Connection Error
-          </p>
-          <p className="text-base text-warm-brown-600">
+          </h3>
+          <p className="text-body text-warm-brown-600">
             {error || "Unable to start conversation. Please try again."}
           </p>
         </div>
-        <Button
-          onClick={handleRetry}
-          size="lg"
-          className="bg-coral-500 text-white px-12 py-6 rounded-full text-xl font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl"
-        >
-          Try Again
-        </Button>
+        <div className="space-y-4">
+          <Button
+            onClick={handleRetry}
+            className="btn-primary w-full"
+          >
+            Try Again
+          </Button>
+          <Button
+            onClick={clearError}
+            className="btn-secondary w-full"
+          >
+            Back to Start
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -205,25 +227,25 @@ export default function UnifiedConversationInterface({
     return (
       <div className="h-full flex">
         {/* Left side - Rating and Review Info */}
-        <div className="w-1/2 p-6 border-r border-gray-200">
-          <div className="space-y-6">
+        <div className="w-1/2 p-8 border-r border-warm-brown-200">
+          <div className="space-y-8">
             {/* Rating */}
             <div className="text-center">
-              <h3 className="text-2xl font-bold text-warm-brown-800 mb-4">Your Rating</h3>
-              <div className="bg-gradient-to-r from-yellow-50 to-orange-50 rounded-xl p-6 border border-yellow-200">
-                <div className="flex items-center justify-center space-x-2 mb-2">
+              <h3 className="text-heading-1 text-warm-brown-800 mb-6">Your Rating</h3>
+              <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-8 border border-coral-200 shadow-sm">
+                <div className="flex items-center justify-center space-x-1 mb-4">
                   {[...Array(5)].map((_, i) => (
                     <Star
                       key={i}
-                      className={`w-8 h-8 ${
+                      className={`w-10 h-10 ${
                         i < (review.overallRating || 0)
-                          ? "text-yellow-500 fill-current"
-                          : "text-gray-300"
+                          ? "text-coral-500 fill-current"
+                          : "text-warm-brown-200"
                       }`}
                     />
                   ))}
                 </div>
-                <div className="text-4xl font-bold text-warm-brown-800">
+                <div className="text-display-1 text-warm-brown-800">
                   {review.overallRating || 0}/5
                 </div>
               </div>
@@ -232,19 +254,19 @@ export default function UnifiedConversationInterface({
             {/* Summary if available */}
             {review.summary && (
               <div>
-                <h4 className="text-lg font-semibold text-warm-brown-800 mb-3">Summary</h4>
-                <div className="text-warm-brown-700 bg-sage-50 p-4 rounded-lg border border-sage-200">
+                <h4 className="text-heading-3 text-warm-brown-800 mb-4">Summary</h4>
+                <div className="text-body text-warm-brown-700 bg-sage-50 p-6 rounded-xl border border-sage-200 shadow-sm">
                   {review.summary}
                 </div>
               </div>
             )}
 
             {/* Start New Conversation Button */}
-            <div className="pt-6">
+            <div className="pt-8">
               <Button
                 onClick={handleStartNewConversation}
                 size="lg"
-                className="w-full bg-coral-500 text-white hover:bg-coral-600 py-4 text-lg font-semibold"
+                className="btn-primary w-full py-4 text-heading-3"
               >
                 Start New Conversation
               </Button>
@@ -253,9 +275,9 @@ export default function UnifiedConversationInterface({
         </div>
 
         {/* Right side - Chat Thread */}
-        <div className="w-1/2 p-6 flex flex-col">
-          <h3 className="text-2xl font-bold text-warm-brown-800 mb-4">Conversation with Feedback</h3>
-          <div className="flex-1 overflow-hidden border border-coral-200 rounded-lg">
+        <div className="w-1/2 p-8 flex flex-col">
+          <h3 className="text-heading-1 text-warm-brown-800 mb-6">Conversation with Feedback</h3>
+          <div className="flex-1 overflow-hidden border border-coral-200 rounded-xl shadow-sm">
             <div className="h-full overflow-y-auto">
               <ChatThread messages={mergedTranscripts} />
             </div>
@@ -285,20 +307,20 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="w-full h-full border-2 border-coral-200 shadow-xl bg-gradient-to-br from-white to-coral-50">
-      <CardHeader className="text-center pb-4">
+    <Card className="card-surface w-full h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
+      <CardHeader className="text-center pb-6">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-3xl font-bold text-warm-brown-800">
+          <CardTitle className="text-display-2 text-warm-brown-800">
             {state === 'review' ? 'Your Review' : 'AI Conversation Practice'}
           </CardTitle>
           {state === 'review' && (
-            <Badge variant="secondary" className="bg-green-100 text-green-800 text-sm px-3 py-1">
+            <Badge variant="secondary" className="bg-green-100 text-green-800 text-body-small px-3 py-1 rounded-lg">
               ✓ Complete
             </Badge>
           )}
         </div>
         {state !== 'review' && (
-          <p className="text-warm-brown-600 text-base">
+          <p className="text-body text-warm-brown-600 mt-3">
             {state === 'idle' && 'Click to start your free practice session'}
             {state === 'connecting' && 'Establishing connection...'}
             {state === 'active' && 'Conversation in progress'}

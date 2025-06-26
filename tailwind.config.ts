@@ -99,6 +99,35 @@ export default {
           900: "var(--sage-900)",
         },
       },
+      spacing: {
+        'space-1': 'var(--space-1)',
+        'space-2': 'var(--space-2)', 
+        'space-3': 'var(--space-3)',
+        'space-4': 'var(--space-4)',
+        'space-6': 'var(--space-6)',
+        'space-8': 'var(--space-8)',
+        'space-12': 'var(--space-12)',
+        'space-16': 'var(--space-16)',
+        'space-20': 'var(--space-20)',
+      },
+      fontSize: {
+        'display-1': ['var(--font-size-4xl)', { lineHeight: 'var(--line-height-tight)' }],
+        'display-2': ['var(--font-size-3xl)', { lineHeight: 'var(--line-height-tight)' }],
+        'heading-1': ['var(--font-size-2xl)', { lineHeight: 'var(--line-height-tight)' }],
+        'heading-2': ['var(--font-size-xl)', { lineHeight: 'var(--line-height-normal)' }],
+        'heading-3': ['var(--font-size-lg)', { lineHeight: 'var(--line-height-normal)' }],
+        'body-large': ['var(--font-size-lg)', { lineHeight: 'var(--line-height-relaxed)' }],
+        'body': ['var(--font-size-base)', { lineHeight: 'var(--line-height-normal)' }],
+        'body-small': ['var(--font-size-sm)', { lineHeight: 'var(--line-height-normal)' }],
+        'caption': ['var(--font-size-xs)', { lineHeight: 'var(--line-height-normal)' }],
+      },
+      boxShadow: {
+        'shadow-sm': 'var(--shadow-sm)',
+        'shadow-base': 'var(--shadow-base)',
+        'shadow-md': 'var(--shadow-md)',
+        'shadow-lg': 'var(--shadow-lg)',
+        'shadow-xl': 'var(--shadow-xl)',
+      },
       keyframes: {
         "accordion-down": {
           from: {

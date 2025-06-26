@@ -57,6 +57,78 @@
   --sage-700: hsl(108, 14%, 30%);
   --sage-800: hsl(109, 12%, 22%);
   --sage-900: hsl(110, 10%, 15%);
+
+  /* Design System - Typography Tokens */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-base: 1rem;     /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  
+  --line-height-tight: 1.25;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.75;
+  
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* Design System - Spacing Tokens */
+  --space-1: 0.25rem;   /* 4px */
+  --space-2: 0.5rem;    /* 8px */
+  --space-3: 0.75rem;   /* 12px */
+  --space-4: 1rem;      /* 16px */
+  --space-6: 1.5rem;    /* 24px */
+  --space-8: 2rem;      /* 32px */
+  --space-12: 3rem;     /* 48px */
+  --space-16: 4rem;     /* 64px */
+  --space-20: 5rem;     /* 80px */
+
+  /* Design System - Border Radius Tokens */
+  --radius-sm: 0.125rem;   /* 2px */
+  --radius-base: 0.25rem;  /* 4px */
+  --radius-md: 0.375rem;   /* 6px */
+  --radius-lg: 0.5rem;     /* 8px */
+  --radius-xl: 0.75rem;    /* 12px */
+  --radius-2xl: 1rem;      /* 16px */
+  --radius-full: 9999px;
+
+  /* Design System - Shadow Tokens */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-base: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+
+  /* Design System - Semantic Color Tokens */
+  --color-primary: var(--coral-600);
+  --color-primary-hover: var(--coral-700);
+  --color-primary-active: var(--coral-800);
+  --color-primary-light: var(--coral-100);
+  
+  --color-secondary: var(--sage-600);
+  --color-secondary-hover: var(--sage-700);
+  --color-secondary-light: var(--sage-100);
+  
+  --color-neutral: var(--warm-brown-600);
+  --color-neutral-light: var(--warm-brown-100);
+  --color-neutral-dark: var(--warm-brown-800);
+  
+  --color-success: var(--sage-600);
+  --color-warning: hsl(45, 93%, 47%);   /* Amber-500 */
+  --color-error: hsl(0, 72%, 51%);      /* Red-500 */
+  --color-info: hsl(217, 91%, 60%);     /* Blue-500 */
+
+  /* Design System - Surface Colors */
+  --color-background: var(--warm-brown-50);
+  --color-surface: white;
+  --color-surface-hover: var(--warm-brown-50);
+  --color-border: var(--warm-brown-200);
+  --color-border-light: var(--warm-brown-100);
 }
 
 .dark {
@@ -89,6 +161,122 @@
   body {
     @apply font-sans antialiased bg-background text-foreground;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  /* Typography System Classes */
+  .text-display-1 { 
+    font-size: var(--font-size-4xl); 
+    line-height: var(--line-height-tight); 
+    font-weight: var(--font-weight-bold); 
+  }
+  
+  .text-display-2 { 
+    font-size: var(--font-size-3xl); 
+    line-height: var(--line-height-tight); 
+    font-weight: var(--font-weight-bold); 
+  }
+  
+  .text-heading-1 { 
+    font-size: var(--font-size-2xl); 
+    line-height: var(--line-height-tight); 
+    font-weight: var(--font-weight-semibold); 
+  }
+  
+  .text-heading-2 { 
+    font-size: var(--font-size-xl); 
+    line-height: var(--line-height-normal); 
+    font-weight: var(--font-weight-semibold); 
+  }
+  
+  .text-heading-3 { 
+    font-size: var(--font-size-lg); 
+    line-height: var(--line-height-normal); 
+    font-weight: var(--font-weight-medium); 
+  }
+  
+  .text-body-large { 
+    font-size: var(--font-size-lg); 
+    line-height: var(--line-height-relaxed); 
+    font-weight: var(--font-weight-normal); 
+  }
+  
+  .text-body { 
+    font-size: var(--font-size-base); 
+    line-height: var(--line-height-normal); 
+    font-weight: var(--font-weight-normal); 
+  }
+  
+  .text-body-small { 
+    font-size: var(--font-size-sm); 
+    line-height: var(--line-height-normal); 
+    font-weight: var(--font-weight-normal); 
+  }
+  
+  .text-caption { 
+    font-size: var(--font-size-xs); 
+    line-height: var(--line-height-normal); 
+    font-weight: var(--font-weight-normal); 
+  }
+
+  /* Component Base Classes */
+  .btn-primary {
+    background-color: hsl(var(--color-primary));
+    color: white;
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-6);
+    font-weight: var(--font-weight-medium);
+    box-shadow: var(--shadow-base);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-primary:hover {
+    background-color: hsl(var(--color-primary-hover));
+    box-shadow: var(--shadow-md);
+  }
+
+  .btn-secondary {
+    background-color: hsl(var(--color-secondary-light));
+    color: hsl(var(--color-secondary));
+    border: 1px solid hsl(var(--color-border));
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-6);
+    font-weight: var(--font-weight-medium);
+    transition: all 0.2s ease-in-out;
+  }
+
+  .btn-secondary:hover {
+    background-color: hsl(var(--color-surface-hover));
+    border-color: hsl(var(--color-secondary));
+  }
+
+  .card-surface {
+    background-color: hsl(var(--color-surface));
+    border: 1px solid hsl(var(--color-border-light));
+    border-radius: var(--radius-xl);
+    padding: var(--space-8);
+    box-shadow: var(--shadow-base);
+  }
+
+  /* Focus States for Accessibility */
+  .btn-primary:focus,
+  .btn-secondary:focus {
+    outline: 2px solid hsl(var(--color-primary));
+    outline-offset: 2px;
+  }
+
+  /* Loading State Component */
+  .loading-spinner {
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  /* Consistent transitions */
+  .smooth-transition {
+    transition: all 0.2s ease-in-out;
   }
 }
 
