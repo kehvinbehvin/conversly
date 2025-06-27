@@ -101,6 +101,11 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 27, 2025: **AUTOSCROLL FUNCTIONALITY IMPLEMENTED** - Fixed screen scrolling behavior for anonymous conversation tool
+  - **Initial Conversation Start**: Automatically scrolls to conversation interface when user starts conversation
+  - **New Conversation from Review**: Scrolls back to interface when "Start New Conversation" button is clicked
+  - **Smooth Scrolling**: Uses browser's smooth scroll behavior with proper positioning
+  - **State-Based Triggers**: Activates on isConnecting/isConnected state changes and manual reset actions
 - June 27, 2025: **SCORE EXPLANATION FEATURE IMPLEMENTED** - Added educational text explaining how conversation scores are calculated
   - **Location**: Positioned below score display in review state of anonymous conversation tool
   - **Content**: Explains baseline of 0, +1 for good conversational skills, -1 for improvement areas

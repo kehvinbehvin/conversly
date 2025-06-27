@@ -153,6 +153,15 @@ export default function UnifiedConversationInterface({
   const handleStartNewConversation = () => {
     // Reset to idle state without auto-starting
     resetForNewConversation();
+    
+    // Auto-scroll back to conversation interface for new conversation
+    if (conversationRef.current) {
+      console.log("📍 Auto-scrolling to conversation interface for new conversation");
+      conversationRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
   };
 
   const handleRetry = () => {
