@@ -11,7 +11,7 @@ import Landing from "@/pages/landing";
 // import Conversation from "@/pages/conversation";
 // import Review from "@/pages/review";
 // import History from "@/pages/history";
-// import NotFound from "@/pages/not-found";
+import NotFound from "@/pages/not-found";
 import { ConversationProvider } from "@/contexts/ConversationContext";
 
 function Router() {
