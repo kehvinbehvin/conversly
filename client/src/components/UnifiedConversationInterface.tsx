@@ -42,40 +42,49 @@ export default function UnifiedConversationInterface({
     const navbarHeight = 64; // h-16 = 64px
     let targetElement: HTMLElement | null = null;
     let offset = navbarHeight;
+    let centerInViewport = false;
 
     switch (targetState) {
       case "idle":
         // Anchor to "Strike up a conversation..." heading
         targetElement = idleHeaderRef.current;
+        offset = navbarHeight + 20; // Small additional offset for idle
         break;
       case "connecting":
-        targetElement = connectingContentRef.current;
-        // For centered states, add extra offset to center better
-        offset = navbarHeight + window.innerHeight * 0.1; // 10% from top for better centering
-        break;
       case "active":
-        targetElement = activeContentRef.current;
-        offset = navbarHeight + window.innerHeight * 0.1;
-        break;
       case "processing":
-        targetElement = processingContentRef.current;
-        offset = navbarHeight + window.innerHeight * 0.1;
-        break;
       case "error":
-        targetElement = errorContentRef.current;
-        offset = navbarHeight + window.innerHeight * 0.1;
+        // For centered states, we want to center the element in viewport
+        targetElement = targetState === "connecting" ? connectingContentRef.current :
+                       targetState === "active" ? activeContentRef.current :
+                       targetState === "processing" ? processingContentRef.current :
+                       errorContentRef.current;
+        centerInViewport = true;
         break;
       case "review":
         // Anchor at the score section
         targetElement = reviewScoreRef.current;
+        offset = navbarHeight + 20; // Small additional offset for review
         break;
     }
 
     if (targetElement) {
-      const elementTop = targetElement.getBoundingClientRect().top + window.pageYOffset;
-      const scrollPosition = Math.max(0, elementTop - offset);
+      const elementRect = targetElement.getBoundingClientRect();
+      const elementTop = elementRect.top + window.pageYOffset;
       
-      console.log(`📍 Auto-scrolling to ${targetState} state anchor (position: ${scrollPosition}, offset: ${offset})`);
+      let scrollPosition;
+      if (centerInViewport) {
+        // Center the element in the viewport
+        const elementHeight = elementRect.height;
+        const viewportHeight = window.innerHeight;
+        const centerOffset = (viewportHeight - elementHeight) / 2 - navbarHeight;
+        scrollPosition = Math.max(0, elementTop - Math.max(centerOffset, navbarHeight + 20));
+      } else {
+        // Simple offset from top
+        scrollPosition = Math.max(0, elementTop - offset);
+      }
+      
+      console.log(`📍 Auto-scrolling to ${targetState} state anchor (position: ${scrollPosition}, offset: ${centerInViewport ? 'centered' : offset})`);
       window.scrollTo({
         top: scrollPosition,
         behavior: 'smooth'

@@ -101,6 +101,14 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 27, 2025: **AUTOSCROLL POSITIONING FIX IMPLEMENTED** - Fixed autoscroll feature to use correct anchor points and viewport centering
+  - **Problem Identified**: Previous implementation scrolled too far down, showing content below conversation interface
+  - **Root Cause**: Incorrect offset calculation using `window.innerHeight * 0.1` added excessive padding
+  - **Solution**: Implemented proper viewport centering for connecting/active/processing/error states
+  - **Idle State**: Anchors to "Practice conversations" heading with navbar + 20px offset
+  - **Centered States**: Uses element height and viewport height to calculate true center position
+  - **Review State**: Anchors to score section with navbar + 20px offset
+  - **Mobile/Desktop**: Consistent behavior across all screen sizes with proper navbar height compensation
 - June 27, 2025: **EMPTY TRANSCRIPT ERROR HANDLING IMPLEMENTED** - Fixed webhook bug where empty transcripts caused client to wait indefinitely
   - **Server-Side Fix**: Added SSE notification for empty transcript scenarios with new "empty_transcript_error" message type
   - **Status Management**: Conversations with empty transcripts now receive "empty_transcript" status for proper tracking
