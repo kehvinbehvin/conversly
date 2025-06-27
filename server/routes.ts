@@ -47,10 +47,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize anonymous user on server start
   await ensureAnonymousUser();
 
-  // Serve static files that should not be processed by React router
-  app.use("/sitemap.xml", express.static(path.resolve(import.meta.dirname, "..", "client", "public")));
-  app.use("/robots.txt", express.static(path.resolve(import.meta.dirname, "..", "client", "public")));
-
   // Get current user (demo user for MVP)
   app.get(
     "/api/user",
