@@ -121,13 +121,13 @@ export default function UnifiedConversationInterface({
 
   // Timer expiration callback
   const handleTimerExpired = useCallback(() => {
-    console.log('⏰ Timer expired - automatically ending conversation');
+    console.log("⏰ Timer expired - automatically ending conversation");
     endConversation();
   }, [endConversation]);
 
   // Conversation timer - 5 minutes (300,000 ms)
   const timer = useConversationTimer({
-    durationMs: 0.5 * 60 * 1000, // 5 minutes
+    durationMs: 5 * 60 * 1000, // 5 minutes
     onTimerExpired: handleTimerExpired,
     isActive: isConnected, // Timer only runs when conversation is active
   });
@@ -416,7 +416,8 @@ export default function UnifiedConversationInterface({
                 <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
                   <div className="text-center">
                     <div className="text-heading-1 text-warm-brown-800 font-bold">
-                      {(review.overallRating ?? 0) > 0 ? '+' : ''}{review.overallRating ?? 0}
+                      {(review.overallRating ?? 0) > 0 ? "+" : ""}
+                      {review.overallRating ?? 0}
                     </div>
                   </div>
                 </div>
