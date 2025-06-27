@@ -398,11 +398,6 @@ export default function UnifiedConversationInterface({
                     <div className="text-heading-1 text-warm-brown-800 font-bold">
                       {(review.overallRating ?? 0) > 0 ? '+' : ''}{review.overallRating ?? 0}
                     </div>
-                    <div className="text-sm text-warm-brown-600 mt-1">
-                      {(review.overallRating ?? 0) > 0 ? 'Strong performance' : 
-                       (review.overallRating ?? 0) < 0 ? 'Room for improvement' : 
-                       'Baseline'}
-                    </div>
                   </div>
                 </div>
               </div>
