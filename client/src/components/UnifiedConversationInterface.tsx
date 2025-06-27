@@ -127,7 +127,7 @@ export default function UnifiedConversationInterface({
 
   // Conversation timer - 5 minutes (300,000 ms)
   const timer = useConversationTimer({
-    durationMs: 5 * 60 * 1000, // 5 minutes
+    durationMs: 0.5 * 60 * 1000, // 5 minutes
     onTimerExpired: handleTimerExpired,
     isActive: isConnected, // Timer only runs when conversation is active
   });

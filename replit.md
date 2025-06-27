@@ -101,6 +101,13 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 27, 2025: **5-MINUTE CONVERSATION TIMER IMPLEMENTED** - Added automatic conversation time limit with countdown display
+  - **Timer Logic**: Custom useConversationTimer hook manages 5-minute countdown with automatic session termination
+  - **UI Integration**: Timer displays as "4:32 remaining" format with clock icon in active conversation state
+  - **Positioning**: Timer positioned below avatar description, above status indicator as requested
+  - **Auto-termination**: Uses existing endConversation() flow when timer expires, no modal popup
+  - **State Management**: Timer starts only when conversation is active, resets on errors or manual termination
+  - **SDK Integration**: Properly integrates with ElevenLabs conversation.endSession() method
 - June 27, 2025: **SCORING SYSTEM IMPLEMENTATION COMPLETED** - Replaced 1-5 rating system with complement/improvement based scoring
   - **New Scoring Logic**: Complements add +1, improvements subtract -1, starting from 0 baseline
   - **Braintrust Integration**: Updated prompt to return category field ("complement" | "improvement") for each review
