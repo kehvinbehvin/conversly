@@ -409,7 +409,7 @@ export default function UnifiedConversationInterface({
               <Button onClick={handleRetry} className="btn-primary w-full">
                 Try Again
               </Button>
-              <Button onClick={clearError} className="btn-secondary w-full">
+              <Button onClick={resetForNewConversation} className="btn-secondary w-full">
                 Back to Start
               </Button>
             </div>
