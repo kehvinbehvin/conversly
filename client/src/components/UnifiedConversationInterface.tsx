@@ -120,12 +120,37 @@ export default function UnifiedConversationInterface({
   };
 
   const state = getState();
+  
+  // Track review view when state changes to review
+  useEffect(() => {
+    if (state === "review" && conversationData?.review) {
+      const score = conversationData.review.overallRating || 0;
+      trackReviewEvent('viewed', score, currentConversationId ?? undefined, {
+        avatar_id: selectedAvatar.agent_id,
+        avatar_name: selectedAvatar.name,
+        conversation_id: conversationData.id,
+      });
+      trackConversationEvent('completed', selectedAvatar.agent_id, undefined, {
+        avatar_name: selectedAvatar.name,
+        final_score: score,
+        conversation_id: conversationData.id,
+      });
+    }
+  }, [state, conversationData?.review, conversationData?.id, currentConversationId, selectedAvatar.agent_id, selectedAvatar.name]);
 
   const handleStartConversation = () => {
     if (selectedAvatar?.agent_id) {
       console.log(
         `🚀 Starting conversation with ${selectedAvatar.name} (${selectedAvatar.agent_id})`,
       );
+      trackButtonClick('Start Conversation', 'Conversation Control', {
+        avatar_id: selectedAvatar.agent_id,
+        avatar_name: selectedAvatar.name,
+      });
+      trackConversationEvent('started', selectedAvatar.agent_id, undefined, {
+        avatar_name: selectedAvatar.name,
+        avatar_description: selectedAvatar.description,
+      });
       scrollToTop();
       startConversation(selectedAvatar.agent_id);
     } else {
@@ -136,8 +161,13 @@ export default function UnifiedConversationInterface({
   // Timer expiration callback
   const handleTimerExpired = useCallback(() => {
     console.log("⏰ Timer expired - automatically ending conversation");
+    trackConversationEvent('ended', selectedAvatar.agent_id, 5 * 60 * 1000, {
+      avatar_name: selectedAvatar.name,
+      ended_by: 'timer',
+      timer_expired: true,
+    });
     endConversation();
-  }, [endConversation]);
+  }, [endConversation, selectedAvatar.agent_id, selectedAvatar.name]);
 
   // Conversation timer - 5 minutes (300,000 ms)
   const timer = useConversationTimer({
@@ -147,16 +177,41 @@ export default function UnifiedConversationInterface({
   });
 
   const handleEndConversation = () => {
+    // Calculate conversation duration based on timer remaining
+    const totalDuration = 5 * 60 * 1000; // 5 minutes
+    const duration = isConnected ? totalDuration - timer.timeRemainingMs : undefined;
+    
+    trackButtonClick('Stop Conversation', 'Conversation Control', {
+      avatar_id: selectedAvatar.agent_id,
+      avatar_name: selectedAvatar.name,
+      conversation_duration: duration,
+    });
+    trackConversationEvent('ended', selectedAvatar.agent_id, duration, {
+      avatar_name: selectedAvatar.name,
+      ended_by: 'user',
+      timer_remaining: timer.timeRemainingMs,
+    });
+    
     endConversation();
   };
 
   const handleStartNewConversation = () => {
+    trackButtonClick('Start New Conversation', 'Conversation Control', {
+      previous_avatar_id: selectedAvatar.agent_id,
+      previous_avatar_name: selectedAvatar.name,
+      from_state: state,
+    });
     // Reset to idle state without auto-starting
     resetForNewConversation();
     scrollToTop();
   };
 
   const handleRetry = () => {
+    trackButtonClick('Try Again', 'Error Recovery', {
+      avatar_id: selectedAvatar.agent_id,
+      avatar_name: selectedAvatar.name,
+      error_message: error,
+    });
     clearError();
     if (selectedAvatar?.agent_id) {
       startConversation(selectedAvatar.agent_id);

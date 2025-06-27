@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { MessageCircle, BarChart3, Clock, TrendingUp } from "lucide-react";
 import type { ConversationWithReview } from "@shared/schema";
+import { trackPageView, trackButtonClick } from "@/lib/gtm";
 
 export default function Dashboard() {
   const { data: conversations, isLoading, refetch } = useQuery<ConversationWithReview[]>({
@@ -18,10 +19,14 @@ export default function Dashboard() {
     queryKey: ["/api/user"],
   });
 
-  // Force refetch when component mounts to ensure fresh data
+  // Track dashboard page view and force refetch when component mounts
   useEffect(() => {
+    trackPageView('Dashboard', 'User Area', {
+      user_id: (user as any)?.id,
+      conversations_count: conversations?.length || 0,
+    });
     refetch();
-  }, [refetch]);
+  }, [refetch, user, conversations?.length]);
 
   const recentConversations = conversations?.slice(0, 3) || [];
   const completedConversations = conversations?.filter(c => c.status === "completed" || c.status === "analyzed") || [];
@@ -35,7 +40,7 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-warm-brown-800 mb-2">
-            Welcome back{user?.email ? `, ${user.email.split('@')[0]}` : ''}!
+            Welcome back{(user as any)?.email ? `, ${(user as any).email.split('@')[0]}` : ''}!
           </h1>
           <p className="text-warm-brown-600">
             Ready to practice and improve your conversation skills?
@@ -121,14 +126,25 @@ export default function Dashboard() {
               </CardHeader>
               <CardContent className="space-y-4">
                 <Link href="/conversation">
-                  <Button className="w-full bg-coral-500 hover:bg-coral-600 text-white">
+                  <Button 
+                    className="w-full bg-coral-500 hover:bg-coral-600 text-white"
+                    onClick={() => trackButtonClick('Start New Conversation', 'Dashboard Navigation', {
+                      source: 'dashboard_quick_actions'
+                    })}
+                  >
                     <MessageCircle className="w-4 h-4 mr-2" />
                     Start New Conversation
                   </Button>
                 </Link>
                 
                 <Link href="/history">
-                  <Button variant="outline" className="w-full border-warm-brown-200 text-warm-brown-700 hover:bg-warm-brown-50">
+                  <Button 
+                    variant="outline" 
+                    className="w-full border-warm-brown-200 text-warm-brown-700 hover:bg-warm-brown-50"
+                    onClick={() => trackButtonClick('View All Sessions', 'Dashboard Navigation', {
+                      source: 'dashboard_quick_actions'
+                    })}
+                  >
                     <BarChart3 className="w-4 h-4 mr-2" />
                     View All Sessions
                   </Button>
