@@ -421,6 +421,13 @@ export default function UnifiedConversationInterface({
                     </div>
                   </div>
                 </div>
+                
+                {/* Score Explanation */}
+                <div className="mt-3 text-sm text-warm-brown-600 bg-warm-brown-50 p-3 rounded-lg border border-warm-brown-200">
+                  <p className="leading-relaxed">
+                    Starting from a baseline of 0, you earn <span className="font-medium text-sage-700">+1 point</span> for good displays of conversational skill and <span className="font-medium text-coral-700">-1 point</span> for areas that need improvement.
+                  </p>
+                </div>
               </div>
 
               {/* Summary if available */}
