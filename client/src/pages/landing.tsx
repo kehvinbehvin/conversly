@@ -1,15 +1,11 @@
-import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
-  Check,
   Mic,
   Lightbulb,
   Clock,
   Shield,
   TrendingUp,
-  BarChart3,
-  Star,
 } from "lucide-react";
 import { AnonymousConversationProvider } from "@/contexts/AnonymousConversationContext";
 import UnifiedConversationInterface from "@/components/UnifiedConversationInterface";
@@ -58,8 +54,6 @@ export default function Landing() {
             </div>
           </AnonymousConversationProvider>
         </div>
-
-        
       </section>
 
       {/* How It Works Section */}
@@ -84,8 +78,9 @@ export default function Landing() {
                 Start Talking
               </h3>
               <p className="text-warm-brown-600">
-                Begin a 5-minute voice conversation with our AI coach about "How
-                was your weekend?" in a safe, judgment-free environment.
+                Begin a 5-minute voice conversation with any AI. The hardest
+                part of any conversation is the opening, practice without any
+                pressure.
               </p>
             </div>
 
@@ -95,11 +90,12 @@ export default function Landing() {
                 <Lightbulb className="w-10 h-10 text-white" />
               </div>
               <h3 className="text-2xl font-semibold text-warm-brown-800">
-                AI Analysis
+                Get Feedback
               </h3>
               <p className="text-warm-brown-600">
-                Our advanced AI analyzes your conversation, identifying
-                strengths, areas for improvement, and communication patterns.
+                Our AI analyzes your conversation and provides feedback on your
+                conversational skills based on conventional conversational
+                wisdoms
               </p>
             </div>
 
@@ -109,11 +105,10 @@ export default function Landing() {
                 <TrendingUp className="w-10 h-10 text-white" />
               </div>
               <h3 className="text-2xl font-semibold text-warm-brown-800">
-                Get Feedback
+                Iterate
               </h3>
               <p className="text-warm-brown-600">
-                Receive personalized, actionable feedback with annotations and
-                suggestions to improve your conversation skills.
+                Dont stop at the feedback, use it to improve and practice again!
               </p>
             </div>
           </div>
@@ -125,11 +120,11 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center space-y-6 mb-16">
             <h2 className="text-4xl font-bold text-warm-brown-800">
-              Why Choose Conversly?
+              Practice makes perfect
             </h2>
             <p className="text-xl text-warm-brown-600 max-w-3xl mx-auto">
-              Designed specifically for socially self-aware individuals seeking
-              genuine improvement
+              We're always innovating to adding more tools that will help you
+              improve your conversational skills
             </p>
           </div>
 
@@ -157,27 +152,11 @@ export default function Landing() {
                   <Mic className="w-6 h-6 text-sage-500" />
                 </div>
                 <h3 className="text-xl font-semibold text-warm-brown-800 mb-4">
-                  Voice-First Practice
+                  Voice Practice
                 </h3>
                 <p className="text-warm-brown-600">
                   Authentic conversation practice using natural speech patterns
                   and vocal communication.
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* Feature 3 */}
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-warm-brown-200 rounded-xl flex items-center justify-center mb-6">
-                  <BarChart3 className="w-6 h-6 text-warm-brown-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-warm-brown-800 mb-4">
-                  Detailed Analytics
-                </h3>
-                <p className="text-warm-brown-600">
-                  Track your progress with conversation metrics and detailed
-                  feedback over time.
                 </p>
               </CardContent>
             </Card>
@@ -213,55 +192,6 @@ export default function Landing() {
                 </p>
               </CardContent>
             </Card>
-
-            {/* Feature 6 */}
-            <Card className="bg-white shadow-lg hover:shadow-xl transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-12 h-12 bg-warm-brown-200 rounded-xl flex items-center justify-center mb-6">
-                  <TrendingUp className="w-6 h-6 text-warm-brown-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-warm-brown-800 mb-4">
-                  Continuous Improvement
-                </h3>
-                <p className="text-warm-brown-600">
-                  Build confidence progressively with each session, tracking
-                  your growth journey.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-warm-brown-800 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <div className="space-y-8">
-            <h2 className="text-4xl lg:text-5xl font-bold">
-              Ready to Build Your Conversation Confidence?
-            </h2>
-            <p className="text-xl text-warm-brown-200 max-w-3xl mx-auto">
-              Join hundreds of socially self-aware individuals who are improving
-              their interpersonal connections through guided voice
-              conversations.
-            </p>
-
-            <div className="space-y-6">
-              <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-warm-brown-200">
-                <div className="flex items-center space-x-2">
-                  <Check className="w-5 h-5 text-sage-400" />
-                  <span>No commitment required</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Check className="w-5 h-5 text-sage-400" />
-                  <span>Safe practice environment</span>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Check className="w-5 h-5 text-sage-400" />
-                  <span>Instant AI feedback</span>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -359,7 +289,7 @@ export default function Landing() {
 
           <div className="border-t border-warm-brown-700 mt-12 pt-8 text-center">
             <p className="text-warm-brown-400">
-              © 2024 Conversly. All rights reserved.
+              © 2025 Conversly. All rights reserved.
             </p>
           </div>
         </div>

@@ -199,7 +199,7 @@ export default function UnifiedConversationInterface({
               <span className="text-coral-500">Build confidence.</span>
             </h1>
             <p className="text-base sm:text-lg text-warm-brown-600">
-              AI-powered conversation practice with instant feedback
+              Still suck at conversations after reading every book on conversational skills? <span className="text-coral-500">You need practice.</span> 
             </p>
             <div className="space-y-3 text-sm text-warm-brown-600">
               <div className="flex items-center space-x-2">
@@ -208,7 +208,7 @@ export default function UnifiedConversationInterface({
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="w-4 h-4 text-sage-500" />
-                <span>Instant feedback</span>
+                <span>Get feedback</span>
               </div>
               <div className="flex items-center space-x-2">
                 <Check className="w-4 h-4 text-sage-500" />
