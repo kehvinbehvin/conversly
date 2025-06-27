@@ -132,12 +132,12 @@ export const AVATARS: Avatar[] = [
   },
   {
     name: "Maya",
-    description: "A cycling enthuiast at a cycling event",
+    description: "A cyclist at a cycling event",
     agent_id: "agent_01jyq00m9aev8rq8e6a040rjmv",
   },
   {
     name: "Sam",
-    description: "A mutual friend at a housewarming party",
+    description: "A fellow housewarming guest",
     agent_id: "agent_01jyq0j92gfxdrv3me49xygae1",
   },
 ];
