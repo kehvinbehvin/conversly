@@ -109,6 +109,10 @@ Conversly is a conversational practice application designed to help users improv
   - **State Reset Fix**: Fixed "Back to Start" button to properly reset all conversation state instead of transitioning to processing state
   - **Button Styling Fix**: Resolved inconsistent hover effects on "Back to Start" button through targeted CSS adjustments
   - **Test Coverage**: Created comprehensive tests validating database status updates and error handling logic
+- June 27, 2025: **SEO CONFIGURATION IMPLEMENTED** - Added robots.txt for landing page only indexing
+  - **Robots.txt Created**: Only allows search engine indexing of landing page (/)
+  - **Privacy Protection**: Blocks indexing of dashboard, conversation history, and internal pages
+  - **Landing Page Focus**: Ensures only the anonymous conversation tool is discoverable via search
 - June 27, 2025: **TARGETED SCROLL TO TOP IMPLEMENTED** - Added user-triggered scroll functionality for specific buttons
   - **Start Conversation Scroll**: "Start Conversation" button now scrolls to top when clicked
   - **Start New Conversation Scroll**: "Start New Conversation" button now scrolls to top when clicked

@@ -1,0 +1,13 @@
+User-agent: *
+Allow: /$
+Disallow: /
+
+# Allow only the landing page (root) to be indexed
+# Block all other pages including:
+# - /dashboard
+# - /conversation/*
+# - /history
+# - /storage
+# - API endpoints
+
+Sitemap: https://your-domain.com/sitemap.xml
