@@ -101,6 +101,14 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 27, 2025: **ENVIRONMENT-AWARE WEBHOOK AND AGENT CONFIGURATION IMPLEMENTED** - Complete system for dev/production environment separation
+  - **Agent Configuration**: AVATARS array now automatically switches between development and production agent IDs based on NODE_ENV
+  - **Webhook Secret Management**: Environment-aware webhook verification using ELEVENLABS_WEBHOOK_SECRET_DEV for development and ELEVENLABS_WEBHOOK_SECRET for production
+  - **Environment Detection**: Universal utility function works on both server-side (NODE_ENV) and client-side (Vite import.meta.env)
+  - **Development Agents**: agent_01jyfb9fh8f67agfzvv09tvg3t (Jessie), agent_01jypzmj9heh3rhmn47anjbsr8 (Shawn), agent_01jyq00m9aev8rq8e6a040rjmv (Maya), agent_01jyq0j92gfxdrv3me49xygae1 (Sam)
+  - **Production Agents**: agent_01jys1g9ndfcqthwrs8p9fy4bn (Jessie), agent_01jys1h6dfe0dt1x186wkqcnmb (Shawn), agent_01jys1jsmje7wvb6vak1dt4t54 (Maya), agent_01jys1hz8zf9crk3j8aq7hnk9b (Sam)
+  - **Enhanced Error Handling**: Clear error messages when webhook secrets are missing for specific environments
+  - **Test Coverage**: Updated avatar selection tests to validate both environment configurations
 - June 27, 2025: **PRODUCTION SSE DEPLOYMENT ISSUE RESOLVED** - Fixed CORS conflict causing conversations to hang after ending in production
   - **Root Cause**: SSE endpoint bypassed main CORS configuration with wildcard origin, causing browser CORS violations in production
   - **Primary Fix**: Removed conflicting CORS headers from SSE endpoint, allowing main CORS middleware to handle all origin validation
