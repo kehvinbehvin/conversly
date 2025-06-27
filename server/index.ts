@@ -12,6 +12,9 @@ app.use(cors({
     // Application domains
     'https://conversly.space',
     'https://5ce5254b-6ab1-414d-8435-b8bc8f1a7dee-00-3gmc41dozejlm.worf.replit.dev',
+    // Replit internal domains (for webhooks)
+    /^https:\/\/.*\.replit\.dev$/,
+    /^https:\/\/.*\.replit\.co$/,
     // External service domains
     'https://api.braintrust.dev',
     'https://braintrust.dev',

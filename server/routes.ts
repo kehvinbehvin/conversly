@@ -25,7 +25,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Ensure anonymous user exists
   async function ensureAnonymousUser() {
     try {
-      let anonymousUser = await storage.getUserByEmail("anonymous@conversly.com");
+      let anonymousUser = await storage.getUserByEmail(
+        "anonymous@conversly.com",
+      );
       if (!anonymousUser) {
         anonymousUser = await storage.createUser({
           email: "anonymous@conversly.com",
@@ -158,15 +160,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
         const review = await storage.getReviewByConversationId(id);
 
         // Include transcript data if available
-        const transcript = conversation.transcriptId ? 
-          await storage.getTranscript(conversation.transcriptId) : null;
+        const transcript = conversation.transcriptId
+          ? await storage.getTranscript(conversation.transcriptId)
+          : null;
 
         res.json({
           ...conversation,
           review,
           transcript,
           // Helper flags for frontend
-          isComplete: conversation.status === 'completed' && !!review,
+          isComplete: conversation.status === "completed" && !!review,
         });
       } catch (error) {
         console.error("Error fetching conversation:", error);
@@ -186,7 +189,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
         // Validate required userId parameter
         let validatedUserId = userId;
-        
+
         // If no userId provided, use demo user
         if (!validatedUserId) {
           const user = await storage.getUserByEmail("demo@conversly.com");
@@ -195,7 +198,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           }
           validatedUserId = user.id;
         }
-        if (process.env.NODE_ENV !== 'test') {
+        if (process.env.NODE_ENV !== "test") {
           const user = await storage.getUser(userId);
           if (!user) {
             return res.status(404).json({ message: "User not found" });
@@ -204,10 +207,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
         }
 
         // Check if conversation with this ElevenLabs ID already exists (only for webhook handling)
-        if (elevenlabsConversationId && req.headers['elevenlabs-signature']) {
-          const existingConversation = await storage.getConversationByElevenlabsId(elevenlabsConversationId);
+        if (elevenlabsConversationId && req.headers["elevenlabs-signature"]) {
+          const existingConversation =
+            await storage.getConversationByElevenlabsId(
+              elevenlabsConversationId,
+            );
           if (existingConversation) {
-            console.log("📝 Conversation already exists:", existingConversation.id, "for ElevenLabs ID:", elevenlabsConversationId);
+            console.log(
+              "📝 Conversation already exists:",
+              existingConversation.id,
+              "for ElevenLabs ID:",
+              elevenlabsConversationId,
+            );
             return res.json(existingConversation);
           }
         }
@@ -221,7 +232,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
         };
 
         const conversation = await storage.createConversation(conversationData);
-        console.log("📝 Created conversation:", conversation.id, "for ElevenLabs ID:", elevenlabsConversationId);
+        console.log(
+          "📝 Created conversation:",
+          conversation.id,
+          "for ElevenLabs ID:",
+          elevenlabsConversationId,
+        );
         console.log("📝 Request body:", JSON.stringify(req.body, null, 2));
         console.log("📝 Call stack trace for conversation creation");
         res.status(201).json(conversation);
@@ -357,6 +373,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }),
     verifyWebhookSignature,
     async (req, res) => {
+      console.log("Webhook request", req);
       const startTime = Date.now();
       console.log(
         "🎯 ElevenLabs webhook received at",
@@ -367,6 +384,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Log request headers for debugging
         console.log("📋 Webhook headers:", {
           "content-type": req.headers["content-type"],
+          "host": req.headers["host"],
+          "origin": req.headers["origin"],
+          "referer": req.headers["referer"],
           "elevenlabs-signature": req.headers["elevenlabs-signature"]
             ? "present"
             : "missing",
@@ -393,25 +413,44 @@ export async function registerRoutes(app: Express): Promise<Server> {
         );
 
         // Validate webhook payload structure
-        if (!webhookData || typeof webhookData !== 'object') {
+        if (!webhookData || typeof webhookData !== "object") {
           console.error("❌ Invalid webhook payload structure");
           return res.status(400).json({ message: "Invalid webhook payload" });
         }
 
-        if (!webhookData.data || typeof webhookData.data !== 'object') {
-          console.error("❌ Missing or invalid 'data' field in webhook payload");
-          console.error("📋 Available top-level fields:", Object.keys(webhookData));
-          return res.status(400).json({ message: "Missing or invalid data field" });
+        if (!webhookData.data || typeof webhookData.data !== "object") {
+          console.error(
+            "❌ Missing or invalid 'data' field in webhook payload",
+          );
+          console.error(
+            "📋 Available top-level fields:",
+            Object.keys(webhookData),
+          );
+          return res
+            .status(400)
+            .json({ message: "Missing or invalid data field" });
         }
 
         // Extract data from the nested structure with validation
-        const { conversation_id, transcript: transcriptArray, metadata, analysis } = webhookData.data;
+        const {
+          conversation_id,
+          transcript: transcriptArray,
+          metadata,
+          analysis,
+        } = webhookData.data;
 
         // Validate required fields
-        if (!conversation_id || typeof conversation_id !== 'string') {
-          console.error("❌ Missing or invalid conversation_id in webhook payload");
-          console.error("📋 Available data fields:", Object.keys(webhookData.data || {}));
-          return res.status(400).json({ message: "Missing or invalid conversation_id" });
+        if (!conversation_id || typeof conversation_id !== "string") {
+          console.error(
+            "❌ Missing or invalid conversation_id in webhook payload",
+          );
+          console.error(
+            "📋 Available data fields:",
+            Object.keys(webhookData.data || {}),
+          );
+          return res
+            .status(400)
+            .json({ message: "Missing or invalid conversation_id" });
         }
 
         console.log(
@@ -423,12 +462,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         let transcriptData: TranscriptObject[] = [];
         if (transcriptArray && Array.isArray(transcriptArray)) {
           transcriptData = transcriptArray
-            .filter((turn) => turn && typeof turn === 'object' && turn.role && turn.message)
+            .filter(
+              (turn) =>
+                turn && typeof turn === "object" && turn.role && turn.message,
+            )
             .map((turn, index) => ({
               index: index,
-              role: turn.role === 'agent' ? 'agent' : 'user',
+              role: turn.role === "agent" ? "agent" : "user",
               message: turn.message,
-              time_in_call_secs: turn.time_in_call_secs || 0
+              time_in_call_secs: turn.time_in_call_secs || 0,
             }));
         }
 
@@ -462,16 +504,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Find conversation by ElevenLabs ID
         let conversation;
         try {
-          conversation = await storage.getConversationByElevenlabsId(conversation_id);
+          conversation =
+            await storage.getConversationByElevenlabsId(conversation_id);
         } catch (storageError) {
-          console.error("❌ Database error while finding conversation:", storageError);
-          return res.status(500).json({ message: "Database error finding conversation" });
+          console.error(
+            "❌ Database error while finding conversation:",
+            storageError,
+          );
+          return res
+            .status(500)
+            .json({ message: "Database error finding conversation" });
         }
 
         if (!conversation) {
-          console.log(`🔍 No existing conversation found for ElevenLabs ID: ${conversation_id}`);
-          console.log("⚠️ This shouldn't happen as conversations should be created on connect");
-          
+          console.log(
+            `🔍 No existing conversation found for ElevenLabs ID: ${conversation_id}`,
+          );
+          console.log(
+            "⚠️ This shouldn't happen as conversations should be created on connect",
+          );
+
           // Try anonymous user first, then demo user as fallback
           let user = await storage.getUserByEmail("anonymous@conversly.com");
           if (!user) {
@@ -487,15 +539,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
             userId: user.id,
             status: "completed" as const,
             elevenlabsConversationId: conversation_id,
-            metadata: { webhookReceived: true, fallbackCreated: true, ...callMetadata },
+            metadata: {
+              webhookReceived: true,
+              fallbackCreated: true,
+              ...callMetadata,
+            },
           };
 
           try {
             conversation = await storage.createConversation(conversationData);
-            console.log("⚠️ Created fallback conversation:", conversation.id, "for ElevenLabs ID:", conversation_id);
+            console.log(
+              "⚠️ Created fallback conversation:",
+              conversation.id,
+              "for ElevenLabs ID:",
+              conversation_id,
+            );
           } catch (createError) {
             console.error("❌ Failed to create conversation:", createError);
-            return res.status(500).json({ message: "Failed to create conversation" });
+            return res
+              .status(500)
+              .json({ message: "Failed to create conversation" });
           }
         }
 
@@ -510,7 +573,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
         console.log("📝 Updating conversation with:", {
           transcriptTurns: transcriptData.length,
           hasAudioUrl: !!audio_url,
-          audioUrl: audio_url && typeof audio_url === 'string' ? String(audio_url).substring(0, 50) + "..." : null,
+          audioUrl:
+            audio_url && typeof audio_url === "string"
+              ? String(audio_url).substring(0, 50) + "..."
+              : null,
           metadata: callMetadata,
         });
 
@@ -520,7 +586,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
             conversation.id,
             transcriptData,
             audio_url,
-            callMetadata
+            callMetadata,
           );
           console.log("✅ Conversation updated successfully");
         } catch (updateError) {
@@ -539,10 +605,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           );
 
           try {
-            const review = await createReviewWithTranscripts(conversation.id, transcriptData);
+            const review = await createReviewWithTranscripts(
+              conversation.id,
+              transcriptData,
+            );
             if (review) {
-              console.log("✅ Review with transcript analysis created successfully:", review.id);
-              
+              console.log(
+                "✅ Review with transcript analysis created successfully:",
+                review.id,
+              );
+
               // Update conversation status to completed
               await storage.updateConversation(conversation.id, {
                 status: "completed",
@@ -552,17 +624,24 @@ export async function registerRoutes(app: Express): Promise<Server> {
               // Notify SSE clients that review is ready
               const sseClient = sseConnections.get(conversation_id);
               if (sseClient && !sseClient.destroyed) {
-                sseClient.write(`data: ${JSON.stringify({
-                  type: "review_ready",
-                  conversationId: conversation_id,
-                  dbConversationId: conversation.id
-                })}\n\n`);
+                sseClient.write(
+                  `data: ${JSON.stringify({
+                    type: "review_ready",
+                    conversationId: conversation_id,
+                    dbConversationId: conversation.id,
+                  })}\n\n`,
+                );
                 console.log("📡 Sent review_ready notification to SSE client");
               } else {
-                console.log("📡 No active SSE connection for conversation:", conversation_id);
+                console.log(
+                  "📡 No active SSE connection for conversation:",
+                  conversation_id,
+                );
               }
             } else {
-              console.error("❌ Failed to create review with transcript analysis");
+              console.error(
+                "❌ Failed to create review with transcript analysis",
+              );
             }
 
             console.log(
@@ -616,21 +695,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
             });
             console.log("⚠️ Conversation status updated to 'empty_transcript'");
           } catch (statusUpdateError) {
-            console.error("❌ Failed to update status for empty transcript:", statusUpdateError);
+            console.error(
+              "❌ Failed to update status for empty transcript:",
+              statusUpdateError,
+            );
           }
 
           // Notify SSE clients that an error occurred due to empty transcript
           const sseClient = sseConnections.get(conversation_id);
           if (sseClient && !sseClient.destroyed) {
-            sseClient.write(`data: ${JSON.stringify({
-              type: "empty_transcript_error",
-              conversationId: conversation_id,
-              dbConversationId: conversation.id,
-              message: "No conversation data was captured. Please try again."
-            })}\n\n`);
-            console.log("📡 Sent empty_transcript_error notification to SSE client");
+            sseClient.write(
+              `data: ${JSON.stringify({
+                type: "empty_transcript_error",
+                conversationId: conversation_id,
+                dbConversationId: conversation.id,
+                message: "No conversation data was captured. Please try again.",
+              })}\n\n`,
+            );
+            console.log(
+              "📡 Sent empty_transcript_error notification to SSE client",
+            );
           } else {
-            console.log("📡 No active SSE connection for conversation:", conversation_id);
+            console.log(
+              "📡 No active SSE connection for conversation:",
+              conversation_id,
+            );
           }
         }
 
@@ -669,48 +758,61 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Transcript routes
   app.get("/api/transcripts/:id", transcriptRoutes.getTranscript);
-  app.post("/api/transcripts", express.json(), transcriptRoutes.createTranscript);
-  app.patch("/api/transcripts/:id", express.json(), transcriptRoutes.updateTranscript);
+  app.post(
+    "/api/transcripts",
+    express.json(),
+    transcriptRoutes.createTranscript,
+  );
+  app.patch(
+    "/api/transcripts/:id",
+    express.json(),
+    transcriptRoutes.updateTranscript,
+  );
 
   // Review routes
   app.get("/api/reviews/:id", reviewRoutes.getReview);
-  app.get("/api/conversations/:conversationId/review", reviewRoutes.getReviewByConversationId);
+  app.get(
+    "/api/conversations/:conversationId/review",
+    reviewRoutes.getReviewByConversationId,
+  );
   app.post("/api/reviews", express.json(), reviewRoutes.createReview);
   app.patch("/api/reviews/:id", express.json(), reviewRoutes.updateReview);
 
-
-
-
-
-
-
   // Add SSE endpoint for real-time notifications
-  app.get('/api/events/:conversationId', (req, res) => {
+  app.get("/api/events/:conversationId", (req, res) => {
     const conversationId = req.params.conversationId;
-    
+
     // Set SSE headers - CORS handled by main middleware
     res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive'
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache",
+      Connection: "keep-alive",
     });
-    
+
     // Store the connection
     sseConnections.set(conversationId, res);
-    console.log('📡 SSE connection established for conversation:', conversationId);
-    
+    console.log(
+      "📡 SSE connection established for conversation:",
+      conversationId,
+    );
+
     // Send initial connection message
-    res.write(`data: ${JSON.stringify({ type: 'connected', conversationId })}\n\n`);
-    
+    res.write(
+      `data: ${JSON.stringify({ type: "connected", conversationId })}\n\n`,
+    );
+
     // Handle client disconnect
-    req.on('close', () => {
+    req.on("close", () => {
       sseConnections.delete(conversationId);
-      console.log('📡 SSE connection closed for conversation:', conversationId);
+      console.log("📡 SSE connection closed for conversation:", conversationId);
     });
-    
-    req.on('aborted', () => {
+
+    req.on("aborted", () => {
       sseConnections.delete(conversationId);
-      console.log('📡 SSE connection aborted for conversation:', conversationId);
+      console.log(
+        "📡 SSE connection aborted for conversation:",
+        conversationId,
+      );
     });
   });
 

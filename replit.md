@@ -119,6 +119,7 @@ Conversly is a conversational practice application designed to help users improv
   - **Professional Setup**: Replaced custom CORS headers with industry-standard cors middleware
   - **Enhanced Security**: Restricted origins to authorized domains only
   - **Application Domains**: conversly.space and Replit deployment domain
+  - **Replit Domain Patterns**: Added regex patterns for *.replit.dev and *.replit.co to handle webhook routing variations
   - **External Services**: Added Braintrust (api.braintrust.dev, braintrust.dev) and ElevenLabs (api.elevenlabs.io, elevenlabs.io)
   - **Development Support**: Includes localhost origins for local development
   - **Webhook Support**: Included elevenlabs-signature header for webhook authentication
