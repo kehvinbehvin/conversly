@@ -58,8 +58,8 @@ describe('Review Analyzer', () => {
     ];
 
     const mockReviews: ReviewObject[] = [
-      { index: 0, review: 'Good greeting' },
-      { index: 2, review: 'Polite response' }
+      { index: 0, review: 'Good greeting', category: 'complement' },
+      { index: 2, review: 'Polite response', category: 'improvement' }
       // Note: missing review for index 1 to test null handling
     ];
 
@@ -97,16 +97,20 @@ describe('Review Analyzer', () => {
     });
   });
 
-  it('should generate appropriate summary and rating', async () => {
+  it('should calculate score correctly based on review categories', async () => {
     const { analyzeConversationWithBraintrust } = await import('../services/braintrust');
     const mockAnalyze = vi.mocked(analyzeConversationWithBraintrust);
 
     const transcriptData: TranscriptObject[] = [
-      { index: 0, role: 'agent', message: 'Test message', time_in_call_secs: 1 }
+      { index: 0, role: 'agent', message: 'Test message 1', time_in_call_secs: 1 },
+      { index: 1, role: 'user', message: 'Test message 2', time_in_call_secs: 3 },
+      { index: 2, role: 'agent', message: 'Test message 3', time_in_call_secs: 5 }
     ];
 
     const mockReviews: ReviewObject[] = [
-      { index: 0, review: 'Test review feedback' }
+      { index: 0, review: 'Great response', category: 'complement' },
+      { index: 1, review: 'Could be better', category: 'improvement' },
+      { index: 2, review: 'Good follow-up', category: 'complement' }
     ];
 
     mockAnalyze.mockResolvedValueOnce({ reviews: mockReviews });
@@ -114,8 +118,8 @@ describe('Review Analyzer', () => {
     const review = await createReviewWithTranscripts(testConversationId, transcriptData);
 
     expect(review?.summary).toContain('Conversation analysis');
-    expect(review?.overallRating).toBeGreaterThanOrEqual(1);
-    expect(review?.overallRating).toBeLessThanOrEqual(5);
+    // Score should be: +1 (complement) -1 (improvement) +1 (complement) = +1
+    expect(review?.overallRating).toBe(1);
   });
 
   it('should handle Braintrust analysis errors gracefully', async () => {
@@ -143,5 +147,28 @@ describe('Review Analyzer', () => {
 
     expect(review?.transcriptWithReviews).toHaveLength(0);
     expect(review?.summary).toContain('Conversation analysis');
+    expect(review?.overallRating).toBe(0); // No reviews = score of 0
+  });
+
+  it('should handle missing category data and calculate negative scores', async () => {
+    const { analyzeConversationWithBraintrust } = await import('../services/braintrust');
+    const mockAnalyze = vi.mocked(analyzeConversationWithBraintrust);
+
+    const transcriptData: TranscriptObject[] = [
+      { index: 0, role: 'agent', message: 'Test message 1', time_in_call_secs: 1 },
+      { index: 1, role: 'user', message: 'Test message 2', time_in_call_secs: 3 }
+    ];
+
+    const mockReviews: ReviewObject[] = [
+      { index: 0, review: 'Needs improvement', category: 'improvement' },
+      { index: 1, review: 'Poor response', category: 'improvement' }
+    ];
+
+    mockAnalyze.mockResolvedValueOnce({ reviews: mockReviews });
+
+    const review = await createReviewWithTranscripts(testConversationId, transcriptData);
+
+    // Score should be: -1 (improvement) -1 (improvement) = -2
+    expect(review?.overallRating).toBe(-2);
   });
 });

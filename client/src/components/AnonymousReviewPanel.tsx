@@ -101,7 +101,10 @@ export default function AnonymousReviewPanel() {
               Conversation with Feedback
             </h4>
             <div className="text-lg font-bold text-warm-brown-800 bg-yellow-50 px-3 py-1 rounded">
-              {review.overallRating || 0}/5
+              {(() => {
+                const score = review.overallRating ?? 0;
+                return `Score: ${score > 0 ? '+' : ''}${score}`;
+              })()}
             </div>
           </div>
 

@@ -22,12 +22,23 @@ export async function createReviewWithTranscripts(conversationId: number, transc
       };
     });
     
-    // Generate summary and rating
+    // Generate summary and calculate score based on review categories
     const reviewCount = reviewObjects.length;
     const summary = reviewCount > 0 
       ? `Conversation analysis completed with ${reviewCount} review items for conversation turns.`
       : "Conversation analysis completed - practice session finished successfully.";
-    const overallRating = Math.max(1, Math.min(5, 4 - Math.floor(reviewCount / 5)));
+    
+    // Calculate score: +1 for complement, -1 for improvement, 0 for missing category
+    const overallRating = reviewObjects.reduce((score, reviewItem) => {
+      if (reviewItem.category === "complement") {
+        return score + 1;
+      } else if (reviewItem.category === "improvement") {
+        return score - 1;
+      } else {
+        // Default to 0 for missing or invalid category data
+        return score;
+      }
+    }, 0);
 
     // Create review record with merged transcript and review data
     const review = await storage.createReview({

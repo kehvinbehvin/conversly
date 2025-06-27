@@ -122,11 +122,11 @@ export default function ConversationDetail({ id }: { id: string }) {
             </div>
 
             <div className="flex items-center space-x-4">
-              {review?.overallRating && (
+              {review?.overallRating !== null && review?.overallRating !== undefined && (
                 <div className="flex items-center space-x-2">
                   <Star className="w-5 h-5 text-coral-500 fill-current" />
                   <span className="text-xl font-bold text-warm-brown-800">
-                    {review.overallRating}/5
+                    Score: {review.overallRating > 0 ? '+' : ''}{review.overallRating}
                   </span>
                 </div>
               )}

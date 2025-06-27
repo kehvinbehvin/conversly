@@ -41,7 +41,7 @@ export const reviews = pgTable("reviews", {
   id: serial("id").primaryKey(),
   conversationId: integer("conversation_id").notNull(),
   summary: text("summary").notNull(),
-  overallRating: integer("overall_rating"), // 1-5 scale
+  overallRating: integer("overall_rating"), // Score: +1 per complement, -1 per improvement
   transcriptWithReviews: jsonb("transcript_with_reviews").notNull(), // Merged transcript and review data
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
@@ -87,6 +87,7 @@ export type TranscriptObject = {
 export type ReviewObject = {
   index: number;
   review: string;
+  category: "complement" | "improvement";
 };
 
 export type TranscriptWithReview = TranscriptObject & {
