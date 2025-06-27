@@ -9,6 +9,7 @@ import { AVATARS } from "@shared/schema";
 import type { TranscriptWithReview, Avatar } from "@shared/schema";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useConversationTimer } from "@/hooks/useConversationTimer";
+import { trackConversationEvent, trackAvatarSelection, trackButtonClick, trackReviewEvent } from "@/lib/gtm";
 
 interface UnifiedConversationInterfaceProps {
   agentId?: string; // Made optional since we'll manage it internally
@@ -35,9 +36,12 @@ export default function UnifiedConversationInterface({
   
 
 
-  // Log avatar selection for debugging
+  // Handle avatar selection with GTM tracking
   const handleAvatarSelect = (avatar: Avatar) => {
     console.log(`👤 Avatar selected: ${avatar.name} (${avatar.agent_id})`);
+    trackAvatarSelection(avatar.agent_id, avatar.name, {
+      avatar_description: avatar.description,
+    });
     setSelectedAvatar(avatar);
   };
 

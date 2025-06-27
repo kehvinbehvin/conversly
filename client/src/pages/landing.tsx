@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -9,9 +10,37 @@ import {
 } from "lucide-react";
 import { AnonymousConversationProvider } from "@/contexts/AnonymousConversationContext";
 import UnifiedConversationInterface from "@/components/UnifiedConversationInterface";
+import { trackPageView, trackButtonClick, trackSectionView } from "@/lib/gtm";
 
 export default function Landing() {
+  // Track landing page view on component mount
+  useEffect(() => {
+    trackPageView('Landing Page', 'Homepage');
+    
+    // Set up intersection observer for section tracking
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+            const sectionId = entry.target.id;
+            if (sectionId) {
+              trackSectionView(sectionId);
+            }
+          }
+        });
+      },
+      { threshold: 0.5 }
+    );
+
+    // Observe all sections
+    const sections = document.querySelectorAll('section[id]');
+    sections.forEach((section) => observer.observe(section));
+
+    return () => observer.disconnect();
+  }, []);
+
   const scrollToSection = (id: string) => {
+    trackButtonClick(`Scroll to ${id}`, 'Navigation');
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
