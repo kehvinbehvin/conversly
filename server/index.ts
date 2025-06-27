@@ -9,8 +9,14 @@ const app = express();
 // Enable CORS for specific origins only
 app.use(cors({
   origin: [
+    // Application domains
     'https://conversly.space',
     'https://5ce5254b-6ab1-414d-8435-b8bc8f1a7dee-00-3gmc41dozejlm.worf.replit.dev',
+    // External service domains
+    'https://api.braintrust.dev',
+    'https://braintrust.dev',
+    'https://api.elevenlabs.io',
+    'https://elevenlabs.io',
     // Allow localhost for development
     'http://localhost:5000',
     'http://127.0.0.1:5000'

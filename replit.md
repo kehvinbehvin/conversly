@@ -111,8 +111,9 @@ Conversly is a conversational practice application designed to help users improv
   - **Test Coverage**: Created comprehensive tests validating database status updates and error handling logic
 - June 27, 2025: **CORS CONFIGURATION ENHANCED** - Upgraded from custom middleware to dedicated cors package with restricted origins
   - **Professional Setup**: Replaced custom CORS headers with industry-standard cors middleware
-  - **Enhanced Security**: Restricted origins to conversly.space and Replit deployment domain only
-  - **Authorized Domains**: Only allows conversly.space and 5ce5254b-6ab1-414d-8435-b8bc8f1a7dee-00-3gmc41dozejlm.worf.replit.dev
+  - **Enhanced Security**: Restricted origins to authorized domains only
+  - **Application Domains**: conversly.space and Replit deployment domain
+  - **External Services**: Added Braintrust (api.braintrust.dev, braintrust.dev) and ElevenLabs (api.elevenlabs.io, elevenlabs.io)
   - **Development Support**: Includes localhost origins for local development
   - **Webhook Support**: Included elevenlabs-signature header for webhook authentication
 - June 27, 2025: **SEO CONFIGURATION IMPLEMENTED** - Added robots.txt for landing page only indexing
