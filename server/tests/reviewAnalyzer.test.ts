@@ -63,7 +63,10 @@ describe('Review Analyzer', () => {
       // Note: missing review for index 1 to test null handling
     ];
 
-    mockAnalyze.mockResolvedValueOnce({ reviews: mockReviews });
+    mockAnalyze.mockResolvedValueOnce({ 
+      reviews: mockReviews, 
+      summary: 'Test conversation analysis completed' 
+    });
 
     const review = await createReviewWithTranscripts(testConversationId, transcriptData);
 
@@ -113,11 +116,14 @@ describe('Review Analyzer', () => {
       { index: 2, review: 'Good follow-up', category: 'complement' }
     ];
 
-    mockAnalyze.mockResolvedValueOnce({ reviews: mockReviews });
+    mockAnalyze.mockResolvedValueOnce({ 
+      reviews: mockReviews, 
+      summary: 'Overall good conversation with areas for improvement' 
+    });
 
     const review = await createReviewWithTranscripts(testConversationId, transcriptData);
 
-    expect(review?.summary).toContain('Conversation analysis');
+    expect(review?.summary).toBe('Overall good conversation with areas for improvement');
     // Score should be: +1 (complement) -1 (improvement) +1 (complement) = +1
     expect(review?.overallRating).toBe(1);
   });
@@ -141,12 +147,15 @@ describe('Review Analyzer', () => {
     const { analyzeConversationWithBraintrust } = await import('../services/braintrust');
     const mockAnalyze = vi.mocked(analyzeConversationWithBraintrust);
 
-    mockAnalyze.mockResolvedValueOnce({ reviews: [] });
+    mockAnalyze.mockResolvedValueOnce({ 
+      reviews: [], 
+      summary: '' 
+    });
 
     const review = await createReviewWithTranscripts(testConversationId, []);
 
     expect(review?.transcriptWithReviews).toHaveLength(0);
-    expect(review?.summary).toContain('Conversation analysis');
+    expect(review?.summary).toBe('Summary not available'); // Fallback when empty
     expect(review?.overallRating).toBe(0); // No reviews = score of 0
   });
 
@@ -164,7 +173,10 @@ describe('Review Analyzer', () => {
       { index: 1, review: 'Poor response', category: 'improvement' }
     ];
 
-    mockAnalyze.mockResolvedValueOnce({ reviews: mockReviews });
+    mockAnalyze.mockResolvedValueOnce({ 
+      reviews: mockReviews, 
+      summary: 'Areas for improvement identified in conversation' 
+    });
 
     const review = await createReviewWithTranscripts(testConversationId, transcriptData);
 

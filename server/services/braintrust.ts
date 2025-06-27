@@ -3,6 +3,7 @@ import type { ReviewObject, TranscriptObject } from "@shared/schema";
 
 export interface BraintrustResponse {
   reviews: ReviewObject[];
+  summary: string;
 }
 
 export async function analyzeConversationWithBraintrust(
@@ -20,13 +21,18 @@ export async function analyzeConversationWithBraintrust(
 
     console.log('🧠 Raw Braintrust response:', JSON.stringify(result, null, 2));
 
-    // Handle the new response format with reviews
+    // Handle the new response format with reviews and summary
     let reviews: ReviewObject[] = [];
+    let summary: string = "";
     const typedResult = result as any;
+    
     if (typedResult.reviews && Array.isArray(typedResult.reviews)) {
       reviews = typedResult.reviews;
+      summary = typedResult.summary || "";
     } else if (Array.isArray(typedResult)) {
+      // Legacy format - array of reviews only
       reviews = typedResult;
+      summary = "";
     }
 
     const validatedReviews = reviews
@@ -43,7 +49,7 @@ export async function analyzeConversationWithBraintrust(
       })
       .filter(Boolean) as ReviewObject[];
 
-    return { reviews: validatedReviews };
+    return { reviews: validatedReviews, summary };
   } catch (error) {
     console.error("Braintrust analysis error:", error);
     throw new Error(

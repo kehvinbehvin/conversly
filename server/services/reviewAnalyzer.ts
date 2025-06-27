@@ -20,9 +20,11 @@ export async function createReviewWithTranscripts(
     const braintrustResponse =
       await analyzeConversationWithBraintrust(transcriptString);
 
-    // Extract review objects from Braintrust response
+    // Extract review objects and summary from Braintrust response
     const reviewObjects: ReviewObject[] = braintrustResponse.reviews || [];
+    const braintrustSummary: string = braintrustResponse.summary || "";
     console.log("Review objects from Braintrust:", reviewObjects);
+    console.log("Summary from Braintrust:", braintrustSummary);
 
     // Merge transcript data with review data based on index
     const transcriptWithReviews: TranscriptWithReview[] = transcriptData.map(
@@ -37,12 +39,10 @@ export async function createReviewWithTranscripts(
       },
     );
 
-    // Generate summary and calculate score based on review categories
-    const reviewCount = reviewObjects.length;
-    const summary =
-      reviewCount > 0
-        ? `Conversation analysis completed with ${reviewCount} review items for conversation turns.`
-        : "Conversation analysis completed - practice session finished successfully.";
+    // Use Braintrust summary with fallback logic
+    const summary = braintrustSummary && braintrustSummary.trim() 
+      ? braintrustSummary.trim()
+      : "Summary not available";
 
     // Calculate score: +1 for complement, -1 for improvement, 0 for missing category
     const overallRating = reviewObjects.reduce((score, reviewItem) => {

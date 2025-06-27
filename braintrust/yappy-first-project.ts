@@ -16,7 +16,7 @@ export const conversationConsultant_7a00 = project.prompts.create({
   id: "82e81aa9-80d7-48e7-8bea-d0a7862dcda0",
   name: "Conversation Consultant",
   slug: "conversation-consultant-7a00",
-  version: "8fbc071b2e3fed1d", 
+  version: "c77da954a09e6610", 
   model: "gpt-4o",
   messages: [
     {
@@ -53,6 +53,7 @@ export const conversationConsultant_7a00 = project.prompts.create({
         '1. **index**: quote the exact user-utterance you’re addressing\n' +
         "2. **review**: analyse the user's response in the conversation, offer constructive feedback based on your knowledge base, else provided positive feedback based on your knowledge base too..\n" +
         '3. **category**: analyse the review that you are giving to the user and label it as a complement when the user displayed a good conversation technique or improvement if the user needs advice in conversation techniques\n' +
+        "4. Other than the feedback objects, you are to analyse all the reviews that you are giving and give a short summary on what principles the user should focus on citing references from your knowledge based on the user's performance in the transcript. \n" +
         '\n' +
         'Only suggest improvements if you think the individual may be lacking in a skill in conversation taught in our knowledge. Else provide positive feedback on what the user can continue doing.\n' +
         '\n' +
@@ -70,7 +71,8 @@ export const conversationConsultant_7a00 = project.prompts.create({
         '      "index": number,\n' +
         '      "review": string\n' +
         '    }\n' +
-        '  ]\n' +
+        '  ],\n' +
+        '  "summary": string\n' +
         '}\n' +
         '\n' +
         '````\n' +
@@ -1011,7 +1013,7 @@ export const conversationConsultant_7a00 = project.prompts.create({
           type: 'object',
           title: 'ConversationFeedbackResponse',
           '$schema': 'http://json-schema.org/draft-07/schema#',
-          required: [ 'reviews' ],
+          required: [ 'reviews', 'summary' ],
           properties: {
             reviews: {
               type: 'array',
@@ -1037,6 +1039,10 @@ export const conversationConsultant_7a00 = project.prompts.create({
                 additionalProperties: false
               },
               description: 'A list of feedback review objects'
+            },
+            summary: {
+              type: 'string',
+              description: "Summary of the entire transcript based on the user's performance"
             }
           },
           description: 'Container object holding a list of review objects for the user',
