@@ -230,26 +230,25 @@
   }
 
   .btn-primary:hover {
-    box-shadow: var(--shadow-md) !important;
-    transform: translateY(-1px) !important;
-    background-color: hsl(var(--color-primary-hover)) !important;
+    box-shadow: var(--shadow-md);
+    transform: translateY(-1px);
   }
 
   .btn-secondary {
-    background-color: hsl(var(--color-secondary-light)) !important;
-    color: hsl(var(--color-secondary)) !important;
-    border: 1px solid hsl(var(--color-border)) !important;
-    border-radius: var(--radius-lg) !important;
-    padding: var(--space-3) var(--space-6) !important;
-    font-weight: var(--font-weight-medium) !important;
-    transition: all 0.2s ease-in-out !important;
+    background-color: hsl(var(--color-secondary-light));
+    color: hsl(var(--color-secondary));
+    border: 1px solid hsl(var(--color-border));
+    border-radius: var(--radius-lg);
+    padding: var(--space-3) var(--space-6);
+    font-weight: var(--font-weight-medium);
+    transition: all 0.2s ease-in-out;
   }
 
   .btn-secondary:hover {
     background-color: hsl(var(--color-surface-hover)) !important;
     border-color: hsl(var(--color-secondary)) !important;
-    transform: translateY(-1px) !important;
-    box-shadow: var(--shadow-base) !important;
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-base);
   }
 
   .card-surface {
