@@ -3,6 +3,7 @@ import express from "express";
 import bodyParser from "body-parser";
 import { createServer, type Server } from "http";
 import { createHmac, timingSafeEqual } from "crypto";
+import path from "path";
 // Removed WebSocket import - using SSE instead
 import { ElevenLabsClient } from "@elevenlabs/elevenlabs-js";
 import { storage } from "./storage";
@@ -45,6 +46,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Initialize anonymous user on server start
   await ensureAnonymousUser();
+
+  // Serve static files that should not be processed by React router
+  app.use("/sitemap.xml", express.static(path.resolve(import.meta.dirname, "..", "client", "public")));
+  app.use("/robots.txt", express.static(path.resolve(import.meta.dirname, "..", "client", "public")));
 
   // Get current user (demo user for MVP)
   app.get(
