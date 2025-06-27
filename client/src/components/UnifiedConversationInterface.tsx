@@ -28,16 +28,8 @@ export default function UnifiedConversationInterface({
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
   
-  // Simple scroll to top utility
-  const scrollToTop = () => {
-    console.log('📍 Scrolling to top');
-    window.scrollTo({
-      top: 0,
-      behavior: 'smooth'
-    });
-  };
-
-
+  // Ref for scrolling to conversation interface
+  const conversationRef = useRef<HTMLDivElement>(null);
 
   // Log avatar selection for debugging
   const handleAvatarSelect = (avatar: Avatar) => {
@@ -68,19 +60,16 @@ export default function UnifiedConversationInterface({
     }
   }, [isSpeaking, isConnected, selectedAvatar.name]);
 
-  // Scroll to top when starting conversation
+  // Auto-scroll to conversation interface when conversation starts
   useEffect(() => {
-    if (isConnecting || isConnected) {
-      scrollToTop();
+    if ((isConnecting || isConnected) && conversationRef.current) {
+      console.log("📍 Auto-scrolling to conversation interface");
+      conversationRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
     }
   }, [isConnecting, isConnected]);
-
-  // Scroll to top when review is ready
-  useEffect(() => {
-    if (isReviewReady) {
-      scrollToTop();
-    }
-  }, [isReviewReady]);
 
   // Determine current state
   const getState = (): ConversationState => {
@@ -165,8 +154,14 @@ export default function UnifiedConversationInterface({
     // Reset to idle state without auto-starting
     resetForNewConversation();
     
-    // Auto-scroll back to idle state anchor for new conversation
-    setTimeout(() => scrollToStateAnchor("idle"), 100);
+    // Auto-scroll back to conversation interface for new conversation
+    if (conversationRef.current) {
+      console.log("📍 Auto-scrolling to conversation interface for new conversation");
+      conversationRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
   };
 
   const handleRetry = () => {
