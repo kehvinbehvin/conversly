@@ -42,11 +42,6 @@ export default function Landing() {
                 >
                   Features
                 </button>
-                <Link href="/dashboard">
-                  <Button className="bg-coral-500 text-white px-6 py-2 rounded-full font-medium hover:bg-coral-600 transition-colors shadow-sm">
-                    Get Started
-                  </Button>
-                </Link>
               </div>
             </div>
           </div>
@@ -252,12 +247,6 @@ export default function Landing() {
             </p>
 
             <div className="space-y-6">
-              <Link href="/dashboard">
-                <Button className="bg-coral-500 text-white px-8 py-4 rounded-full text-lg font-semibold hover:bg-coral-600 transform hover:scale-105 transition-all duration-200 shadow-lg hover:shadow-xl">
-                  Start Your First Conversation
-                </Button>
-              </Link>
-
               <div className="flex flex-col sm:flex-row items-center justify-center space-y-2 sm:space-y-0 sm:space-x-8 text-warm-brown-200">
                 <div className="flex items-center space-x-2">
                   <Check className="w-5 h-5 text-sage-400" />
@@ -307,14 +296,6 @@ export default function Landing() {
                   >
                     Features
                   </button>
-                </li>
-                <li>
-                  <Link
-                    href="/dashboard"
-                    className="hover:text-white transition-colors"
-                  >
-                    Get Started
-                  </Link>
                 </li>
               </ul>
             </div>
