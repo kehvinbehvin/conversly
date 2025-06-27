@@ -98,8 +98,16 @@ Conversly is a conversational practice application designed to help users improv
 - **TypeScript**: Strict mode with ESNext modules
 - **Path Aliases**: @ for client, @shared for shared code
 - **CSS Processing**: PostCSS with Tailwind and Autoprefixer
+- **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 27, 2025: **SCORING SYSTEM IMPLEMENTATION COMPLETED** - Replaced 1-5 rating system with complement/improvement based scoring
+  - **New Scoring Logic**: Complements add +1, improvements subtract -1, starting from 0 baseline
+  - **Braintrust Integration**: Updated prompt to return category field ("complement" | "improvement") for each review
+  - **UI Updates**: Score display now shows "+3" or "-2" format instead of rating fractions
+  - **Database Schema**: Reused existing overall_rating column to store positive/negative scores
+  - **Configuration Management**: Added requirement to run `braintrust pull --project-name "Yappy-first-project"` after prompt updates
+  - **End-to-End Validation**: Confirmed scoring works correctly with real conversation analysis
 - June 26, 2025: **AVATAR SELECTION FEATURE COMPLETED** - Multi-agent conversation system with user choice
   - **Agent Selection Interface**: 2x2 grid layout (desktop/tablet) and vertical stack (mobile) for 4 conversation avatars
   - **Dynamic Agent Integration**: Each avatar maps to unique ElevenLabs agent_id for personalized conversations

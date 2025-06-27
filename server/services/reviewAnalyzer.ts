@@ -1,33 +1,49 @@
 import { analyzeConversationWithBraintrust } from "./braintrust";
 import { storage } from "../storage";
-import type { Conversation, Review, TranscriptObject, ReviewObject, TranscriptWithReview } from "@shared/schema";
+import type {
+  Conversation,
+  Review,
+  TranscriptObject,
+  ReviewObject,
+  TranscriptWithReview,
+} from "@shared/schema";
 
-export async function createReviewWithTranscripts(conversationId: number, transcriptData: TranscriptObject[]): Promise<Review | null> {
+export async function createReviewWithTranscripts(
+  conversationId: number,
+  transcriptData: TranscriptObject[],
+): Promise<Review | null> {
   try {
     // Convert transcript data to string format for LLM analysis
     const transcriptString = JSON.stringify(transcriptData);
-    
+
     // Run AI analysis with new input format
-    const braintrustResponse = await analyzeConversationWithBraintrust(transcriptString);
-    
+    const braintrustResponse =
+      await analyzeConversationWithBraintrust(transcriptString);
+
     // Extract review objects from Braintrust response
     const reviewObjects: ReviewObject[] = braintrustResponse.reviews || [];
-    
+    console.log("Review objects from Braintrust:", reviewObjects);
+
     // Merge transcript data with review data based on index
-    const transcriptWithReviews: TranscriptWithReview[] = transcriptData.map(transcriptItem => {
-      const matchingReview = reviewObjects.find(review => review.index === transcriptItem.index);
-      return {
-        ...transcriptItem,
-        review: matchingReview?.review || null
-      };
-    });
-    
+    const transcriptWithReviews: TranscriptWithReview[] = transcriptData.map(
+      (transcriptItem) => {
+        const matchingReview = reviewObjects.find(
+          (review) => review.index === transcriptItem.index,
+        );
+        return {
+          ...transcriptItem,
+          review: matchingReview?.review || null,
+        };
+      },
+    );
+
     // Generate summary and calculate score based on review categories
     const reviewCount = reviewObjects.length;
-    const summary = reviewCount > 0 
-      ? `Conversation analysis completed with ${reviewCount} review items for conversation turns.`
-      : "Conversation analysis completed - practice session finished successfully.";
-    
+    const summary =
+      reviewCount > 0
+        ? `Conversation analysis completed with ${reviewCount} review items for conversation turns.`
+        : "Conversation analysis completed - practice session finished successfully.";
+
     // Calculate score: +1 for complement, -1 for improvement, 0 for missing category
     const overallRating = reviewObjects.reduce((score, reviewItem) => {
       if (reviewItem.category === "complement") {
@@ -45,7 +61,7 @@ export async function createReviewWithTranscripts(conversationId: number, transc
       conversationId,
       summary,
       overallRating,
-      transcriptWithReviews: transcriptWithReviews
+      transcriptWithReviews: transcriptWithReviews,
     });
 
     return review;
