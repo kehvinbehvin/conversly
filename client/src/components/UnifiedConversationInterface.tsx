@@ -26,13 +26,13 @@ export default function UnifiedConversationInterface({
 }: UnifiedConversationInterfaceProps) {
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
-  
+
   // Log avatar selection for debugging
   const handleAvatarSelect = (avatar: Avatar) => {
     console.log(`👤 Avatar selected: ${avatar.name} (${avatar.agent_id})`);
     setSelectedAvatar(avatar);
   };
-  
+
   const {
     isConnecting,
     isConnected,
@@ -50,7 +50,9 @@ export default function UnifiedConversationInterface({
   // Log speaking state changes for debugging
   useEffect(() => {
     if (isConnected) {
-      console.log(`🎤 Speaking state changed: ${isSpeaking ? 'Agent is speaking' : 'Agent listening'} - Avatar: ${selectedAvatar.name}`);
+      console.log(
+        `🎤 Speaking state changed: ${isSpeaking ? "Agent is speaking" : "Agent listening"} - Avatar: ${selectedAvatar.name}`,
+      );
     }
   }, [isSpeaking, isConnected, selectedAvatar.name]);
 
@@ -107,7 +109,9 @@ export default function UnifiedConversationInterface({
 
   const handleStartConversation = () => {
     if (selectedAvatar?.agent_id) {
-      console.log(`🚀 Starting conversation with ${selectedAvatar.name} (${selectedAvatar.agent_id})`);
+      console.log(
+        `🚀 Starting conversation with ${selectedAvatar.name} (${selectedAvatar.agent_id})`,
+      );
       startConversation(selectedAvatar.agent_id);
     } else {
       console.error("❌ No avatar selected or invalid agent_id");
@@ -224,7 +228,8 @@ export default function UnifiedConversationInterface({
                 Connecting...
               </h3>
               <p className="text-body text-warm-brown-600">
-                Setting up your AI conversation coach. This will takes just a few seconds
+                Setting up your AI conversation coach. This will takes just a
+                few seconds
               </p>
             </div>
           </div>
@@ -241,33 +246,44 @@ export default function UnifiedConversationInterface({
             {/* Avatar Profile Display */}
             <div className="flex flex-col items-center space-y-6">
               {/* Profile Photo with Dynamic Highlighting */}
-              <div 
+              <div
                 className={`relative w-32 h-32 rounded-full overflow-hidden shadow-lg transition-all duration-300 ${
-                  isSpeaking 
-                    ? 'ring-4 ring-coral-500 ring-opacity-75 shadow-coral-200 shadow-2xl scale-105' 
-                    : 'ring-2 ring-warm-brown-200 ring-opacity-50'
+                  isSpeaking
+                    ? "ring-4 ring-coral-500 ring-opacity-75 shadow-coral-200 shadow-2xl scale-105"
+                    : "ring-2 ring-warm-brown-200 ring-opacity-50"
                 }`}
               >
-                <div 
+                <div
                   className={`w-full h-full bg-gradient-to-br transition-all duration-300 ${
-                    isSpeaking 
-                      ? 'from-coral-400 to-coral-600' 
-                      : 'from-sage-400 to-sage-600'
+                    isSpeaking
+                      ? "from-coral-400 to-coral-600"
+                      : "from-sage-400 to-sage-600"
                   } flex items-center justify-center`}
                 >
                   <span className="text-4xl text-white font-bold">
                     {selectedAvatar.name.charAt(0)}
                   </span>
                 </div>
-                
 
+                {/* Speaking Indicator Pulse */}
+                {isSpeaking && (
+                  <div className="absolute inset-0 rounded-full">
+                    <div className="absolute inset-0 rounded-full bg-coral-500 opacity-25 animate-ping"></div>
+                    <div
+                      className="absolute inset-2 rounded-full bg-coral-400 opacity-30 animate-ping"
+                      style={{ animationDelay: "75ms" }}
+                    ></div>
+                  </div>
+                )}
               </div>
 
               {/* Avatar Name and Description */}
               <div className="space-y-2 max-w-sm">
-                <h3 className={`text-heading-2 transition-colors duration-300 ${
-                  isSpeaking ? 'text-coral-700' : 'text-warm-brown-800'
-                }`}>
+                <h3
+                  className={`text-heading-2 transition-colors duration-300 ${
+                    isSpeaking ? "text-coral-700" : "text-warm-brown-800"
+                  }`}
+                >
                   {selectedAvatar.name}
                 </h3>
                 <p className="text-body text-warm-brown-600 leading-relaxed">
@@ -278,22 +294,22 @@ export default function UnifiedConversationInterface({
 
             {/* Status and Speaking Indicator */}
             <div className="space-y-3">
-              <div className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
-                isSpeaking 
-                  ? 'bg-coral-100 text-coral-800 border border-coral-200' 
-                  : 'bg-sage-100 text-sage-800 border border-sage-200'
-              }`}>
-                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                  isSpeaking ? 'bg-coral-500 animate-pulse' : 'bg-sage-500'
-                }`}></div>
+              <div
+                className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
+                  isSpeaking
+                    ? "bg-coral-100 text-coral-800 border border-coral-200"
+                    : "bg-sage-100 text-sage-800 border border-sage-200"
+                }`}
+              >
+                <div
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    isSpeaking ? "bg-coral-500 animate-pulse" : "bg-sage-500"
+                  }`}
+                ></div>
                 <span className="text-sm font-medium">
-                  {isSpeaking ? 'Speaking...' : 'Listening'}
+                  {isSpeaking ? "Speaking..." : "Listening"}
                 </span>
               </div>
-              
-              <p className="text-body text-warm-brown-700">
-                Speak naturally and confidently. The AI is ready to help you practice!
-              </p>
             </div>
 
             <Button

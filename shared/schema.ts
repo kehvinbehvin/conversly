@@ -1,4 +1,12 @@
-import { pgTable, text, serial, integer, boolean, timestamp, jsonb } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  text,
+  serial,
+  integer,
+  boolean,
+  timestamp,
+  jsonb,
+} from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
@@ -37,8 +45,6 @@ export const reviews = pgTable("reviews", {
   transcriptWithReviews: jsonb("transcript_with_reviews").notNull(), // Merged transcript and review data
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
-
-
 
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -104,7 +110,9 @@ export type Avatar = {
 export const avatarSchema = z.object({
   name: z.string().min(1, "Avatar name is required"),
   description: z.string().min(1, "Avatar description is required"),
-  agent_id: z.string().regex(/^agent_[a-z0-9]{26}$/, "Invalid ElevenLabs agent ID format"),
+  agent_id: z
+    .string()
+    .regex(/^agent_[a-z0-9]{26}$/, "Invalid ElevenLabs agent ID format"),
 });
 
 // Type for validated avatar
@@ -115,23 +123,23 @@ export const AVATARS: Avatar[] = [
   {
     name: "Jessie",
     description: "Your local cafe barista",
-    agent_id: "agent_01jyfb9fh8f67agfzvv09tvg3t"
+    agent_id: "agent_01jyfb9fh8f67agfzvv09tvg3t",
   },
   {
-    name: "Shawn", 
+    name: "Shawn",
     description: "A mutual friend at a house party",
-    agent_id: "agent_01jypzmj9heh3rhmn47anjbsr8"
+    agent_id: "agent_01jypzmj9heh3rhmn47anjbsr8",
   },
   {
     name: "Maya",
-    description: "A cycling enthuiast at a cycling event", 
-    agent_id: "agent_01jyq00m9aev8rq8e6a040rjmv"
+    description: "A cycling enthuiast at a cycling event",
+    agent_id: "agent_01jyq00m9aev8rq8e6a040rjmv",
   },
   {
     name: "Sam",
-    description: "Your friend's +1 at dinner",
-    agent_id: "agent_01jyq0j92gfxdrv3me49xygae1"
-  }
+    description: "A mutual friend at a housewarming party",
+    agent_id: "agent_01jyq0j92gfxdrv3me49xygae1",
+  },
 ];
 
 // Legacy types removed - no longer used after refactor
@@ -141,16 +149,31 @@ export const usersRelations = relations(users, ({ many }) => ({
   conversations: many(conversations),
 }));
 
-export const conversationsRelations = relations(conversations, ({ one, many }) => ({
-  user: one(users, { fields: [conversations.userId], references: [users.id] }),
-  transcript: one(transcripts, { fields: [conversations.transcriptId], references: [transcripts.id] }),
-  review: one(reviews, { fields: [conversations.id], references: [reviews.conversationId] }),
-}));
+export const conversationsRelations = relations(
+  conversations,
+  ({ one, many }) => ({
+    user: one(users, {
+      fields: [conversations.userId],
+      references: [users.id],
+    }),
+    transcript: one(transcripts, {
+      fields: [conversations.transcriptId],
+      references: [transcripts.id],
+    }),
+    review: one(reviews, {
+      fields: [conversations.id],
+      references: [reviews.conversationId],
+    }),
+  }),
+);
 
 export const transcriptsRelations = relations(transcripts, ({ many }) => ({
   conversations: many(conversations),
 }));
 
 export const reviewsRelations = relations(reviews, ({ one }) => ({
-  conversation: one(conversations, { fields: [reviews.conversationId], references: [conversations.id] }),
+  conversation: one(conversations, {
+    fields: [reviews.conversationId],
+    references: [conversations.id],
+  }),
 }));
