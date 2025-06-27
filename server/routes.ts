@@ -309,7 +309,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       );
 
       console.log("Expected:", expectedSignature);
-      console.log("Acutal:", signature);
+      console.log("Actual:", signature);
 
       return { isValid: isValidSignature };
     } catch (error) {
@@ -318,9 +318,17 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   };
 
-  // Environment-aware webhook secret selection
+  /**
+   * Environment-aware webhook secret selection
+   * 
+   * Automatically selects the correct ElevenLabs webhook secret based on environment:
+   * - Development: Uses ELEVENLABS_WEBHOOK_SECRET_DEV
+   * - Production: Uses ELEVENLABS_WEBHOOK_SECRET
+   * 
+   * This ensures webhook signature verification works correctly across environments
+   * without manual configuration changes during deployment.
+   */
   function getWebhookSecret(): string {
-    console.log("ENV", process.env.NODE_ENV);
     const environment =
       process.env.NODE_ENV === "production" ? "production" : "development";
 

@@ -119,7 +119,23 @@ export const avatarSchema = z.object({
 // Type for validated avatar
 export type ValidatedAvatar = z.infer<typeof avatarSchema>;
 
-// Environment detection utility
+/**
+ * Environment-Aware Avatar Configuration System
+ * 
+ * Automatically switches between development and production ElevenLabs agent IDs
+ * based on the current environment. This ensures proper webhook routing and
+ * agent selection without manual configuration changes during deployment.
+ * 
+ * Environment Detection:
+ * - Server-side: Uses NODE_ENV environment variable
+ * - Client-side: Uses Vite's import.meta.env.PROD
+ * - Fallback: Defaults to development for safety
+ * 
+ * Usage:
+ * - Development: Uses DEVELOPMENT_AVATARS with original agent IDs
+ * - Production: Uses PRODUCTION_AVATARS with production agent IDs
+ * - Testing: Use getAvatarsForEnvironment() for environment-specific tests
+ */
 function getEnvironment(): 'development' | 'production' {
   // Check server-side environment
   if (typeof process !== 'undefined' && process.env) {

@@ -51,6 +51,7 @@ Conversly is a conversational practice application designed to help users improv
 ### Avatar Selection System
 - **Multi-Agent Support**: 4 unique conversation partners with distinct personalities
 - **Avatar Profiles**: Jessie (barista), Shawn (party friend), Maya (cycling enthusiast), Sam (dinner +1)
+- **Environment-Aware Configuration**: Automatic switching between development and production agent IDs
 - **Responsive Interface**: 2x2 grid on desktop/tablet, vertical stack on mobile
 - **ElevenLabs Integration**: Each avatar maps to unique agent_id for personalized voice interactions
 - **State Management**: Selected avatar persists throughout conversation lifecycle
@@ -71,7 +72,7 @@ Conversly is a conversational practice application designed to help users improv
 
 ### Core Services
 - **OpenAI API**: GPT-4o for conversation analysis and feedback generation
-- **ElevenLabs API**: Voice conversation capabilities and speech processing
+- **ElevenLabs API**: Voice conversation capabilities with environment-specific agent configurations
 - **Neon Database**: Serverless PostgreSQL hosting
 - **Stripe**: Payment processing for premium features
 
@@ -91,8 +92,9 @@ Conversly is a conversational practice application designed to help users improv
 ### Production
 - **Build Process**: Vite for client, ESBuild for server
 - **Deployment Target**: Replit autoscale deployment
-- **Environment Variables**: DATABASE_URL, OPENAI_API_KEY, ELEVENLABS_API_KEY
+- **Environment Variables**: DATABASE_URL, OPENAI_API_KEY, ELEVENLABS_API_KEY, ELEVENLABS_WEBHOOK_SECRET, ELEVENLABS_WEBHOOK_SECRET_DEV
 - **Static Assets**: Served from dist/public directory
+- **Environment Detection**: Automatic switching to production agents and webhook secrets when NODE_ENV=production
 
 ### Configuration
 - **TypeScript**: Strict mode with ESNext modules
