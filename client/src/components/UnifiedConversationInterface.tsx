@@ -1,13 +1,14 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, AlertCircle, Check } from "lucide-react";
+import { MessageCircle, AlertCircle, Check, Clock } from "lucide-react";
 import { useAnonymousConversation } from "@/contexts/AnonymousConversationContext";
 import ChatThread from "@/components/ChatThread";
 import AvatarSelection from "@/components/AvatarSelection";
 import { AVATARS } from "@shared/schema";
 import type { TranscriptWithReview, Avatar } from "@shared/schema";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { useConversationTimer } from "@/hooks/useConversationTimer";
 
 interface UnifiedConversationInterfaceProps {
   agentId?: string; // Made optional since we'll manage it internally
@@ -117,6 +118,19 @@ export default function UnifiedConversationInterface({
       console.error("❌ No avatar selected or invalid agent_id");
     }
   };
+
+  // Timer expiration callback
+  const handleTimerExpired = useCallback(() => {
+    console.log('⏰ Timer expired - automatically ending conversation');
+    endConversation();
+  }, [endConversation]);
+
+  // Conversation timer - 5 minutes (300,000 ms)
+  const timer = useConversationTimer({
+    durationMs: 5 * 60 * 1000, // 5 minutes
+    onTimerExpired: handleTimerExpired,
+    isActive: isConnected, // Timer only runs when conversation is active
+  });
 
   const handleEndConversation = () => {
     endConversation();
@@ -290,6 +304,12 @@ export default function UnifiedConversationInterface({
                   {selectedAvatar.description}
                 </p>
               </div>
+            </div>
+
+            {/* Timer Display */}
+            <div className="flex items-center justify-center space-x-2 text-warm-brown-800">
+              <Clock className="w-4 h-4" />
+              <span className="text-sm font-medium">{timer.formattedTime}</span>
             </div>
 
             {/* Status and Speaking Indicator */}
