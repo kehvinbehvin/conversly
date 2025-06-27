@@ -158,6 +158,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Conversation not found" });
         }
 
+        // Check if conversation is older than 1 hour
+        const currentTime = new Date();
+        const conversationTime = new Date(conversation.createdAt);
+        const timeDifferenceMs = currentTime.getTime() - conversationTime.getTime();
+        const oneHourMs = 60 * 60 * 1000; // 1 hour in milliseconds
+
+        if (timeDifferenceMs > oneHourMs) {
+          return res.status(204).send(); // No Content - conversation expired
+        }
+
         const review = await storage.getReviewByConversationId(id);
 
         // Include transcript data if available

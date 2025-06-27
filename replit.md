@@ -103,6 +103,12 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 27, 2025: **1-HOUR CONVERSATION ACCESS LIMIT IMPLEMENTED** - Added time-based access control to conversation API endpoint
+  - **Route Protection**: /api/conversations/:id now checks conversation age against created_at timestamp
+  - **Time Validation**: Compares current time with conversation.createdAt, returns 204 No Content if difference exceeds 1 hour
+  - **Clean Response**: Returns empty response (204 status) instead of conversation data for expired conversations
+  - **System Design**: Maintains data integrity while providing time-limited access to conversation reviews
+  - **Implementation**: Uses millisecond precision time comparison (60 * 60 * 1000ms = 1 hour threshold)
 - June 27, 2025: **ENVIRONMENT-AWARE GOOGLE TAG MANAGER INTEGRATION COMPLETED** - Comprehensive analytics tracking with automatic container switching
   - **Environment-Based Container Selection**: Automatically switches between GTM-NCK6KLG8 (development) and GTM-PPWXFQR6 (production) based on NODE_ENV
   - **Package Installation**: Added react-gtm-module and @types/react-gtm-module for TypeScript support
