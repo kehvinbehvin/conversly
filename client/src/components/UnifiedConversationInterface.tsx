@@ -28,8 +28,7 @@ export default function UnifiedConversationInterface({
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
   
-  // Ref for scrolling to conversation interface
-  const conversationRef = useRef<HTMLDivElement>(null);
+
 
   // Log avatar selection for debugging
   const handleAvatarSelect = (avatar: Avatar) => {
@@ -60,16 +59,7 @@ export default function UnifiedConversationInterface({
     }
   }, [isSpeaking, isConnected, selectedAvatar.name]);
 
-  // Auto-scroll to conversation interface when conversation starts
-  useEffect(() => {
-    if ((isConnecting || isConnected) && conversationRef.current) {
-      console.log("📍 Auto-scrolling to conversation interface");
-      conversationRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
-      });
-    }
-  }, [isConnecting, isConnected]);
+
 
   // Determine current state
   const getState = (): ConversationState => {
@@ -153,15 +143,6 @@ export default function UnifiedConversationInterface({
   const handleStartNewConversation = () => {
     // Reset to idle state without auto-starting
     resetForNewConversation();
-    
-    // Auto-scroll back to conversation interface for new conversation
-    if (conversationRef.current) {
-      console.log("📍 Auto-scrolling to conversation interface for new conversation");
-      conversationRef.current.scrollIntoView({ 
-        behavior: 'smooth', 
-        block: 'start' 
-      });
-    }
   };
 
   const handleRetry = () => {
@@ -516,7 +497,6 @@ export default function UnifiedConversationInterface({
 
   return (
     <Card 
-      ref={conversationRef}
       className="flex flex-col flex-1 min-h-0 min-h-[600px] lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50"
     >
       <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center justify-center">

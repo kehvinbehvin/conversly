@@ -109,11 +109,11 @@ Conversly is a conversational practice application designed to help users improv
   - **State Reset Fix**: Fixed "Back to Start" button to properly reset all conversation state instead of transitioning to processing state
   - **Button Styling Fix**: Resolved inconsistent hover effects on "Back to Start" button through targeted CSS adjustments
   - **Test Coverage**: Created comprehensive tests validating database status updates and error handling logic
-- June 27, 2025: **AUTOSCROLL FUNCTIONALITY IMPLEMENTED** - Fixed screen scrolling behavior for anonymous conversation tool
-  - **Initial Conversation Start**: Automatically scrolls to conversation interface when user starts conversation
-  - **New Conversation from Review**: Scrolls back to interface when "Start New Conversation" button is clicked
-  - **Smooth Scrolling**: Uses browser's smooth scroll behavior with proper positioning
-  - **State-Based Triggers**: Activates on isConnecting/isConnected state changes and manual reset actions
+- June 27, 2025: **AUTOSCROLL FUNCTIONALITY REMOVED** - Eliminated automatic scrolling behavior for cleaner user experience
+  - **No Auto-scroll on Start**: Conversation interface no longer automatically scrolls when starting
+  - **No Auto-scroll on Reset**: "Start New Conversation" button no longer triggers scrolling
+  - **Manual Control**: Users maintain full control over their viewport position
+  - **Cleaner Code**: Removed conversationRef and related scroll logic for simpler implementation
 - June 27, 2025: **SCORE EXPLANATION FEATURE IMPLEMENTED** - Added educational text explaining how conversation scores are calculated
   - **Location**: Positioned below score display in review state of anonymous conversation tool
   - **Content**: Explains baseline of 0, +1 for good conversational skills, -1 for improvement areas
