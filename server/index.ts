@@ -6,9 +6,15 @@ import { initializeDatabase } from "./db-setup";
 
 const app = express();
 
-// Enable CORS for all routes
+// Enable CORS for specific origins only
 app.use(cors({
-  origin: true, // Allow all origins in development
+  origin: [
+    'https://conversly.space',
+    'https://5ce5254b-6ab1-414d-8435-b8bc8f1a7dee-00-3gmc41dozejlm.worf.replit.dev',
+    // Allow localhost for development
+    'http://localhost:5000',
+    'http://127.0.0.1:5000'
+  ],
   credentials: true, // Allow cookies and auth headers
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization', 'elevenlabs-signature']

@@ -109,11 +109,12 @@ Conversly is a conversational practice application designed to help users improv
   - **State Reset Fix**: Fixed "Back to Start" button to properly reset all conversation state instead of transitioning to processing state
   - **Button Styling Fix**: Resolved inconsistent hover effects on "Back to Start" button through targeted CSS adjustments
   - **Test Coverage**: Created comprehensive tests validating database status updates and error handling logic
-- June 27, 2025: **CORS CONFIGURATION ENHANCED** - Upgraded from custom middleware to dedicated cors package
+- June 27, 2025: **CORS CONFIGURATION ENHANCED** - Upgraded from custom middleware to dedicated cors package with restricted origins
   - **Professional Setup**: Replaced custom CORS headers with industry-standard cors middleware
-  - **Enhanced Security**: Added credentials support and comprehensive header allowlist
+  - **Enhanced Security**: Restricted origins to conversly.space and Replit deployment domain only
+  - **Authorized Domains**: Only allows conversly.space and 5ce5254b-6ab1-414d-8435-b8bc8f1a7dee-00-3gmc41dozejlm.worf.replit.dev
+  - **Development Support**: Includes localhost origins for local development
   - **Webhook Support**: Included elevenlabs-signature header for webhook authentication
-  - **Development Optimized**: Configured for flexible origin handling during development
 - June 27, 2025: **SEO CONFIGURATION IMPLEMENTED** - Added robots.txt for landing page only indexing
   - **Robots.txt Created**: Only allows search engine indexing of landing page (/)
   - **Privacy Protection**: Blocks indexing of dashboard, conversation history, and internal pages
