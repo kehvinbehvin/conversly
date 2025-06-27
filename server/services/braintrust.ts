@@ -35,6 +35,7 @@ export async function analyzeConversationWithBraintrust(
         return {
           index: item.index,
           review: String(item.review),
+          category: item.category || undefined, // Preserve category field from LLM response
         };
       })
       .filter(Boolean) as ReviewObject[];
