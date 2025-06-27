@@ -320,9 +320,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Environment-aware webhook secret selection
   function getWebhookSecret(): string {
-    const environment = process.env.NODE_ENV === 'production' ? 'production' : 'development';
-    
-    if (environment === 'production') {
+    console.log("ENV", process.env.NODE_ENV);
+    const environment =
+      process.env.NODE_ENV === "production" ? "production" : "development";
+
+    if (environment === "production") {
       return process.env.ELEVENLABS_WEBHOOK_SECRET || "";
     } else {
       return process.env.ELEVENLABS_WEBHOOK_SECRET_DEV || "";
@@ -347,7 +349,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
     // Get environment-specific webhook secret
     const secret = getWebhookSecret();
-    const environment = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+    const environment =
+      process.env.NODE_ENV === "production" ? "production" : "development";
     const rawBody = (req as any).body; // assume already a buffer
     console.log("📦 Raw body:", rawBody);
 
@@ -357,17 +360,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
 
     console.log(`🌍 Environment: ${environment}`);
-    console.log(`🔑 Webhook secret configured (${environment}):`, secret);
+    console.log("🔐 Webhook secret:", secret);
     console.log("🔐 Signature provided:", signature);
 
     // Check if secret exists for current environment
     if (!secret) {
-      const secretEnvVar = environment === 'production' ? 'ELEVENLABS_WEBHOOK_SECRET' : 'ELEVENLABS_WEBHOOK_SECRET_DEV';
-      console.error(`❌ No webhook secret found for ${environment} environment. Please set ${secretEnvVar}`);
-      return res.status(500).json({ 
+      const secretEnvVar =
+        environment === "production"
+          ? "ELEVENLABS_WEBHOOK_SECRET"
+          : "ELEVENLABS_WEBHOOK_SECRET_DEV";
+      console.error(
+        `❌ No webhook secret found for ${environment} environment. Please set ${secretEnvVar}`,
+      );
+      return res.status(500).json({
         message: `Webhook secret not configured for ${environment} environment`,
         environment,
-        requiredEnvVar: secretEnvVar
+        requiredEnvVar: secretEnvVar,
       });
     }
 
