@@ -28,6 +28,11 @@ export default function UnifiedConversationInterface({
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
   
+  // Scroll to top function
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+  
 
 
   // Log avatar selection for debugging
@@ -117,6 +122,7 @@ export default function UnifiedConversationInterface({
       console.log(
         `🚀 Starting conversation with ${selectedAvatar.name} (${selectedAvatar.agent_id})`,
       );
+      scrollToTop();
       startConversation(selectedAvatar.agent_id);
     } else {
       console.error("❌ No avatar selected or invalid agent_id");
@@ -143,6 +149,7 @@ export default function UnifiedConversationInterface({
   const handleStartNewConversation = () => {
     // Reset to idle state without auto-starting
     resetForNewConversation();
+    scrollToTop();
   };
 
   const handleRetry = () => {
