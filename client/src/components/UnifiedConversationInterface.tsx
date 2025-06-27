@@ -7,7 +7,7 @@ import ChatThread from "@/components/ChatThread";
 import AvatarSelection from "@/components/AvatarSelection";
 import { AVATARS } from "@shared/schema";
 import type { TranscriptWithReview, Avatar } from "@shared/schema";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useConversationTimer } from "@/hooks/useConversationTimer";
 
 interface UnifiedConversationInterfaceProps {
@@ -27,6 +27,9 @@ export default function UnifiedConversationInterface({
 }: UnifiedConversationInterfaceProps) {
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
+  
+  // Ref for scrolling to conversation interface
+  const conversationRef = useRef<HTMLDivElement>(null);
 
   // Log avatar selection for debugging
   const handleAvatarSelect = (avatar: Avatar) => {
@@ -56,6 +59,17 @@ export default function UnifiedConversationInterface({
       );
     }
   }, [isSpeaking, isConnected, selectedAvatar.name]);
+
+  // Auto-scroll to conversation interface when conversation starts
+  useEffect(() => {
+    if ((isConnecting || isConnected) && conversationRef.current) {
+      console.log("📍 Auto-scrolling to conversation interface");
+      conversationRef.current.scrollIntoView({ 
+        behavior: 'smooth', 
+        block: 'start' 
+      });
+    }
+  }, [isConnecting, isConnected]);
 
   // Determine current state
   const getState = (): ConversationState => {
@@ -492,7 +506,10 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card className="flex flex-col flex-1 min-h-0 min-h-[600px] lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50">
+    <Card 
+      ref={conversationRef}
+      className="flex flex-col flex-1 min-h-0 min-h-[600px] lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50"
+    >
       <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center justify-center">
         {renderCurrentState()}
       </CardContent>
