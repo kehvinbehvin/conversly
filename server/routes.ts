@@ -374,6 +374,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     verifyWebhookSignature,
     async (req, res) => {
       console.log("Webhook request", req);
+      console.log("Webhook host", req.get("host"));
       const startTime = Date.now();
       console.log(
         "🎯 ElevenLabs webhook received at",
@@ -384,9 +385,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
         // Log request headers for debugging
         console.log("📋 Webhook headers:", {
           "content-type": req.headers["content-type"],
-          "host": req.headers["host"],
-          "origin": req.headers["origin"],
-          "referer": req.headers["referer"],
           "elevenlabs-signature": req.headers["elevenlabs-signature"]
             ? "present"
             : "missing",
