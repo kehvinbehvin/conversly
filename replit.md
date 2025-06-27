@@ -103,16 +103,18 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
-- June 27, 2025: **GOOGLE TAG MANAGER INTEGRATION COMPLETED** - Comprehensive analytics tracking implemented across application
+- June 27, 2025: **ENVIRONMENT-AWARE GOOGLE TAG MANAGER INTEGRATION COMPLETED** - Comprehensive analytics tracking with automatic container switching
+  - **Environment-Based Container Selection**: Automatically switches between GTM-NCK6KLG8 (development) and GTM-PPWXFQR6 (production) based on NODE_ENV
   - **Package Installation**: Added react-gtm-module and @types/react-gtm-module for TypeScript support
-  - **Automatic GTM Initialization**: GTM-PPWXFQR6 container initialized in main.tsx without manual HTML snippets
-  - **Tracking Utility Library**: Created comprehensive GTM tracking utility with conversation, avatar, review, and navigation events
+  - **Automatic GTM Initialization**: Environment-specific container initialized in main.tsx without manual HTML snippets
+  - **Enhanced Tracking Utility**: Created comprehensive GTM tracking utility with environment context and development logging
+  - **Event Enrichment**: All events automatically include environment, GTM container ID, and timestamp metadata
   - **Landing Page Tracking**: Page views, section views (intersection observer), and navigation button clicks
   - **Conversation Flow Tracking**: Avatar selection, conversation start/end, timer expiration, and completion events
   - **Review Analytics**: Review viewing, scoring, and conversation completion tracking with detailed metadata
   - **Dashboard Integration**: Page views, navigation buttons, and user interaction tracking
   - **Error Recovery Tracking**: "Try Again" and "Back to Start" button interactions with error context
-  - **Comprehensive Event Data**: All events include relevant context like avatar details, conversation duration, scores, and user flow
+  - **Development Debugging**: GTM events logged to console in development mode for debugging and validation
 - June 27, 2025: **ENVIRONMENT-AWARE WEBHOOK AND AGENT CONFIGURATION IMPLEMENTED** - Complete system for dev/production environment separation
   - **Agent Configuration**: AVATARS array now automatically switches between development and production agent IDs based on NODE_ENV
   - **Webhook Secret Management**: Environment-aware webhook verification using ELEVENLABS_WEBHOOK_SECRET_DEV for development and ELEVENLABS_WEBHOOK_SECRET for production

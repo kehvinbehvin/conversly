@@ -1,5 +1,17 @@
 import TagManager from 'react-gtm-module';
 
+// Environment detection utility
+function getEnvironment(): 'development' | 'production' {
+  return import.meta.env.PROD ? 'production' : 'development';
+}
+
+function getGTMContainerId(): string {
+  return getEnvironment() === 'production' ? 'GTM-PPWXFQR6' : 'GTM-NCK6KLG8';
+}
+
+// Export environment utilities for external use
+export { getEnvironment, getGTMContainerId };
+
 // GTM Event Types
 export interface GTMEvent {
   event: string;
@@ -39,9 +51,21 @@ export const GTMEvents = {
  */
 export const pushGTMEvent = (eventData: GTMEvent): void => {
   try {
+    const enrichedEvent = {
+      ...eventData,
+      environment: getEnvironment(),
+      gtm_container_id: getGTMContainerId(),
+      timestamp: eventData.timestamp || new Date().toISOString(),
+    };
+
     TagManager.dataLayer({
-      dataLayer: eventData,
+      dataLayer: enrichedEvent,
     });
+
+    // Log events in development for debugging
+    if (getEnvironment() === 'development') {
+      console.log('GTM Event:', enrichedEvent);
+    }
   } catch (error) {
     console.error('Failed to push GTM event:', error);
   }
