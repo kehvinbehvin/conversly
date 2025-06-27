@@ -437,7 +437,7 @@ export default function UnifiedConversationInterface({
           <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col lg:min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
             <div className="space-y-4 pr-2 lg:flex-1 lg:overflow-y-auto">
               {/* Score */}
-              <div ref={reviewScoreRef}>
+              <div>
                 <h3 className="text-heading-3 text-warm-brown-800 mb-3">
                   Your Score
                 </h3>
