@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageCircle, Star, Clock, Search, Calendar, BarChart3 } from "lucide-react";
+import { MessageCircle, Clock, Search, Calendar, BarChart3 } from "lucide-react";
 import type { ConversationWithReview } from "@shared/schema";
 
 export default function History() {
@@ -86,12 +86,14 @@ export default function History() {
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-warm-brown-200 rounded-lg">
-                  <Star className="w-6 h-6 text-warm-brown-600" />
+                  <BarChart3 className="w-6 h-6 text-warm-brown-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-warm-brown-600">Avg Rating</p>
+                  <p className="text-sm text-warm-brown-600">Avg Score</p>
                   <p className="text-2xl font-bold text-warm-brown-800">
-                    {averageRating > 0 ? averageRating.toFixed(1) : "—"}
+                    {averageRating > 0 ? `+${averageRating.toFixed(1)}` : 
+                     averageRating < 0 ? averageRating.toFixed(1) : 
+                     averageRating === 0 ? "0" : "—"}
                   </p>
                 </div>
               </div>
@@ -194,11 +196,11 @@ export default function History() {
                     </div>
                     
                     <div className="flex items-center space-x-4">
-                      {conversation.review?.overallRating && (
+                      {conversation.review?.overallRating !== null && conversation.review?.overallRating !== undefined && (
                         <div className="flex items-center space-x-1">
-                          <Star className="w-4 h-4 text-coral-500 fill-current" />
+                          <BarChart3 className="w-4 h-4 text-coral-500" />
                           <span className="text-sm font-medium text-warm-brown-700">
-                            {conversation.review.overallRating}/5
+                            Score: {conversation.review.overallRating > 0 ? '+' : ''}{conversation.review.overallRating}
                           </span>
                         </div>
                       )}

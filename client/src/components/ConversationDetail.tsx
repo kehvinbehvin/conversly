@@ -4,7 +4,7 @@ import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AlertCircle, ArrowLeft, Star } from "lucide-react";
+import { AlertCircle, ArrowLeft, BarChart3 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import ChatThread from "@/components/ChatThread";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
@@ -124,7 +124,7 @@ export default function ConversationDetail({ id }: { id: string }) {
             <div className="flex items-center space-x-4">
               {review?.overallRating !== null && review?.overallRating !== undefined && (
                 <div className="flex items-center space-x-2">
-                  <Star className="w-5 h-5 text-coral-500 fill-current" />
+                  <BarChart3 className="w-5 h-5 text-coral-500" />
                   <span className="text-xl font-bold text-warm-brown-800">
                     Score: {review.overallRating > 0 ? '+' : ''}{review.overallRating}
                   </span>
@@ -150,7 +150,7 @@ export default function ConversationDetail({ id }: { id: string }) {
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center space-x-2">
-                  <Star className="w-5 h-5 text-sage-500" />
+                  <BarChart3 className="w-5 h-5 text-sage-500" />
                   <span>Overall Assessment</span>
                 </CardTitle>
               </CardHeader>

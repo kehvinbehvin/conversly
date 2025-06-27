@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MessageCircle, BarChart3, Clock, TrendingUp, Star } from "lucide-react";
+import { MessageCircle, BarChart3, Clock, TrendingUp } from "lucide-react";
 import type { ConversationWithReview } from "@shared/schema";
 
 export default function Dashboard() {
@@ -80,12 +80,14 @@ export default function Dashboard() {
             <CardContent className="p-6">
               <div className="flex items-center space-x-4">
                 <div className="p-3 bg-warm-brown-200 rounded-lg">
-                  <Star className="w-6 h-6 text-warm-brown-600" />
+                  <BarChart3 className="w-6 h-6 text-warm-brown-600" />
                 </div>
                 <div>
-                  <p className="text-sm text-warm-brown-600">Avg Rating</p>
+                  <p className="text-sm text-warm-brown-600">Avg Score</p>
                   <p className="text-2xl font-bold text-warm-brown-800">
-                    {averageRating > 0 ? averageRating.toFixed(1) : "—"}
+                    {averageRating > 0 ? `+${averageRating.toFixed(1)}` : 
+                     averageRating < 0 ? averageRating.toFixed(1) : 
+                     averageRating === 0 ? "0" : "—"}
                   </p>
                 </div>
               </div>
@@ -188,11 +190,11 @@ export default function Dashboard() {
                           </div>
                           
                           <div className="flex items-center space-x-2">
-                            {conversation.review?.overallRating && (
+                            {conversation.review?.overallRating !== null && conversation.review?.overallRating !== undefined && (
                               <div className="flex items-center space-x-1">
-                                <Star className="w-4 h-4 text-coral-500 fill-current" />
+                                <BarChart3 className="w-4 h-4 text-coral-500" />
                                 <span className="text-sm font-medium text-warm-brown-700">
-                                  {conversation.review.overallRating}
+                                  Score: {conversation.review.overallRating > 0 ? '+' : ''}{conversation.review.overallRating}
                                 </span>
                               </div>
                             )}
@@ -259,9 +261,9 @@ export default function Dashboard() {
                 
                 <div className="text-center">
                   <div className="w-16 h-16 bg-warm-brown-200 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Star className="w-8 h-8 text-warm-brown-600" />
+                    <TrendingUp className="w-8 h-8 text-warm-brown-600" />
                   </div>
-                  <h4 className="font-medium text-warm-brown-800 mb-2">Quality Focus</h4>
+                  <h4 className="font-medium text-warm-brown-800 mb-2">Performance Tracking</h4>
                   <p className="text-sm text-warm-brown-600">
                     Your conversations demonstrate strong storytelling and detail sharing.
                   </p>

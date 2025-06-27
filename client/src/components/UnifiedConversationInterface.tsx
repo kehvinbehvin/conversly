@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { MessageCircle, Star, AlertCircle, Check } from "lucide-react";
+import { MessageCircle, AlertCircle, Check } from "lucide-react";
 import { useAnonymousConversation } from "@/contexts/AnonymousConversationContext";
 import ChatThread from "@/components/ChatThread";
 import AvatarSelection from "@/components/AvatarSelection";
@@ -388,26 +388,21 @@ export default function UnifiedConversationInterface({
           {/* Left side - Rating and Review Info */}
           <div className="w-full lg:w-1/2 pr-0 lg:pr-8 border-b lg:border-b-0 lg:border-r border-warm-brown-200 flex flex-col lg:min-h-0 mb-6 lg:mb-0 pb-6 lg:pb-0">
             <div className="space-y-4 pr-2 lg:flex-1 lg:overflow-y-auto">
-              {/* Rating */}
+              {/* Score */}
               <div>
                 <h3 className="text-heading-3 text-warm-brown-800 mb-3">
-                  Your Rating
+                  Your Score
                 </h3>
                 <div className="bg-gradient-to-r from-coral-50 to-sage-50 rounded-xl p-4 border border-coral-200 shadow-sm">
-                  <div className="flex items-center justify-center space-x-1 mb-2">
-                    {[...Array(5)].map((_, i) => (
-                      <Star
-                        key={i}
-                        className={`w-6 h-6 ${
-                          i < (review.overallRating || 0)
-                            ? "text-coral-500 fill-current"
-                            : "text-warm-brown-200"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <div className="text-heading-2 text-warm-brown-800">
-                    {review.overallRating || 0}/5
+                  <div className="text-center">
+                    <div className="text-heading-1 text-warm-brown-800 font-bold">
+                      {(review.overallRating ?? 0) > 0 ? '+' : ''}{review.overallRating ?? 0}
+                    </div>
+                    <div className="text-sm text-warm-brown-600 mt-1">
+                      {(review.overallRating ?? 0) > 0 ? 'Strong performance' : 
+                       (review.overallRating ?? 0) < 0 ? 'Room for improvement' : 
+                       'Baseline'}
+                    </div>
                   </div>
                 </div>
               </div>
