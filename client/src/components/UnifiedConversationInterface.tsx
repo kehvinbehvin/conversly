@@ -260,13 +260,7 @@ export default function UnifiedConversationInterface({
                   </span>
                 </div>
                 
-                {/* Speaking Indicator Pulse */}
-                {isSpeaking && (
-                  <div className="absolute inset-0 rounded-full">
-                    <div className="absolute inset-0 rounded-full bg-coral-500 opacity-25 animate-ping"></div>
-                    <div className="absolute inset-2 rounded-full bg-coral-400 opacity-30 animate-ping" style={{ animationDelay: '75ms' }}></div>
-                  </div>
-                )}
+
               </div>
 
               {/* Avatar Name and Description */}
@@ -447,7 +441,7 @@ export default function UnifiedConversationInterface({
   const renderCurrentState = () => {
     switch (state) {
       case "idle":
-        return renderActiveState();
+        return renderIdleState();
       case "connecting":
         return renderConnectingState();
       case "active":
