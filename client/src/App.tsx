@@ -7,24 +7,25 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import Navigation from "@/components/navigation";
 import ScrollToTop from "@/components/ScrollToTop";
 import Landing from "@/pages/landing";
-import Dashboard from "@/pages/dashboard";
-import Conversation from "@/pages/conversation";
-import Review from "@/pages/review";
-import History from "@/pages/history";
-import NotFound from "@/pages/not-found";
+// import Dashboard from "@/pages/dashboard";
+// import Conversation from "@/pages/conversation";
+// import Review from "@/pages/review";
+// import History from "@/pages/history";
+// import NotFound from "@/pages/not-found";
 import { ConversationProvider } from "@/contexts/ConversationContext";
 
 function Router() {
   return (
     <Switch>
       <Route path="/" component={Landing} />
-      <Route path="/dashboard" component={Dashboard} />
-      <Route path="/conversation" component={Conversation} />
-      <Route path="/conversation/:id" component={Conversation} />
-      <Route path="/review/:id" component={Review} />
-      <Route path="/history" component={History} />
-      <Route path="/storage" component={lazy(() => import("./pages/storage"))} />
-      <Route component={NotFound} />
+      {/* Commented out other pages - only landing page visible */}
+      {/* <Route path="/dashboard" component={Dashboard} /> */}
+      {/* <Route path="/conversation" component={Conversation} /> */}
+      {/* <Route path="/conversation/:id" component={Conversation} /> */}
+      {/* <Route path="/review/:id" component={Review} /> */}
+      {/* <Route path="/history" component={History} /> */}
+      {/* <Route path="/storage" component={lazy(() => import("./pages/storage"))} /> */}
+      {/* <Route component={NotFound} /> */}
     </Switch>
   );
 }
