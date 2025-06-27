@@ -28,71 +28,16 @@ export default function UnifiedConversationInterface({
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
   
-  // Refs for different anchor points in each state
-  const conversationRef = useRef<HTMLDivElement>(null);
-  const idleHeaderRef = useRef<HTMLHeadingElement>(null);
-  const connectingContentRef = useRef<HTMLDivElement>(null);
-  const activeContentRef = useRef<HTMLDivElement>(null);
-  const processingContentRef = useRef<HTMLDivElement>(null);
-  const errorContentRef = useRef<HTMLDivElement>(null);
-  const reviewScoreRef = useRef<HTMLDivElement>(null);
-
-  // Utility function to scroll to appropriate anchor based on state
-  const scrollToStateAnchor = (targetState: ConversationState) => {
-    const navbarHeight = 64; // h-16 = 64px
-    let targetElement: HTMLElement | null = null;
-    let offset = navbarHeight;
-    let centerInViewport = false;
-
-    switch (targetState) {
-      case "idle":
-        // Anchor to "Strike up a conversation..." heading
-        targetElement = idleHeaderRef.current;
-        offset = navbarHeight + 20; // Small additional offset for idle
-        break;
-      case "connecting":
-      case "active":
-      case "processing":
-      case "error":
-        // For centered states, we want to center the element in viewport
-        targetElement = targetState === "connecting" ? connectingContentRef.current :
-                       targetState === "active" ? activeContentRef.current :
-                       targetState === "processing" ? processingContentRef.current :
-                       errorContentRef.current;
-        centerInViewport = true;
-        break;
-      case "review":
-        // Anchor at the score section
-        targetElement = reviewScoreRef.current;
-        offset = navbarHeight + 20; // Small additional offset for review
-        break;
-    }
-
-    if (targetElement) {
-      const elementRect = targetElement.getBoundingClientRect();
-      const elementTop = elementRect.top + window.pageYOffset;
-      
-      let scrollPosition;
-      if (centerInViewport) {
-        // Center the element in the viewport
-        const elementHeight = elementRect.height;
-        const viewportHeight = window.innerHeight;
-        const centerOffset = (viewportHeight - elementHeight) / 2 - navbarHeight;
-        scrollPosition = Math.max(0, elementTop - Math.max(centerOffset, navbarHeight + 20));
-      } else {
-        // Simple offset from top
-        scrollPosition = Math.max(0, elementTop - offset);
-      }
-      
-      console.log(`📍 Auto-scrolling to ${targetState} state anchor (position: ${scrollPosition}, offset: ${centerInViewport ? 'centered' : offset})`);
-      window.scrollTo({
-        top: scrollPosition,
-        behavior: 'smooth'
-      });
-    } else {
-      console.warn(`⚠️ Could not find anchor element for ${targetState} state`);
-    }
+  // Simple scroll to top utility
+  const scrollToTop = () => {
+    console.log('📍 Scrolling to top');
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
   };
+
+
 
   // Log avatar selection for debugging
   const handleAvatarSelect = (avatar: Avatar) => {
@@ -123,26 +68,19 @@ export default function UnifiedConversationInterface({
     }
   }, [isSpeaking, isConnected, selectedAvatar.name]);
 
-  // Auto-scroll to appropriate anchor when state changes
+  // Scroll to top when starting conversation
   useEffect(() => {
-    const currentState = getState();
-    
-    // Scroll to appropriate anchor for connecting and active states
     if (isConnecting || isConnected) {
-      // Small delay to ensure DOM elements are rendered
-      setTimeout(() => scrollToStateAnchor(currentState), 150);
+      scrollToTop();
     }
   }, [isConnecting, isConnected]);
 
-  // Auto-scroll when transitioning to review state
+  // Scroll to top when review is ready
   useEffect(() => {
-    const currentState = getState();
-    
-    if (currentState === "review") {
-      // Small delay to ensure DOM is updated
-      setTimeout(() => scrollToStateAnchor("review"), 150);
+    if (isReviewReady) {
+      scrollToTop();
     }
-  }, [isReviewReady, conversationData?.review]);
+  }, [isReviewReady]);
 
   // Determine current state
   const getState = (): ConversationState => {
@@ -271,7 +209,7 @@ export default function UnifiedConversationInterface({
         {/* Left side - Marketing content */}
         <div className="w-full lg:w-1/2 pr-0 lg:pr-8 flex flex-col justify-center mb-8 lg:mb-0 lg:h-full">
           <div className="space-y-6">
-            <h1 ref={idleHeaderRef} className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
+            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight">
               <span className="text-warm-brown-800">
                 Practice conversations.{" "}
               </span>
@@ -323,7 +261,7 @@ export default function UnifiedConversationInterface({
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
       <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
-          <div ref={connectingContentRef} className="text-center space-y-8">
+          <div className="text-center space-y-8">
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
             </div>
@@ -346,7 +284,7 @@ export default function UnifiedConversationInterface({
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
       <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
-          <div ref={activeContentRef} className="text-center space-y-8">
+          <div className="text-center space-y-8">
             {/* Avatar Profile Display */}
             <div className="flex flex-col items-center space-y-6">
               {/* Profile Photo with Dynamic Highlighting */}
@@ -439,7 +377,7 @@ export default function UnifiedConversationInterface({
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
       <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
-          <div ref={processingContentRef} className="text-center space-y-8">
+          <div className="text-center space-y-8">
             <div className="flex justify-center">
               <div className="animate-spin rounded-full h-12 w-12 border-4 border-coral-200 border-t-coral-600"></div>
             </div>
@@ -462,7 +400,7 @@ export default function UnifiedConversationInterface({
     <div className="h-full flex p-4 sm:p-6 lg:p-8">
       <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
-          <div ref={errorContentRef} className="text-center space-y-8">
+          <div className="text-center space-y-8">
             <div className="w-32 h-32 rounded-full bg-red-100 flex items-center justify-center shadow-lg mx-auto">
               <AlertCircle className="w-16 h-16 text-red-500" />
             </div>
