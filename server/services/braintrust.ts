@@ -18,12 +18,15 @@ export async function analyzeConversationWithBraintrust(
       input: { transcript: transcriptJson },
     });
 
+    console.log('🧠 Raw Braintrust response:', JSON.stringify(result, null, 2));
+
     // Handle the new response format with reviews
     let reviews: ReviewObject[] = [];
-    if (result.reviews && Array.isArray(result.reviews)) {
-      reviews = result.reviews;
-    } else if (Array.isArray(result)) {
-      reviews = result;
+    const typedResult = result as any;
+    if (typedResult.reviews && Array.isArray(typedResult.reviews)) {
+      reviews = typedResult.reviews;
+    } else if (Array.isArray(typedResult)) {
+      reviews = typedResult;
     }
 
     const validatedReviews = reviews
