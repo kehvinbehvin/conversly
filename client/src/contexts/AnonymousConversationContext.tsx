@@ -82,25 +82,6 @@ export function AnonymousConversationProvider({
             currentId: conversationIdRef.current
           });
         }
-      } else if (message.type === 'empty_transcript_error') {
-        console.log('📡 Empty transcript error message detected');
-        
-        if (message.conversationId === conversationIdRef.current) {
-          console.log('📡 Conversation ID matches - setting error state');
-          setError(message.message || 'No conversation data was captured. Please try again.');
-          setIsConnecting(false);
-          setIsReviewReady(false);
-          
-          // End the conversation to clean up the ElevenLabs connection
-          if (conversation.endSession) {
-            conversation.endSession();
-          }
-        } else {
-          console.log('📡 Conversation ID mismatch for error:', {
-            messageId: message.conversationId,
-            currentId: conversationIdRef.current
-          });
-        }
       }
     }
   });

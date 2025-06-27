@@ -608,30 +608,6 @@ export async function registerRoutes(app: Express): Promise<Server> {
             transcriptTurns: transcriptData ? transcriptData.length : 0,
             originalTranscriptLength: transcriptArray?.length || 0,
           });
-
-          // Update conversation status to indicate empty transcript
-          try {
-            await storage.updateConversation(conversation.id, {
-              status: "empty_transcript",
-            });
-            console.log("⚠️ Conversation status updated to 'empty_transcript'");
-          } catch (statusUpdateError) {
-            console.error("❌ Failed to update status for empty transcript:", statusUpdateError);
-          }
-
-          // Notify SSE clients that an error occurred due to empty transcript
-          const sseClient = sseConnections.get(conversation_id);
-          if (sseClient && !sseClient.destroyed) {
-            sseClient.write(`data: ${JSON.stringify({
-              type: "empty_transcript_error",
-              conversationId: conversation_id,
-              dbConversationId: conversation.id,
-              message: "No conversation data was captured. Please try again."
-            })}\n\n`);
-            console.log("📡 Sent empty_transcript_error notification to SSE client");
-          } else {
-            console.log("📡 No active SSE connection for conversation:", conversation_id);
-          }
         }
 
         const processingTime = Date.now() - startTime;

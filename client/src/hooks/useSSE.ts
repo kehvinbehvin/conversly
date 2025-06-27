@@ -4,7 +4,6 @@ interface SSEMessage {
   type: string;
   conversationId?: string;
   dbConversationId?: number;
-  message?: string;
 }
 
 interface UseSSEOptions {
