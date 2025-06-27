@@ -119,8 +119,24 @@ export const avatarSchema = z.object({
 // Type for validated avatar
 export type ValidatedAvatar = z.infer<typeof avatarSchema>;
 
-// Avatar data definitions
-export const AVATARS: Avatar[] = [
+// Environment detection utility
+function getEnvironment(): 'development' | 'production' {
+  // Check server-side environment
+  if (typeof process !== 'undefined' && process.env) {
+    return process.env.NODE_ENV === 'production' ? 'production' : 'development';
+  }
+  
+  // Check client-side environment (Vite)
+  if (typeof import.meta !== 'undefined' && import.meta.env) {
+    return import.meta.env.PROD ? 'production' : 'development';
+  }
+  
+  // Default to development for safety
+  return 'development';
+}
+
+// Avatar data definitions - development environment
+const DEVELOPMENT_AVATARS: Avatar[] = [
   {
     name: "Jessie",
     description: "Your local cafe barista",
@@ -142,6 +158,40 @@ export const AVATARS: Avatar[] = [
     agent_id: "agent_01jyq0j92gfxdrv3me49xygae1",
   },
 ];
+
+// Avatar data definitions - production environment
+const PRODUCTION_AVATARS: Avatar[] = [
+  {
+    name: "Jessie",
+    description: "Your local cafe barista",
+    agent_id: "agent_01jys1g9ndfcqthwrs8p9fy4bn",
+  },
+  {
+    name: "Shawn",
+    description: "A mutual friend at a house party",
+    agent_id: "agent_01jys1h6dfe0dt1x186wkqcnmb",
+  },
+  {
+    name: "Maya",
+    description: "A cyclist at a cycling event",
+    agent_id: "agent_01jys1jsmje7wvb6vak1dt4t54",
+  },
+  {
+    name: "Sam",
+    description: "A fellow housewarming guest",
+    agent_id: "agent_01jys1hz8zf9crk3j8aq7hnk9b",
+  },
+];
+
+// Environment-aware avatar configuration
+export const AVATARS: Avatar[] = getEnvironment() === 'production' 
+  ? PRODUCTION_AVATARS 
+  : DEVELOPMENT_AVATARS;
+
+// Utility function to get avatars for specific environment (useful for testing)
+export function getAvatarsForEnvironment(env: 'development' | 'production'): Avatar[] {
+  return env === 'production' ? PRODUCTION_AVATARS : DEVELOPMENT_AVATARS;
+}
 
 // Legacy types removed - no longer used after refactor
 

@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { AVATARS } from "../../shared/schema";
+import { AVATARS, getAvatarsForEnvironment } from "../../shared/schema";
 import type { Avatar } from "../../shared/schema";
 
 describe("Avatar Selection", () => {
@@ -85,16 +85,32 @@ describe("Avatar Selection", () => {
       expect(AVATARS[0].description).toBe("Your local cafe barista");
     });
 
-    it("should match expected agent_ids for ElevenLabs integration", () => {
-      const expectedAgentIds = [
+    it("should match expected agent_ids for current environment", () => {
+      // Get the current environment from NODE_ENV
+      const environment = process.env.NODE_ENV === 'production' ? 'production' : 'development';
+      
+      const developmentAgentIds = [
         "agent_01jyfb9fh8f67agfzvv09tvg3t", // Jessie
         "agent_01jypzmj9heh3rhmn47anjbsr8", // Shawn
         "agent_01jyq00m9aev8rq8e6a040rjmv", // Maya
         "agent_01jyq0j92gfxdrv3me49xygae1"  // Sam
       ];
       
+      const productionAgentIds = [
+        "agent_01jys1g9ndfcqthwrs8p9fy4bn", // Jessie
+        "agent_01jys1h6dfe0dt1x186wkqcnmb", // Shawn
+        "agent_01jys1jsmje7wvb6vak1dt4t54", // Maya
+        "agent_01jys1hz8zf9crk3j8aq7hnk9b"  // Sam
+      ];
+      
+      const expectedAgentIds = environment === 'production' ? productionAgentIds : developmentAgentIds;
       const actualAgentIds = AVATARS.map(avatar => avatar.agent_id);
+      
       expect(actualAgentIds).toEqual(expectedAgentIds);
+      
+      // Also test that we can get avatars for specific environments
+      expect(getAvatarsForEnvironment('development').map(a => a.agent_id)).toEqual(developmentAgentIds);
+      expect(getAvatarsForEnvironment('production').map(a => a.agent_id)).toEqual(productionAgentIds);
     });
   });
 
