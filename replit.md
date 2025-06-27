@@ -101,6 +101,12 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 27, 2025: **PRODUCTION SSE DEPLOYMENT ISSUE RESOLVED** - Fixed CORS conflict causing conversations to hang after ending in production
+  - **Root Cause**: SSE endpoint bypassed main CORS configuration with wildcard origin, causing browser CORS violations in production
+  - **Primary Fix**: Removed conflicting CORS headers from SSE endpoint, allowing main CORS middleware to handle all origin validation
+  - **Secondary Fix**: Enabled SSE auto-reconnection in production environments (was development-only)
+  - **Systematic Analysis**: Used engineering approach to trace conversation flow, identify dev vs production differences, and validate assumptions
+  - **Environment Consistency**: Production and development now have identical SSE connection handling and error recovery
 - June 27, 2025: **EMPTY TRANSCRIPT ERROR HANDLING IMPLEMENTED** - Fixed webhook bug where empty transcripts caused client to wait indefinitely
   - **Server-Side Fix**: Added SSE notification for empty transcript scenarios with new "empty_transcript_error" message type
   - **Status Management**: Conversations with empty transcripts now receive "empty_transcript" status for proper tracking

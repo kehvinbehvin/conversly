@@ -688,13 +688,11 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get('/api/events/:conversationId', (req, res) => {
     const conversationId = req.params.conversationId;
     
-    // Set SSE headers
+    // Set SSE headers - CORS handled by main middleware
     res.writeHead(200, {
       'Content-Type': 'text/event-stream',
       'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Headers': 'Cache-Control'
+      'Connection': 'keep-alive'
     });
     
     // Store the connection

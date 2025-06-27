@@ -57,16 +57,14 @@ export function useSSE(options: UseSSEOptions = {}) {
       setIsConnected(false);
       optionsRef.current.onDisconnect?.();
       
-      // Auto-reconnect after a delay during development
-      if (process.env.NODE_ENV === 'development') {
-        console.log('🔄 Attempting SSE reconnection in 2 seconds...');
-        setTimeout(() => {
-          if (eventSourceRef.current?.readyState !== EventSource.OPEN) {
-            console.log('🔄 Reconnecting SSE for:', conversationId);
-            connectSSE(conversationId);
-          }
-        }, 2000);
-      }
+      // Auto-reconnect after a delay in all environments
+      console.log('🔄 Attempting SSE reconnection in 2 seconds...');
+      setTimeout(() => {
+        if (eventSourceRef.current?.readyState !== EventSource.OPEN) {
+          console.log('🔄 Reconnecting SSE for:', conversationId);
+          connectSSE(conversationId);
+        }
+      }, 2000);
     };
   };
 
