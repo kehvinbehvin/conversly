@@ -7,7 +7,7 @@ import ChatThread from "@/components/ChatThread";
 import AvatarSelection from "@/components/AvatarSelection";
 import { AVATARS } from "@shared/schema";
 import type { TranscriptWithReview, Avatar } from "@shared/schema";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface UnifiedConversationInterfaceProps {
   agentId?: string; // Made optional since we'll manage it internally
@@ -36,6 +36,7 @@ export default function UnifiedConversationInterface({
   const {
     isConnecting,
     isConnected,
+    isSpeaking,
     currentConversationId,
     conversationData,
     isReviewReady,
@@ -45,6 +46,13 @@ export default function UnifiedConversationInterface({
     clearError,
     resetForNewConversation,
   } = useAnonymousConversation();
+
+  // Log speaking state changes for debugging
+  useEffect(() => {
+    if (isConnected) {
+      console.log(`🎤 Speaking state changed: ${isSpeaking ? 'Agent is speaking' : 'Agent listening'} - Avatar: ${selectedAvatar.name}`);
+    }
+  }, [isSpeaking, isConnected, selectedAvatar.name]);
 
   // Determine current state
   const getState = (): ConversationState => {
@@ -230,15 +238,70 @@ export default function UnifiedConversationInterface({
       <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
-            <div className="flex justify-center">
-              <div className="w-16 h-16 rounded-full bg-coral-500 shadow-lg"></div>
+            {/* Avatar Profile Display */}
+            <div className="flex flex-col items-center space-y-6">
+              {/* Profile Photo with Dynamic Highlighting */}
+              <div 
+                className={`relative w-32 h-32 rounded-full overflow-hidden shadow-lg transition-all duration-300 ${
+                  isSpeaking 
+                    ? 'ring-4 ring-coral-500 ring-opacity-75 shadow-coral-200 shadow-2xl scale-105' 
+                    : 'ring-2 ring-warm-brown-200 ring-opacity-50'
+                }`}
+              >
+                <div 
+                  className={`w-full h-full bg-gradient-to-br transition-all duration-300 ${
+                    isSpeaking 
+                      ? 'from-coral-400 to-coral-600' 
+                      : 'from-sage-400 to-sage-600'
+                  } flex items-center justify-center`}
+                >
+                  <span className="text-4xl text-white font-bold">
+                    {selectedAvatar.name.charAt(0)}
+                  </span>
+                </div>
+                
+                {/* Speaking Indicator Pulse */}
+                {isSpeaking && (
+                  <div className="absolute inset-0 rounded-full">
+                    <div className="absolute inset-0 rounded-full bg-coral-500 opacity-25 animate-ping"></div>
+                    <div className="absolute inset-2 rounded-full bg-coral-400 opacity-30 animate-ping" style={{ animationDelay: '75ms' }}></div>
+                  </div>
+                )}
+              </div>
+
+              {/* Avatar Name and Description */}
+              <div className="space-y-2 max-w-sm">
+                <h3 className={`text-heading-2 transition-colors duration-300 ${
+                  isSpeaking ? 'text-coral-700' : 'text-warm-brown-800'
+                }`}>
+                  {selectedAvatar.name}
+                </h3>
+                <p className="text-body text-warm-brown-600 leading-relaxed">
+                  {selectedAvatar.description}
+                </p>
+              </div>
             </div>
+
+            {/* Status and Speaking Indicator */}
             <div className="space-y-3">
-              <h3 className="text-heading-1 text-warm-brown-800">Connected!</h3>
-              <p className="text-body-large text-warm-brown-700">
-                Speak naturally and confidently into your microphone. The AI is listening!
+              <div className={`inline-flex items-center space-x-2 px-4 py-2 rounded-full transition-all duration-300 ${
+                isSpeaking 
+                  ? 'bg-coral-100 text-coral-800 border border-coral-200' 
+                  : 'bg-sage-100 text-sage-800 border border-sage-200'
+              }`}>
+                <div className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                  isSpeaking ? 'bg-coral-500 animate-pulse' : 'bg-sage-500'
+                }`}></div>
+                <span className="text-sm font-medium">
+                  {isSpeaking ? 'Speaking...' : 'Listening'}
+                </span>
+              </div>
+              
+              <p className="text-body text-warm-brown-700">
+                Speak naturally and confidently. The AI is ready to help you practice!
               </p>
             </div>
+
             <Button
               onClick={handleEndConversation}
               size="lg"
@@ -384,7 +447,7 @@ export default function UnifiedConversationInterface({
   const renderCurrentState = () => {
     switch (state) {
       case "idle":
-        return renderIdleState();
+        return renderActiveState();
       case "connecting":
         return renderConnectingState();
       case "active":

@@ -133,6 +133,16 @@ export default {
         'conversation-md': '100%',  // 100% of available container width for tablet 
         'conversation-sm': '100%',  // 100% of available container width for mobile
       },
+      animationDelay: {
+        '75': '75ms',
+        '100': '100ms',
+        '150': '150ms',
+        '200': '200ms',
+        '300': '300ms',
+        '500': '500ms',
+        '700': '700ms',
+        '1000': '1000ms',
+      },
       keyframes: {
         "accordion-down": {
           from: {

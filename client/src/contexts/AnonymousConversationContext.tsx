@@ -7,6 +7,7 @@ import type { ConversationWithReview } from "@shared/schema";
 interface AnonymousConversationContextType {
   isConnecting: boolean;
   isConnected: boolean;
+  isSpeaking: boolean;
   currentConversationId: string | null;
   conversationData: ConversationWithReview | null;
   isReviewReady: boolean;
@@ -217,6 +218,7 @@ export function AnonymousConversationProvider({
   const value: AnonymousConversationContextType = {
     isConnecting,
     isConnected: conversation.status === "connected",
+    isSpeaking: conversation.isSpeaking || false,
     currentConversationId,
     conversationData,
     isReviewReady,
