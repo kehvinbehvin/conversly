@@ -103,6 +103,16 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 29, 2025: **REAL-TIME MICROPHONE ACTIVITY DETECTION COMPLETED** - Side-by-side avatar display with speaking detection during conversations
+  - **Speaking Detection Hook**: Created useSpeakingDetection hook using ElevenLabs SDK methods (getInputVolume, getInputByteFrequencyData)
+  - **ConversationAvatar Component**: Built unified avatar component with border highlighting for speaking status (coral color scheme)
+  - **Side-by-Side Layout**: Agent and user avatars displayed together during active conversations with responsive design
+  - **Mobile Layout**: Top-bottom stacking on mobile devices (agent on top, user on bottom), side-by-side on desktop
+  - **SDK Integration**: Exposed ElevenLabs conversation object in AnonymousConversationContext for real-time audio analysis
+  - **Audio Thresholds**: Volume detection > 0.1, voice energy > 100 for speaking status determination
+  - **Visual Design**: Border highlights instead of pulsing animations, consistent with warm-brown/coral/sage color palette
+  - **Generic User Avatar**: Created hardcoded SVG for user representation during conversations
+  - **Debug Logging**: Audio analysis data logged to console for threshold tuning and validation
 - June 29, 2025: **NEXT STEPS FRONTEND FEATURE COMPLETED** - Full end-to-end Next Steps implementation with frontend UI
   - **Frontend Component**: Created NextStepsSection component with numbered steps (1, 2, 3) using coral color scheme
   - **UI Integration**: Positioned below Summary section, above "Start New Conversation" button in review state

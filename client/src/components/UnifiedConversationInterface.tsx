@@ -338,7 +338,17 @@ export default function UnifiedConversationInterface({
           <div className="text-center space-y-8">
             {/* Avatar Display - Mobile: Top/Bottom, Desktop: Side-by-Side */}
             <div className="flex flex-col items-center space-y-8">
+              {/* Avatar Description */}
+              <div className="space-y-2 max-w-sm text-center">
+                <h3 className="text-heading-2 text-warm-brown-800">
+                  You are talking {selectedAvatar.name}
+                </h3>
+                <p className="text-body text-warm-brown-600 leading-relaxed">
+                  {selectedAvatar.description}
+                </p>
+              </div>
               <div className="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-12">
+                
                 {/* Agent Avatar */}
                 <ConversationAvatar
                   type="agent"
@@ -353,16 +363,6 @@ export default function UnifiedConversationInterface({
                   isSpeaking={isUserSpeaking}
                   size="lg"
                 />
-              </div>
-
-              {/* Avatar Description */}
-              <div className="space-y-2 max-w-sm text-center">
-                <h3 className="text-heading-2 text-warm-brown-800">
-                  {selectedAvatar.name}
-                </h3>
-                <p className="text-body text-warm-brown-600 leading-relaxed">
-                  {selectedAvatar.description}
-                </p>
               </div>
             </div>
 
@@ -419,7 +419,7 @@ export default function UnifiedConversationInterface({
               </h3>
               <p className="text-body text-warm-brown-600">
                 Our AI is analyzing your conversation and preparing detailed
-                feedback
+                feedback. This will take a couple minutes.
               </p>
             </div>
           </div>
@@ -538,7 +538,7 @@ export default function UnifiedConversationInterface({
   const renderCurrentState = () => {
     switch (state) {
       case "idle":
-        return renderConnectingState();
+        return renderIdleState();
       case "connecting":
         return renderConnectingState();
       case "active":
