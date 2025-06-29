@@ -49,41 +49,50 @@ export async function createReview(req: Request, res: Response) {
   try {
     const result = insertReviewSchema.safeParse(req.body);
     if (!result.success) {
-      return res.status(400).json({ 
-        error: "Invalid review data",
-        details: fromZodError(result.error).toString()
-      });
+      const validationError = fromZodError(result.error);
+      return res.status(400).json({ error: validationError.message });
     }
 
-    const review = await storage.createReview(result.data);
+    const reviewData = result.data;
 
-    // Generate next steps automatically after review creation
-    try {
-      // Extract reviews from transcriptWithReviews for Next Steps generation
-      const reviewObjects = result.data.transcriptWithReviews
-        .filter(item => item.review !== null)
-        .map((item, index) => ({
-          index: item.index,
-          review: item.review as string,
-          category: "improvement" // Default category for API-created reviews
-        }));
+    // Create the review
+    const review = await storage.createReview(reviewData);
 
-      const nextStepsResponse = await generateNextSteps({
-        reviews: reviewObjects,
-        summary: result.data.summary
-      });
+    // Generate next steps if we have review data
+    if (result.data.transcriptWithReviews && Array.isArray(result.data.transcriptWithReviews)) {
+      try {
+        const improvementReviews = result.data.transcriptWithReviews
+          .filter((item: any) => item.review && typeof item.review === 'string')
+          .map((item: any, index: number) => ({
+            index,
+            review: item.review,
+            category: 'improvement'
+          }));
 
-      // Create next steps record if generation was successful
-      if (nextStepsResponse.steps.length > 0) {
-        await storage.createNextSteps({
-          conversationId: result.data.conversationId,
-          steps: nextStepsResponse,
+        if (improvementReviews.length > 0) {
+          const nextStepsInput = {
+            reviews: improvementReviews,
+            summary: reviewData.summary || 'Conversation analysis'
+          };
+
+          const nextStepsResponse = await generateNextSteps(nextStepsInput);
+          
+          // Create next steps record
+          await storage.createNextSteps({
+            conversationId: reviewData.conversationId,
+            steps: nextStepsResponse,
+          });
+          console.log("✅ Next steps generated and saved successfully");
+        }
+      } catch (nextStepsError) {
+        console.error("❌ Next steps generation failed:", {
+          error: nextStepsError instanceof Error ? nextStepsError.message : String(nextStepsError),
+          stack: nextStepsError instanceof Error ? nextStepsError.stack : undefined,
+          reviewsCount: result.data.transcriptWithReviews?.length || 0,
+          summaryLength: result.data.summary?.length || 0
         });
-        console.log("✅ Next steps generated and saved automatically");
+        // Continue without next steps - conversation flow is not interrupted
       }
-    } catch (nextStepsError) {
-      console.error("❌ Next steps generation failed:", nextStepsError);
-      // Continue without next steps - review creation is not interrupted
     }
 
     res.status(201).json(review);
@@ -101,12 +110,18 @@ export async function updateReview(req: Request, res: Response) {
       return res.status(400).json({ error: "Invalid review ID" });
     }
 
-    const review = await storage.updateReview(id, req.body);
-    if (!review) {
+    const result = insertReviewSchema.partial().safeParse(req.body);
+    if (!result.success) {
+      const validationError = fromZodError(result.error);
+      return res.status(400).json({ error: validationError.message });
+    }
+
+    const updatedReview = await storage.updateReview(id, result.data);
+    if (!updatedReview) {
       return res.status(404).json({ error: "Review not found" });
     }
 
-    res.json(review);
+    res.json(updatedReview);
   } catch (error) {
     console.error("Error updating review:", error);
     res.status(500).json({ error: "Internal server error" });

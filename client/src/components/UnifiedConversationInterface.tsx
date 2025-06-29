@@ -5,6 +5,7 @@ import { MessageCircle, AlertCircle, Check, Clock } from "lucide-react";
 import { useAnonymousConversation } from "@/contexts/AnonymousConversationContext";
 import ChatThread from "@/components/ChatThread";
 import AvatarSelection from "@/components/AvatarSelection";
+import NextStepsSection from "@/components/NextStepsSection";
 import { AVATARS } from "@shared/schema";
 import type { TranscriptWithReview, Avatar } from "@shared/schema";
 import { useState, useEffect, useCallback, useRef } from "react";
@@ -511,6 +512,9 @@ export default function UnifiedConversationInterface({
                   </div>
                 </div>
               )}
+
+              {/* Next Steps Section */}
+              <NextStepsSection nextSteps={conversationData?.nextSteps} />
             </div>
 
             {/* Start New Conversation Button - Fixed at bottom */}

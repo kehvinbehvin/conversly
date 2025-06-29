@@ -67,10 +67,7 @@ export async function createReviewWithTranscripts(
 
     // Generate next steps based on the review data
     try {
-      const nextStepsResponse = await generateNextSteps({
-        reviews: reviewObjects,
-        summary: braintrustSummary,
-      });
+      const nextStepsResponse = await generateNextSteps(braintrustResponse);
 
       // Create next steps record if generation was successful
       if (nextStepsResponse.steps.length > 0) {
