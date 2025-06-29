@@ -60,9 +60,8 @@ export const takeActionF00e = project.prompts.create({
         '```json\n' +
         '{\n' +
         '  "steps": [\n' +
-        '    {"step": "Practice asking follow-up questions to show genuine curiosity"},\n' +
-        '    {"step": "Share specific personal details to keep conversations flowing"},\n' +
-        '    {"step": "Elaborate answers with vivid details for memorable interactions"}\n' +
+        '    "step": "",\n' +
+        '    "step": ""\n' +
         '  ]\n' +
         '}\n' +
         '\n' +

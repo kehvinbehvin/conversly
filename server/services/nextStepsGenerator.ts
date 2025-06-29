@@ -26,22 +26,54 @@ export async function generateNextSteps(
       input: reviewData
     });
 
-    // Type-safe response handling
-    const response = result as { steps?: Step[] };
+    console.log('Braintrust response received, type:', typeof result);
     
-    // Validate the response structure
-    if (!response || !Array.isArray(response.steps)) {
-      throw new Error('Invalid response format from Next Steps LLM');
+    // The Braintrust configuration format suggests steps as array of strings
+    // Handle the actual response format dynamically
+    let steps: string[] = [];
+    
+    if (typeof result === 'string') {
+      // Parse JSON string response
+      try {
+        const parsed = JSON.parse(result);
+        if (parsed.steps && Array.isArray(parsed.steps)) {
+          steps = parsed.steps;
+        } else {
+          throw new Error('No steps array found in JSON response');
+        }
+      } catch (parseError) {
+        throw new Error('Invalid JSON response from Braintrust');
+      }
+    } else if (result && typeof result === 'object') {
+      // Handle object response
+      const response = result as any;
+      
+      if (Array.isArray(response.steps)) {
+        steps = response.steps;
+      } else if (response.steps) {
+        // Single step
+        steps = [response.steps];
+      } else {
+        throw new Error('No steps found in response object');
+      }
+    } else {
+      throw new Error('Unexpected response format from Braintrust');
     }
 
-    // Validate each step has the required structure
-    const validatedSteps: Step[] = response.steps.map((step: any, index: number) => {
-      if (!step || typeof step.step !== 'string') {
-        throw new Error(`Invalid step format at index ${index}`);
+    // Validate and convert to Step objects
+    const validatedSteps: Step[] = steps.map((stepString: any, index: number) => {
+      if (typeof stepString === 'string') {
+        return { step: stepString };
+      } else {
+        throw new Error(`Step ${index} is not a string: ${typeof stepString}`);
       }
-      return { step: step.step };
     });
 
+    if (validatedSteps.length === 0) {
+      throw new Error('No valid steps generated');
+    }
+
+    console.log(`Generated ${validatedSteps.length} next steps successfully`);
     return { steps: validatedSteps };
   } catch (error) {
     console.error("❌ Next Steps generation failed:", {

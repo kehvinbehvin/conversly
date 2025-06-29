@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { storage } from "../storage";
 import { insertReviewSchema } from "@shared/schema";
 import { fromZodError } from "zod-validation-error";
+import { generateNextSteps } from "../services/nextStepsGenerator";
 
 // GET /api/reviews/:id
 export async function getReview(req: Request, res: Response) {
@@ -55,6 +56,36 @@ export async function createReview(req: Request, res: Response) {
     }
 
     const review = await storage.createReview(result.data);
+
+    // Generate next steps automatically after review creation
+    try {
+      // Extract reviews from transcriptWithReviews for Next Steps generation
+      const reviewObjects = result.data.transcriptWithReviews
+        .filter(item => item.review !== null)
+        .map((item, index) => ({
+          index: item.index,
+          review: item.review as string,
+          category: "improvement" // Default category for API-created reviews
+        }));
+
+      const nextStepsResponse = await generateNextSteps({
+        reviews: reviewObjects,
+        summary: result.data.summary
+      });
+
+      // Create next steps record if generation was successful
+      if (nextStepsResponse.steps.length > 0) {
+        await storage.createNextSteps({
+          conversationId: result.data.conversationId,
+          steps: nextStepsResponse,
+        });
+        console.log("✅ Next steps generated and saved automatically");
+      }
+    } catch (nextStepsError) {
+      console.error("❌ Next steps generation failed:", nextStepsError);
+      // Continue without next steps - review creation is not interrupted
+    }
+
     res.status(201).json(review);
   } catch (error) {
     console.error("Error creating review:", error);
