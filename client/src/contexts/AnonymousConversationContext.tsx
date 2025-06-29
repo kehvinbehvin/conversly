@@ -12,6 +12,7 @@ interface AnonymousConversationContextType {
   conversationData: ConversationWithReview | null;
   isReviewReady: boolean;
   error: string | null;
+  conversation: any; // Expose ElevenLabs conversation object for speaking detection
   startConversation: (agentId: string) => Promise<void>;
   endConversation: () => void;
   clearError: () => void;
@@ -242,6 +243,7 @@ export function AnonymousConversationProvider({
     conversationData,
     isReviewReady,
     error,
+    conversation, // Expose ElevenLabs conversation object
     startConversation,
     endConversation,
     clearError,
