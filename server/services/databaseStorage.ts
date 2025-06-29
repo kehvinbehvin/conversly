@@ -3,6 +3,7 @@ import {
   conversations, 
   reviews,
   transcripts,
+  nextSteps,
   type User, 
   type InsertUser, 
   type Conversation,
@@ -11,6 +12,8 @@ import {
   type InsertReview,
   type Transcript,
   type InsertTranscript,
+  type NextSteps,
+  type InsertNextSteps,
   type ConversationWithReview,
   type TranscriptObject,
   type ReviewObject,
@@ -172,6 +175,37 @@ export class DatabaseStorage implements IStorage {
       .where(eq(reviews.id, id))
       .returning();
     return review || undefined;
+  }
+
+  // Next Steps operations
+  async getNextSteps(id: number): Promise<NextSteps | undefined> {
+    const [nextStepsRecord] = await db.select().from(nextSteps).where(eq(nextSteps.id, id));
+    return nextStepsRecord || undefined;
+  }
+
+  async getNextStepsByConversationId(conversationId: number): Promise<NextSteps | undefined> {
+    const [nextStepsRecord] = await db
+      .select()
+      .from(nextSteps)
+      .where(eq(nextSteps.conversationId, conversationId));
+    return nextStepsRecord || undefined;
+  }
+
+  async createNextSteps(insertNextSteps: InsertNextSteps): Promise<NextSteps> {
+    const [nextStepsRecord] = await db
+      .insert(nextSteps)
+      .values(insertNextSteps)
+      .returning();
+    return nextStepsRecord;
+  }
+
+  async updateNextSteps(id: number, updates: Partial<NextSteps>): Promise<NextSteps | undefined> {
+    const [nextStepsRecord] = await db
+      .update(nextSteps)
+      .set(updates)
+      .where(eq(nextSteps.id, id))
+      .returning();
+    return nextStepsRecord || undefined;
   }
 
 }

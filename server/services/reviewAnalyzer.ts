@@ -1,4 +1,5 @@
 import { analyzeConversationWithBraintrust } from "./braintrust";
+import { generateNextSteps } from "./nextStepsGenerator";
 import { storage } from "../storage";
 import type {
   Conversation,
@@ -63,6 +64,28 @@ export async function createReviewWithTranscripts(
       overallRating,
       transcriptWithReviews: transcriptWithReviews,
     });
+
+    // Generate next steps based on the review data
+    try {
+      const nextStepsResponse = await generateNextSteps({
+        reviews: reviewObjects,
+        summary: braintrustSummary,
+      });
+
+      // Create next steps record if generation was successful
+      if (nextStepsResponse.steps.length > 0) {
+        await storage.createNextSteps({
+          conversationId,
+          steps: nextStepsResponse,
+        });
+        console.log("✅ Next steps generated and saved successfully");
+      } else {
+        console.log("⚠️ No next steps generated - continuing without next steps");
+      }
+    } catch (nextStepsError) {
+      console.error("❌ Next steps generation failed:", nextStepsError);
+      // Continue without next steps - conversation flow is not interrupted
+    }
 
     return review;
   } catch (error) {

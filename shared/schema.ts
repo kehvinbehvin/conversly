@@ -46,6 +46,13 @@ export const reviews = pgTable("reviews", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const nextSteps = pgTable("next_steps", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").notNull().references(() => conversations.id),
+  steps: jsonb("steps").notNull(), // Array of Step objects: { steps: Step[] }
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -67,6 +74,11 @@ export const insertReviewSchema = createInsertSchema(reviews).omit({
   createdAt: true,
 });
 
+export const insertNextStepsSchema = createInsertSchema(nextSteps).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertConversation = z.infer<typeof insertConversationSchema>;
@@ -75,6 +87,8 @@ export type InsertTranscript = z.infer<typeof insertTranscriptSchema>;
 export type Transcript = typeof transcripts.$inferSelect;
 export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
+export type InsertNextSteps = z.infer<typeof insertNextStepsSchema>;
+export type NextSteps = typeof nextSteps.$inferSelect;
 
 // New data structures as per requirements
 export type TranscriptObject = {
@@ -90,6 +104,10 @@ export type ReviewObject = {
   category: "complement" | "improvement";
 };
 
+export type Step = {
+  step: string;
+};
+
 export type TranscriptWithReview = TranscriptObject & {
   review?: string | null;
 };
@@ -98,6 +116,7 @@ export type TranscriptWithReview = TranscriptObject & {
 export type ConversationWithReview = Conversation & {
   review?: Review;
   transcript?: Transcript;
+  nextSteps?: NextSteps;
 };
 
 // Avatar type for conversation agent selection
@@ -231,6 +250,10 @@ export const conversationsRelations = relations(
       fields: [conversations.id],
       references: [reviews.conversationId],
     }),
+    nextSteps: one(nextSteps, {
+      fields: [conversations.id],
+      references: [nextSteps.conversationId],
+    }),
   }),
 );
 
@@ -241,6 +264,13 @@ export const transcriptsRelations = relations(transcripts, ({ many }) => ({
 export const reviewsRelations = relations(reviews, ({ one }) => ({
   conversation: one(conversations, {
     fields: [reviews.conversationId],
+    references: [conversations.id],
+  }),
+}));
+
+export const nextStepsRelations = relations(nextSteps, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [nextSteps.conversationId],
     references: [conversations.id],
   }),
 }));

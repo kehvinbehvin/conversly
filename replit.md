@@ -103,6 +103,16 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 29, 2025: **NEXT STEPS FEATURE COMPLETED** - AI-generated actionable recommendations system fully implemented
+  - **Database Schema**: Added next_steps table with foreign key relationship to conversations
+  - **Braintrust Integration**: Created nextStepsGenerator service using "take-action-f00e" prompt slug
+  - **Service Layer**: Integrated next steps generation into review creation workflow in reviewAnalyzer.ts
+  - **API Enhancement**: Updated /api/conversations/:id endpoint to include nextSteps in response
+  - **Data Flow**: Review LLM output → Next Steps LLM → Database storage → API response
+  - **Error Handling**: Graceful degradation - conversation flow continues even if next steps generation fails
+  - **Storage Interface**: Added complete CRUD operations for next steps in both memory and database implementations
+  - **API Routes**: Full REST endpoints for next steps management (/api/next-steps, /api/conversations/:id/next-steps)
+  - **End-to-End Validation**: Successfully tested complete workflow from review creation to next steps retrieval
 - June 27, 2025: **1-HOUR CONVERSATION ACCESS LIMIT IMPLEMENTED** - Added time-based access control to conversation API endpoint
   - **Route Protection**: /api/conversations/:id now checks conversation age against created_at timestamp
   - **Time Validation**: Compares current time with conversation.createdAt, returns 204 No Content if difference exceeds 1 hour

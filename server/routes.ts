@@ -11,6 +11,7 @@ import { analyzeConversationWithBraintrust } from "./services/braintrust";
 import type { TranscriptObject } from "@shared/schema";
 import * as transcriptRoutes from "./routes/transcripts";
 import * as reviewRoutes from "./routes/reviews";
+import * as nextStepsRoutes from "./routes/nextSteps";
 import { createReviewWithTranscripts } from "./services/reviewAnalyzer";
 import { z } from "zod";
 
@@ -175,10 +176,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
           ? await storage.getTranscript(conversation.transcriptId)
           : null;
 
+        // Include next steps if available
+        const nextSteps = await storage.getNextStepsByConversationId(id);
+
         res.json({
           ...conversation,
           review,
           transcript,
+          nextSteps,
           // Helper flags for frontend
           isComplete: conversation.status === "completed" && !!review,
         });
@@ -826,6 +831,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
   app.post("/api/reviews", express.json(), reviewRoutes.createReview);
   app.patch("/api/reviews/:id", express.json(), reviewRoutes.updateReview);
+
+  // Next Steps routes
+  app.get("/api/next-steps/:id", nextStepsRoutes.getNextSteps);
+  app.get(
+    "/api/conversations/:conversationId/next-steps",
+    nextStepsRoutes.getNextStepsByConversationId,
+  );
+  app.post("/api/next-steps", express.json(), nextStepsRoutes.createNextSteps);
+  app.patch("/api/next-steps/:id", express.json(), nextStepsRoutes.updateNextSteps);
 
   // Add SSE endpoint for real-time notifications
   app.get("/api/events/:conversationId", (req, res) => {

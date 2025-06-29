@@ -3,6 +3,7 @@ import {
   conversations, 
   reviews,
   transcripts,
+  nextSteps,
   type User, 
   type InsertUser, 
   type Conversation,
@@ -11,6 +12,8 @@ import {
   type InsertReview,
   type Transcript,
   type InsertTranscript,
+  type NextSteps,
+  type InsertNextSteps,
   type ConversationWithReview,
   type TranscriptObject,
   type ReviewObject,
@@ -41,6 +44,12 @@ export interface IStorage {
   getReviewByConversationId(conversationId: number): Promise<Review | undefined>;
   createReview(review: InsertReview): Promise<Review>;
   updateReview(id: number, updates: Partial<Review>): Promise<Review | undefined>;
+
+  // Next Steps operations
+  getNextSteps(id: number): Promise<NextSteps | undefined>;
+  getNextStepsByConversationId(conversationId: number): Promise<NextSteps | undefined>;
+  createNextSteps(nextSteps: InsertNextSteps): Promise<NextSteps>;
+  updateNextSteps(id: number, updates: Partial<NextSteps>): Promise<NextSteps | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -48,20 +57,24 @@ export class MemStorage implements IStorage {
   private conversations: Map<number, Conversation>;
   private reviews: Map<number, Review>;
   private transcripts: Map<number, Transcript>;
+  private nextSteps: Map<number, NextSteps>;
   private currentUserId: number;
   private currentConversationId: number;
   private currentReviewId: number;
   private currentTranscriptId: number;
+  private currentNextStepsId: number;
 
   constructor() {
     this.users = new Map();
     this.conversations = new Map();
     this.reviews = new Map();
     this.transcripts = new Map();
+    this.nextSteps = new Map();
     this.currentUserId = 1;
     this.currentConversationId = 1;
     this.currentReviewId = 1;
     this.currentTranscriptId = 1;
+    this.currentNextStepsId = 1;
 
     // Create a demo user for testing
     this.createUser({
@@ -241,6 +254,41 @@ export class MemStorage implements IStorage {
 
     const updated = { ...review, ...updates };
     this.reviews.set(id, updated);
+    return updated;
+  }
+
+  // Next Steps operations
+  async getNextSteps(id: number): Promise<NextSteps | undefined> {
+    return this.nextSteps.get(id);
+  }
+
+  async getNextStepsByConversationId(conversationId: number): Promise<NextSteps | undefined> {
+    for (const [, nextSteps] of this.nextSteps) {
+      if (nextSteps.conversationId === conversationId) {
+        return nextSteps;
+      }
+    }
+    return undefined;
+  }
+
+  async createNextSteps(insertNextSteps: InsertNextSteps): Promise<NextSteps> {
+    const nextSteps: NextSteps = {
+      id: this.currentNextStepsId++,
+      conversationId: insertNextSteps.conversationId,
+      steps: insertNextSteps.steps,
+      createdAt: new Date(),
+    };
+
+    this.nextSteps.set(nextSteps.id, nextSteps);
+    return nextSteps;
+  }
+
+  async updateNextSteps(id: number, updates: Partial<NextSteps>): Promise<NextSteps | undefined> {
+    const nextSteps = this.nextSteps.get(id);
+    if (!nextSteps) return undefined;
+
+    const updated = { ...nextSteps, ...updates };
+    this.nextSteps.set(id, updated);
     return updated;
   }
 
