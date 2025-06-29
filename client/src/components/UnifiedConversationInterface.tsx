@@ -336,9 +336,9 @@ export default function UnifiedConversationInterface({
       <div className="w-conversation-sm md:w-conversation-md xl:w-conversation mx-auto">
         <div className="h-full flex items-center justify-center">
           <div className="text-center space-y-8">
-            {/* Side-by-Side Avatar Display (Agent | User) */}
+            {/* Avatar Display - Mobile: Top/Bottom, Desktop: Side-by-Side */}
             <div className="flex flex-col items-center space-y-8">
-              <div className="flex items-center justify-center space-x-12">
+              <div className="flex flex-col md:flex-row items-center justify-center space-y-8 md:space-y-0 md:space-x-12">
                 {/* Agent Avatar */}
                 <ConversationAvatar
                   type="agent"
