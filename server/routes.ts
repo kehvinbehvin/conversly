@@ -596,7 +596,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           };
 
           try {
-            conversation = await storage.createConversation(conversationData);
+          conversation = await storage.createConversation(conversationData);
             console.log(
               "⚠️ Created fallback conversation:",
               conversation.id,
