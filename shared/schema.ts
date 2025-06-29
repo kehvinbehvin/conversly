@@ -53,6 +53,15 @@ export const nextSteps = pgTable("next_steps", {
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 
+export const feedback = pgTable("feedback", {
+  id: serial("id").primaryKey(),
+  conversationId: integer("conversation_id").references(() => conversations.id),
+  name: text("name"),
+  email: text("email"),
+  feedback: text("feedback"),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+});
+
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
   createdAt: true,
@@ -79,6 +88,11 @@ export const insertNextStepsSchema = createInsertSchema(nextSteps).omit({
   createdAt: true,
 });
 
+export const insertFeedbackSchema = createInsertSchema(feedback).omit({
+  id: true,
+  createdAt: true,
+});
+
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 export type InsertConversation = z.infer<typeof insertConversationSchema>;
@@ -89,6 +103,8 @@ export type InsertReview = z.infer<typeof insertReviewSchema>;
 export type Review = typeof reviews.$inferSelect;
 export type InsertNextSteps = z.infer<typeof insertNextStepsSchema>;
 export type NextSteps = typeof nextSteps.$inferSelect;
+export type InsertFeedback = z.infer<typeof insertFeedbackSchema>;
+export type Feedback = typeof feedback.$inferSelect;
 
 // New data structures as per requirements
 export type TranscriptObject = {
@@ -271,6 +287,13 @@ export const reviewsRelations = relations(reviews, ({ one }) => ({
 export const nextStepsRelations = relations(nextSteps, ({ one }) => ({
   conversation: one(conversations, {
     fields: [nextSteps.conversationId],
+    references: [conversations.id],
+  }),
+}));
+
+export const feedbackRelations = relations(feedback, ({ one }) => ({
+  conversation: one(conversations, {
+    fields: [feedback.conversationId],
     references: [conversations.id],
   }),
 }));

@@ -12,6 +12,7 @@ import type { TranscriptObject } from "@shared/schema";
 import * as transcriptRoutes from "./routes/transcripts";
 import * as reviewRoutes from "./routes/reviews";
 import * as nextStepsRoutes from "./routes/nextSteps";
+import * as feedbackRoutes from "./routes/feedback";
 import { createReviewWithTranscripts } from "./services/reviewAnalyzer";
 import { z } from "zod";
 
@@ -840,6 +841,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
   app.post("/api/next-steps", express.json(), nextStepsRoutes.createNextSteps);
   app.patch("/api/next-steps/:id", express.json(), nextStepsRoutes.updateNextSteps);
+
+  // Feedback routes
+  app.get("/api/feedback/:id", feedbackRoutes.getFeedback);
+  app.post("/api/feedback", express.json(), feedbackRoutes.createFeedback);
 
   // Add SSE endpoint for real-time notifications
   app.get("/api/events/:conversationId", (req, res) => {

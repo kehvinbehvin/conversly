@@ -4,6 +4,7 @@ import {
   reviews,
   transcripts,
   nextSteps,
+  feedback,
   type User, 
   type InsertUser, 
   type Conversation,
@@ -14,6 +15,8 @@ import {
   type InsertTranscript,
   type NextSteps,
   type InsertNextSteps,
+  type Feedback,
+  type InsertFeedback,
   type ConversationWithReview,
   type TranscriptObject,
   type ReviewObject,
@@ -206,6 +209,20 @@ export class DatabaseStorage implements IStorage {
       .where(eq(nextSteps.id, id))
       .returning();
     return nextStepsRecord || undefined;
+  }
+
+  // Feedback operations
+  async getFeedback(id: number): Promise<Feedback | undefined> {
+    const [feedbackRecord] = await db.select().from(feedback).where(eq(feedback.id, id));
+    return feedbackRecord || undefined;
+  }
+
+  async createFeedback(insertFeedback: InsertFeedback): Promise<Feedback> {
+    const [feedbackRecord] = await db
+      .insert(feedback)
+      .values(insertFeedback)
+      .returning();
+    return feedbackRecord;
   }
 
 }

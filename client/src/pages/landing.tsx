@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { AnonymousConversationProvider } from "@/contexts/AnonymousConversationContext";
 import UnifiedConversationInterface from "@/components/UnifiedConversationInterface";
+import { FeedbackSection } from "@/components/FeedbackSection";
 import { trackPageView, trackButtonClick, trackSectionView } from "@/lib/gtm";
 
 export default function Landing() {
@@ -66,6 +67,12 @@ export default function Landing() {
                   className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
                 >
                   Features
+                </button>
+                <button
+                  onClick={() => scrollToSection("feedback")}
+                  className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
+                >
+                  Feedback
                 </button>
               </div>
             </div>
@@ -225,6 +232,9 @@ export default function Landing() {
         </div>
       </section>
 
+      {/* Feedback Section */}
+      <FeedbackSection />
+
       {/* Footer */}
       <footer className="bg-warm-brown-900 text-warm-brown-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -254,6 +264,14 @@ export default function Landing() {
                     className="hover:text-white transition-colors"
                   >
                     Features
+                  </button>
+                </li>
+                <li>
+                  <button
+                    onClick={() => scrollToSection("feedback")}
+                    className="hover:text-white transition-colors"
+                  >
+                    Feedback
                   </button>
                 </li>
               </ul>

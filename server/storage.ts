@@ -4,6 +4,7 @@ import {
   reviews,
   transcripts,
   nextSteps,
+  feedback,
   type User, 
   type InsertUser, 
   type Conversation,
@@ -14,6 +15,8 @@ import {
   type InsertTranscript,
   type NextSteps,
   type InsertNextSteps,
+  type Feedback,
+  type InsertFeedback,
   type ConversationWithReview,
   type TranscriptObject,
   type ReviewObject,
@@ -50,6 +53,10 @@ export interface IStorage {
   getNextStepsByConversationId(conversationId: number): Promise<NextSteps | undefined>;
   createNextSteps(nextSteps: InsertNextSteps): Promise<NextSteps>;
   updateNextSteps(id: number, updates: Partial<NextSteps>): Promise<NextSteps | undefined>;
+
+  // Feedback operations
+  getFeedback(id: number): Promise<Feedback | undefined>;
+  createFeedback(feedback: InsertFeedback): Promise<Feedback>;
 }
 
 export class MemStorage implements IStorage {
@@ -58,11 +65,13 @@ export class MemStorage implements IStorage {
   private reviews: Map<number, Review>;
   private transcripts: Map<number, Transcript>;
   private nextSteps: Map<number, NextSteps>;
+  private feedback: Map<number, Feedback>;
   private currentUserId: number;
   private currentConversationId: number;
   private currentReviewId: number;
   private currentTranscriptId: number;
   private currentNextStepsId: number;
+  private currentFeedbackId: number;
 
   constructor() {
     this.users = new Map();
@@ -70,11 +79,13 @@ export class MemStorage implements IStorage {
     this.reviews = new Map();
     this.transcripts = new Map();
     this.nextSteps = new Map();
+    this.feedback = new Map();
     this.currentUserId = 1;
     this.currentConversationId = 1;
     this.currentReviewId = 1;
     this.currentTranscriptId = 1;
     this.currentNextStepsId = 1;
+    this.currentFeedbackId = 1;
 
     // Create a demo user for testing
     this.createUser({
@@ -290,6 +301,24 @@ export class MemStorage implements IStorage {
     const updated = { ...nextSteps, ...updates };
     this.nextSteps.set(id, updated);
     return updated;
+  }
+
+  async getFeedback(id: number): Promise<Feedback | undefined> {
+    return this.feedback.get(id);
+  }
+
+  async createFeedback(insertFeedback: InsertFeedback): Promise<Feedback> {
+    const feedback: Feedback = {
+      id: this.currentFeedbackId++,
+      conversationId: insertFeedback.conversationId || null,
+      name: insertFeedback.name || null,
+      email: insertFeedback.email || null,
+      feedback: insertFeedback.feedback || null,
+      createdAt: new Date(),
+    };
+
+    this.feedback.set(feedback.id, feedback);
+    return feedback;
   }
 
 }
