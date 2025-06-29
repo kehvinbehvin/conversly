@@ -27,53 +27,53 @@ export async function generateNextSteps(
     });
 
     console.log('Braintrust response received, type:', typeof result);
+    console.log('Response structure:', JSON.stringify(result, null, 2));
     
-    // The Braintrust configuration format suggests steps as array of strings
-    // Handle the actual response format dynamically
-    let steps: string[] = [];
+    // Handle the Braintrust response format: { "steps": [ { "step": "string" }, { "step": "string" } ] }
+    let validatedSteps: Step[] = [];
     
     if (typeof result === 'string') {
       // Parse JSON string response
       try {
         const parsed = JSON.parse(result);
         if (parsed.steps && Array.isArray(parsed.steps)) {
-          steps = parsed.steps;
+          validatedSteps = parsed.steps.map((stepObj: any, index: number) => {
+            if (stepObj && typeof stepObj === 'object' && typeof stepObj.step === 'string') {
+              return { step: stepObj.step };
+            } else {
+              throw new Error(`Step ${index} invalid format: expected {step: string}, got ${JSON.stringify(stepObj)}`);
+            }
+          });
         } else {
           throw new Error('No steps array found in JSON response');
         }
       } catch (parseError) {
-        throw new Error('Invalid JSON response from Braintrust');
+        throw new Error(`Invalid JSON response from Braintrust: ${parseError}`);
       }
     } else if (result && typeof result === 'object') {
-      // Handle object response
+      // Handle direct object response
       const response = result as any;
       
       if (Array.isArray(response.steps)) {
-        steps = response.steps;
-      } else if (response.steps) {
-        // Single step
-        steps = [response.steps];
+        validatedSteps = response.steps.map((stepObj: any, index: number) => {
+          if (stepObj && typeof stepObj === 'object' && typeof stepObj.step === 'string') {
+            return { step: stepObj.step };
+          } else {
+            throw new Error(`Step ${index} invalid format: expected {step: string}, got ${JSON.stringify(stepObj)}`);
+          }
+        });
       } else {
-        throw new Error('No steps found in response object');
+        throw new Error('No steps array found in response object');
       }
     } else {
-      throw new Error('Unexpected response format from Braintrust');
+      throw new Error(`Unexpected response format from Braintrust: ${typeof result}`);
     }
-
-    // Validate and convert to Step objects
-    const validatedSteps: Step[] = steps.map((stepString: any, index: number) => {
-      if (typeof stepString === 'string') {
-        return { step: stepString };
-      } else {
-        throw new Error(`Step ${index} is not a string: ${typeof stepString}`);
-      }
-    });
 
     if (validatedSteps.length === 0) {
-      throw new Error('No valid steps generated');
+      throw new Error('No valid steps generated from Braintrust response');
     }
 
-    console.log(`Generated ${validatedSteps.length} next steps successfully`);
+    console.log(`Successfully generated ${validatedSteps.length} next steps`);
     return { steps: validatedSteps };
   } catch (error) {
     console.error("❌ Next Steps generation failed:", {
