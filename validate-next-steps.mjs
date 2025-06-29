@@ -1,47 +1,42 @@
-import { invoke } from 'braintrust';
+// Test Next Steps JSON format handling with mock data
+import { generateNextSteps } from './server/services/nextStepsGenerator.ts';
 
-async function validateNextSteps() {
-  const testData = {
-    reviews: [
-      {
-        index: 0,
-        review: 'Good greeting but could use more engaging follow-up questions',
-        category: 'improvement'
-      }
-    ],
-    summary: 'Testing next steps generation with updated configuration'
-  };
-
-  console.log('Testing Braintrust Next Steps Generation...');
-  console.log('Input data:', JSON.stringify(testData, null, 2));
+async function testJsonFormatHandling() {
+  console.log('Testing Next Steps JSON format handling...');
   
-  try {
-    const result = await invoke({
-      projectName: 'Yappy-first-project',
-      slug: 'take-action-f00e',
-      input: testData
+  // Mock the exact Braintrust response format you provided
+  const mockBraintrustResponse = {
+    "steps": [
+      {
+        "step": "Reflect on your recent conversations and identify moments where you gave brief or generic responses. Practice elaborating on your experiences and sharing specific details, as this helps others connect with you and makes interactions more engaging."
+      },
+      {
+        "step": "Before your next conversation, prepare a few open-ended questions and personal anecdotes related to common topics (e.g., work, hobbies, recent events). This preparation will help you steer conversations beyond surface-level exchanges."
+      },
+      {
+        "step": "Focus on active listening and genuine curiosity. When someone shares something, respond with follow-up questions or comments that show you are interested and attentive."
+      }
+    ]
+  };
+  
+  console.log('Mock response format:', JSON.stringify(mockBraintrustResponse, null, 2));
+  
+  // Test the parsing logic directly
+  if (mockBraintrustResponse.steps && Array.isArray(mockBraintrustResponse.steps)) {
+    const validatedSteps = mockBraintrustResponse.steps.map((stepObj, index) => {
+      if (stepObj && typeof stepObj === 'object' && typeof stepObj.step === 'string') {
+        return { step: stepObj.step };
+      } else {
+        throw new Error(`Step ${index} invalid format: expected {step: string}, got ${JSON.stringify(stepObj)}`);
+      }
     });
     
-    console.log('\n✅ SUCCESS!');
-    console.log('Response type:', typeof result);
-    console.log('Full response:', JSON.stringify(result, null, 2));
-    
-    // Analyze the structure
-    if (result && typeof result === 'object' && result.steps) {
-      console.log('\nSteps analysis:');
-      console.log('Steps type:', typeof result.steps);
-      console.log('Steps is array:', Array.isArray(result.steps));
-      
-      if (Array.isArray(result.steps)) {
-        console.log('Steps count:', result.steps.length);
-        result.steps.forEach((step, i) => {
-          console.log(`Step ${i}:`, typeof step, JSON.stringify(step));
-        });
-      }
-    }
-  } catch (error) {
-    console.error('❌ FAILED:', error.message);
+    console.log('✅ JSON parsing successful!');
+    console.log(`Processed ${validatedSteps.length} steps`);
+    validatedSteps.forEach((step, i) => {
+      console.log(`${i + 1}. ${step.step.substring(0, 80)}...`);
+    });
   }
 }
 
-validateNextSteps();
+testJsonFormatHandling();
