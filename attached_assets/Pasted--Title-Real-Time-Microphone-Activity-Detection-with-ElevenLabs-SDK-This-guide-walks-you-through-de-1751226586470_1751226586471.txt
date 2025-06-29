@@ -1,0 +1,99 @@
+
+Title: Real-Time Microphone Activity Detection with ElevenLabs SDK
+
+This guide walks you through detecting microphone input activity (noise, voice, or silence) using the ElevenLabs conversational AI SDK.
+
+---
+
+Use the ElevenLabs SDK that exposes:
+- `getInputVolume()`
+- `getInputByteFrequencyData()`
+
+---
+
+**2. Confirm SDK Access to Microphone**
+
+Make sure your app has obtained microphone access via `navigator.mediaDevices.getUserMedia({ audio: true })`, or the ElevenLabs SDK handles it internally.
+
+---
+
+**3. After Initializing Your Conversation Session**
+
+Start or access the ElevenLabs conversation/session object:
+```js
+const conversation = await ElevenLabs.createConversation(); // or your platform's equivalent
+```
+
+---
+
+**4. Create an Interval to Poll Input Data**
+
+There should be an existing interval that already checks for the Agent's ispeaking status.
+Lets hook into that functionality without creating duplicate code
+
+Use `setInterval()` to poll the audio data regularly (e.g. every 200ms):
+```js
+setInterval(async () => {
+  const volume = await conversation.getInputVolume();
+  const freqData = await conversation.getInputByteFrequencyData();
+  // process the data here
+}, 200);
+```
+
+---
+
+**5. Interpret the Volume Level**
+
+Use `volume` (range 0 to 1, where 0 = -100 dB and 1 = -30 dB) to detect if there’s general sound:
+```js
+if (volume > 0.1) {
+  console.log("Sound detected");
+}
+```
+
+---
+
+**6. Analyze Frequency Data for Voice Detection**
+
+Voice generally occupies low-mid frequencies. Sum values in key bins to detect speech:
+```js
+const voiceEnergy = freqData.slice(2, 10).reduce((sum, val) => sum + val, 0);
+const isVoice = voiceEnergy > 100;
+```
+
+---
+
+**7. Render Microphone Activity in the UI**
+
+Create a the same profile photo as the agent in the active state but for the user.
+So now the agent and the user will be side by side. Instead of the agent alone.
+I want the same UI for both the agent and the user. The main difference is the functionality
+To track whether the agent is speaking or if the user is speaking. The functionality to track
+If the user is speaking will be explained in this requirement doc.
+```js
+<div className={isVoice ? "active" : "idle"} />
+```
+
+---
+
+**8. Add Visual Feedback for Debugging**
+
+Show total input energy or voice detection as debug info for tuning:
+```js
+console.log("Total freq energy:", freqData.reduce((a, b) => a + b, 0));
+```
+
+---
+
+**9. Style and Animate the UI**
+
+Use a visual indicator, highlighting the user profile photo whenever the user is talking.
+
+---
+
+
+References:
+- ElevenLabs Docs: https://docs.elevenlabs.io
+- Web Audio API: https://developer.mozilla.org/en-US/docs/Web/API/AnalyserNode/getByteFrequencyData
+- Voice frequency ranges: https://en.wikipedia.org/wiki/Voice_frequency
+

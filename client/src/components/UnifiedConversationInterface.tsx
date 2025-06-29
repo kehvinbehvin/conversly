@@ -313,8 +313,7 @@ export default function UnifiedConversationInterface({
                 Connecting...
               </h3>
               <p className="text-body text-warm-brown-600">
-                Setting up your AI conversation coach. This will takes just a
-                few seconds
+                Please find a quiet location, setting up your conversation.
               </p>
             </div>
           </div>
@@ -549,7 +548,7 @@ export default function UnifiedConversationInterface({
   const renderCurrentState = () => {
     switch (state) {
       case "idle":
-        return renderIdleState();
+        return renderConnectingState();
       case "connecting":
         return renderConnectingState();
       case "active":
