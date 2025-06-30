@@ -17,7 +17,7 @@ const sizeClasses = {
 
 const borderClasses = {
   speaking: "ring-4 ring-coral-500 ring-opacity-75",
-  idle: "ring-2 ring-gray-200"
+  idle: "ring-4 ring-transparent"
 };
 
 export default function ConversationAvatar({
