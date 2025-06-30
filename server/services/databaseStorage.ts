@@ -159,7 +159,8 @@ export class DatabaseStorage implements IStorage {
     const [review] = await db
       .select()
       .from(reviews)
-      .where(eq(reviews.conversationId, conversationId));
+      .where(eq(reviews.conversationId, conversationId))
+      .orderBy(desc(reviews.createdAt));
     return review || undefined;
   }
 
