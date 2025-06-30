@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 interface SpeakingDetectionOptions {
   conversation: any; // ElevenLabs conversation object
@@ -12,12 +12,11 @@ interface SpeakingStatus {
 
 export function useSpeakingDetection({
   conversation,
-  isConnected
+  isConnected,
 }: SpeakingDetectionOptions): SpeakingStatus {
   const [isAgentSpeaking, setIsAgentSpeaking] = useState(false);
   const [isUserSpeaking, setIsUserSpeaking] = useState(false);
 
-  // Test if polling is required by examining SDK behavior
   useEffect(() => {
     if (!isConnected || !conversation) {
       setIsAgentSpeaking(false);
@@ -25,53 +24,45 @@ export function useSpeakingDetection({
       return;
     }
 
-    // Test the SDK methods to understand their behavior
-    console.log('🔍 Testing ElevenLabs SDK methods availability:');
-    console.log('- getInputVolume available:', typeof conversation.getInputVolume);
-    console.log('- getInputByteFrequencyData available:', typeof conversation.getInputByteFrequencyData);
-    console.log('- isSpeaking available:', typeof conversation.isSpeaking);
-    
-    if (conversation.getInputVolume) {
-      console.log('- Current input volume:', conversation.getInputVolume());
-    }
-    
-    if (conversation.getInputByteFrequencyData) {
-      const freqData = conversation.getInputByteFrequencyData();
-      console.log('- Frequency data type:', freqData?.constructor?.name);
-      console.log('- Frequency data length:', freqData?.length);
-    }
+    let interval: NodeJS.Timeout;
 
-  }, [isConnected, conversation]);
+    const pollMicActivity = async () => {
+      try {
+        // Agent speaking status
+        setIsAgentSpeaking(conversation.isSpeaking || false);
 
-  // For now, use existing agent speaking detection
-  // We'll determine user speaking approach after validating SDK behavior
-  useEffect(() => {
-    if (isConnected && conversation) {
-      setIsAgentSpeaking(conversation.isSpeaking || false);
-      
-      // Temporary user speaking detection logic (to be refined)
-      if (conversation.getInputVolume && conversation.getInputByteFrequencyData) {
-        try {
-          const volume = conversation.getInputVolume();
-          const freqData = conversation.getInputByteFrequencyData();
-          
-          if (volume !== undefined && freqData) {
-            const hasVolume = volume > 0.1;
-            const voiceEnergy = freqData.slice(2, 10).reduce((sum: number, val: number) => sum + val, 0);
-            const hasVoiceFrequency = voiceEnergy > 100;
-            
-            setIsUserSpeaking(hasVolume && hasVoiceFrequency);
-          }
-        } catch (error) {
-          console.warn('Audio analysis error:', error);
+        // User speaking detection
+        const volume = await conversation.getInputVolume?.();
+        const freqData = await conversation.getInputByteFrequencyData?.();
+
+        if (typeof volume === "number" && freqData && freqData.length) {
+          const hasVolume = volume > 0.1;
+          const voiceBinStart = 2; // adjust based on FFT and sampleRate
+          const voiceBinEnd = 10;
+          const voiceEnergy = freqData
+            .slice(voiceBinStart, voiceBinEnd)
+            .reduce((sum: number, val: number) => sum + val, 0);
+
+          const hasVoice = voiceEnergy > 100;
+          setIsUserSpeaking(hasVolume && hasVoice);
+        } else {
           setIsUserSpeaking(false);
         }
+      } catch (err) {
+        console.warn("⚠️ Mic activity polling error:", err);
+        setIsUserSpeaking(false);
       }
-    }
-  });
+    };
+
+    interval = setInterval(pollMicActivity, 100);
+
+    return () => {
+      clearInterval(interval);
+    };
+  }, [isConnected, conversation]);
 
   return {
     isAgentSpeaking,
-    isUserSpeaking
+    isUserSpeaking,
   };
 }

@@ -393,7 +393,7 @@ export default function UnifiedConversationInterface({
                   }`}
                 ></div>
                 <span className="text-sm font-medium">
-                  {isSpeaking ? "Speaking..." : "Listening"}
+                  {isSpeaking ? "Agent Speaking..." : "Agent Listening"}
                 </span>
               </div>
             </div>

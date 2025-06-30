@@ -103,6 +103,12 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 30, 2025: **AVATAR LAYOUT STABILITY FIXES COMPLETED** - Eliminated all visual jumping and layout shifts in conversation interface
+  - **Database Query Fix**: Added ORDER BY created_at DESC to getReviewByConversationId to return most recent review instead of first match
+  - **Border Highlight Stability**: Fixed avatar border highlighting to use consistent ring-4 thickness with color-only changes (coral-500 for speaking)
+  - **Speaking Label Stability**: Changed "Speaking..." label from conditional rendering to CSS visibility control to prevent layout shifts
+  - **Complete Conversation Flow**: Verified end-to-end functionality from avatar selection to review display with proper data integrity
+  - **Production Ready**: All visual layout issues resolved, interface provides stable feedback without disrupting user experience
 - June 30, 2025: **FEEDBACK MODAL FEATURE COMPLETED** - Converted feedback form to popup modal with mobile-first responsive design
   - **Modal Implementation**: Created FeedbackModal using Radix UI Dialog pattern, stays open after submission
   - **Mobile Optimization**: Full-screen modal on mobile devices, standard modal on desktop, mobile navbar shows Feedback button
