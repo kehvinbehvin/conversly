@@ -144,12 +144,11 @@ export function FeedbackForm({ conversationId, onSuccess }: FeedbackFormProps) {
           </h2>
           <p className="text-body-lg text-warm-brown-600 max-w-2xl mx-auto">
             Help us improve Conversly by sharing your thoughts, suggestions, or any issues you encountered. 
-            Your feedback helps us create a better conversation practice experience.
           </p>
         </div>
       </CardHeader>
       
-      <CardContent className="p-6">
+      <CardContent className="px-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
             {/* Name Field */}
