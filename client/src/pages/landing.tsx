@@ -61,26 +61,37 @@ export default function Landing() {
             <div className="text-2xl font-bold text-warm-brown-700">
               Conversly
             </div>
-            <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-8">
-                <button
-                  onClick={() => scrollToSection("how-it-works")}
-                  className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
-                >
-                  How it Works
-                </button>
-                <button
-                  onClick={() => scrollToSection("features")}
-                  className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
-                >
-                  Features
-                </button>
-                <button
-                  onClick={openFeedbackModal}
-                  className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
-                >
-                  Feedback
-                </button>
+            <div className="flex items-center space-x-6">
+              {/* Mobile-only Feedback button */}
+              <button
+                onClick={openFeedbackModal}
+                className="md:hidden text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
+              >
+                Feedback
+              </button>
+              
+              {/* Desktop navigation */}
+              <div className="hidden md:block">
+                <div className="ml-10 flex items-baseline space-x-8">
+                  <button
+                    onClick={() => scrollToSection("how-it-works")}
+                    className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
+                  >
+                    How it Works
+                  </button>
+                  <button
+                    onClick={() => scrollToSection("features")}
+                    className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
+                  >
+                    Features
+                  </button>
+                  <button
+                    onClick={openFeedbackModal}
+                    className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
+                  >
+                    Feedback
+                  </button>
+                </div>
               </div>
             </div>
           </div>
