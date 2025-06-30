@@ -103,6 +103,13 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 30, 2025: **FEEDBACK INTEGRATION IN REVIEW STATE COMPLETED** - Added anonymous feedback button to conversation review interface
+  - **Review State Enhancement**: Added "Submit Anonymous Feedback" button above "Start New Conversation" in review state
+  - **Consistent Design**: Button styling matches existing "Start New Conversation" button for visual coherence
+  - **Modal Integration**: Opens existing FeedbackModal component with proper state management
+  - **GTM Integration**: Leverages existing feedback modal GTM tracking events for analytics
+  - **User Experience**: Provides easy access to feedback submission directly from conversation review
+  - **Action Button Layout**: Both feedback and new conversation buttons positioned at bottom of review panel
 - June 30, 2025: **FRONTEND LOGGING CLEANUP AND GTM ENHANCEMENT COMPLETED** - Removed debug logs and added feedback modal GTM tracking
   - **Debug Log Removal**: Eliminated all GTM, SSE, and state check console logs from frontend components
   - **Clean Console Output**: Removed timer logs, speaking detection logs, and development debugging statements

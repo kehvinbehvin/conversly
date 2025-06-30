@@ -7,6 +7,7 @@ import ChatThread from "@/components/ChatThread";
 import AvatarSelection from "@/components/AvatarSelection";
 import NextStepsSection from "@/components/NextStepsSection";
 import ConversationAvatar from "@/components/ConversationAvatar";
+import { FeedbackModal } from "@/components/FeedbackModal";
 import { useSpeakingDetection } from "@/hooks/useSpeakingDetection";
 import { AVATARS } from "@shared/schema";
 import type { TranscriptWithReview, Avatar } from "@shared/schema";
@@ -31,6 +32,9 @@ export default function UnifiedConversationInterface({
 }: UnifiedConversationInterfaceProps) {
   // Avatar selection state - default to first avatar
   const [selectedAvatar, setSelectedAvatar] = useState<Avatar>(AVATARS[0]);
+  
+  // Feedback modal state
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
   
   // Scroll to top function
   const scrollToTop = () => {
@@ -484,8 +488,15 @@ export default function UnifiedConversationInterface({
               <NextStepsSection nextSteps={conversationData?.nextSteps} />
             </div>
 
-            {/* Start New Conversation Button - Fixed at bottom */}
-            <div className="pt-4 border-t border-warm-brown-100">
+            {/* Action Buttons - Fixed at bottom */}
+            <div className="pt-4 border-t border-warm-brown-100 space-y-3">
+              <Button
+                onClick={() => setIsFeedbackModalOpen(true)}
+                size="lg"
+                className="btn-primary w-full py-3 text-body-large font-semibold"
+              >
+                Submit Anonymous Feedback
+              </Button>
               <Button
                 onClick={handleStartNewConversation}
                 size="lg"
@@ -533,12 +544,19 @@ export default function UnifiedConversationInterface({
   };
 
   return (
-    <Card 
-      className="flex flex-col flex-1 min-h-0 min-h-[600px] lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50"
-    >
-      <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center justify-center">
-        {renderCurrentState()}
-      </CardContent>
-    </Card>
+    <>
+      <Card 
+        className="flex flex-col flex-1 min-h-0 min-h-[600px] lg:h-full border-2 border-coral-200 shadow-lg bg-gradient-to-br from-white to-coral-50"
+      >
+        <CardContent className="flex-1 min-h-0 overflow-hidden flex flex-col p-0 md:justify-center justify-center">
+          {renderCurrentState()}
+        </CardContent>
+      </Card>
+      
+      <FeedbackModal 
+        isOpen={isFeedbackModalOpen}
+        onClose={() => setIsFeedbackModalOpen(false)}
+      />
+    </>
   );
 }
