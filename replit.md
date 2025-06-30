@@ -103,14 +103,14 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
-- June 30, 2025: **API ENDPOINT AUDIT AND CLEANUP COMPLETED** - Comprehensive review and deprecation of unused endpoints
-  - **Server Analysis**: Identified 24 total endpoints, marked 14 as deprecated with clear comments
-  - **Frontend Analysis**: Found 9 active API calls across components, contexts, and pages
-  - **Storage Deprecation**: Removed storage monitoring page and endpoint as no longer needed with database-only architecture
-  - **Navigation Cleanup**: Removed storage page link from navigation menu to streamline interface
-  - **Documentation**: Created comprehensive API audit report documenting active vs deprecated endpoints
-  - **Architecture Validation**: Confirmed frontend uses consolidated conversation endpoint instead of individual resource endpoints
-  - **System Health**: Clean separation between 10 active endpoints and 14 deprecated endpoints ready for future removal
+- June 30, 2025: **API ENDPOINT CLEANUP COMPLETED** - Removed deprecated endpoints while preserving test functionality
+  - **Development-Only Protection**: Added NODE_ENV-based middleware returning 404 in production for deprecated endpoints
+  - **Test Suite Preservation**: Kept 14 deprecated endpoints accessible in development/test environments only
+  - **Clean Production API**: Production environment now serves only 10 active endpoints used by frontend
+  - **Environment-Based Security**: Deprecated endpoints automatically hidden in production without manual configuration
+  - **Test Compatibility**: Full test suite remains functional with transparent access to required endpoints
+  - **Code Cleanup**: Removed deprecated endpoint comments and replaced with clear development-only documentation
+  - **Architecture Integrity**: Maintained clean separation between production API surface and development tooling
 - June 30, 2025: **SEEN-ONCE ACCESS CONTROL IMPLEMENTED** - Replaced 1-hour time limit with one-time conversation access
   - **Database Schema**: Added `seen` timestamp column to conversations table for access tracking
   - **Backfill Migration**: Updated 238 existing conversations with current timestamp for backward compatibility

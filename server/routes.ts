@@ -49,13 +49,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize anonymous user on server start
   await ensureAnonymousUser();
 
-  // Middleware for test-only endpoints requiring local API key
-  function requireLocalApiKey(req: Request, res: Response, next: NextFunction) {
-    const localApiKey = req.headers['x-local-api-key'];
-    if (!localApiKey || localApiKey !== 'test-local-key') {
-      return res.status(401).json({ 
-        error: 'Unauthorized - x-local-api-key required for development endpoints' 
-      });
+  // Middleware for development-only endpoints
+  function requireDevelopmentEnv(req: Request, res: Response, next: NextFunction) {
+    if (process.env.NODE_ENV === 'production') {
+      return res.status(404).end();
     }
     next();
   }
@@ -828,65 +825,65 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
 
 
-  // TODO: Implement x-local-api-key - Test-only endpoints for development/testing
+  // Development-only endpoints - Returns 404 in production
   // These endpoints are deprecated for production use but needed for test suite
   app.post(
     "/api/transcripts",
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     express.json(),
     transcriptRoutes.createTranscript,
   );
   app.get(
     "/api/transcripts/:id", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     transcriptRoutes.getTranscript
   );
   app.patch(
     "/api/transcripts/:id",
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     express.json(),
     transcriptRoutes.updateTranscript,
   );
 
   app.get(
     "/api/reviews/:id", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     reviewRoutes.getReview
   );
   app.post(
     "/api/reviews", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     express.json(), 
     reviewRoutes.createReview
   );
   app.patch(
     "/api/reviews/:id", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     express.json(), 
     reviewRoutes.updateReview
   );
 
   app.get(
     "/api/next-steps/:id", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     nextStepsRoutes.getNextSteps
   );
   app.post(
     "/api/next-steps", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     express.json(), 
     nextStepsRoutes.createNextSteps
   );
   app.patch(
     "/api/next-steps/:id", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     express.json(), 
     nextStepsRoutes.updateNextSteps
   );
 
   app.get(
     "/api/feedback/:id", 
-    requireLocalApiKey,
+    requireDevelopmentEnv,
     feedbackRoutes.getFeedback
   );
 
