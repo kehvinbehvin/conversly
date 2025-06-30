@@ -272,19 +272,19 @@ export default function UnifiedConversationInterface({
             </p>
             <div className="space-y-3 text-sm text-warm-brown-600">
               <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 flex items-center justify-center text-sm font-bold text-primary">
+                <div className="px-2 py-1 rounded bg-primary text-white flex items-center justify-center text-xs font-semibold">
                   1
                 </div>
                 <span>Select an Avatar</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 flex items-center justify-center text-sm font-bold text-primary">
+                <div className="px-2 py-1 rounded bg-primary text-white flex items-center justify-center text-xs font-semibold">
                   2
                 </div>
                 <span>Prepare an opener based on the scenario</span>
               </div>
               <div className="flex items-center space-x-3">
-                <div className="w-6 h-6 flex items-center justify-center text-sm font-bold text-primary">
+                <div className="px-2 py-1 rounded bg-primary text-white flex items-center justify-center text-xs font-semibold">
                   3
                 </div>
                 <span>Start practicing!</span>
