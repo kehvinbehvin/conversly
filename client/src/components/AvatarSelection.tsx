@@ -23,7 +23,7 @@ export default function AvatarSelection({
   return (
     <div className="space-y-4">
       <h3 className="text-heading-2 text-warm-brown-800 text-center">
-        Strike up a conversation with one of our AI avatars
+        Ready with an opener? Strike up a conversation with one of our AI avatars
       </h3>
       
       {/* Desktop & Tablet: 2x2 Grid */}
