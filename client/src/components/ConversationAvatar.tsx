@@ -65,11 +65,9 @@ export default function ConversationAvatar({
         <p className="text-xs font-medium text-gray-600">
           {type === 'user' ? 'You' : (avatarName || 'Agent')}
         </p>
-        {isSpeaking && (
-          <p className="text-xs text-coral-600 font-semibold">
-            Speaking...
-          </p>
-        )}
+        <p className={`text-xs text-coral-600 font-semibold ${isSpeaking ? 'visible' : 'invisible'}`}>
+          Speaking...
+        </p>
       </div>
     </div>
   );
