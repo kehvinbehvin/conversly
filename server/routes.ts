@@ -85,6 +85,31 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
+  // @deprecated - Storage monitoring page no longer needed with database-only architecture
+  app.get(
+    "/api/storage/status",
+    express.json(),
+    express.urlencoded({ extended: false }),
+    async (req, res) => {
+      try {
+        // Count conversations to verify database connectivity
+        const conversations = await storage.getConversationsByUserId(208); // Demo user ID
+        res.json({
+          provider: "database",
+          isWorking: true,
+          conversationCount: conversations.length,
+        });
+      } catch (error) {
+        console.error("Storage status check failed:", error);
+        res.json({
+          provider: "database",
+          isWorking: false,
+          error: error instanceof Error ? error.message : "Unknown error",
+        });
+      }
+    },
+  );
+
   // Generate signed URL for ElevenLabs conversation
   app.post(
     "/api/elevenlabs/signed-url",
@@ -810,6 +835,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Transcript routes
+  // @deprecated - These endpoints are not used by frontend, transcript data accessed via conversations endpoint
   app.get("/api/transcripts/:id", transcriptRoutes.getTranscript);
   app.post(
     "/api/transcripts",
@@ -823,6 +849,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   );
 
   // Review routes
+  // @deprecated - These endpoints are not used by frontend, review data accessed via conversations endpoint
   app.get("/api/reviews/:id", reviewRoutes.getReview);
   app.get(
     "/api/conversations/:conversationId/review",
@@ -832,6 +859,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/reviews/:id", express.json(), reviewRoutes.updateReview);
 
   // Next Steps routes
+  // @deprecated - These endpoints are not used by frontend, next steps data accessed via conversations endpoint
   app.get("/api/next-steps/:id", nextStepsRoutes.getNextSteps);
   app.get(
     "/api/conversations/:conversationId/next-steps",
@@ -841,8 +869,9 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.patch("/api/next-steps/:id", express.json(), nextStepsRoutes.updateNextSteps);
 
   // Feedback routes
-  app.get("/api/feedback/:id", feedbackRoutes.getFeedback);
   app.post("/api/feedback", express.json(), feedbackRoutes.createFeedback);
+  // @deprecated - Individual feedback GET endpoint not used by frontend
+  app.get("/api/feedback/:id", feedbackRoutes.getFeedback);
 
   // Add SSE endpoint for real-time notifications
   app.get("/api/events/:conversationId", (req, res) => {

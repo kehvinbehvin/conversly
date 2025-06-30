@@ -51,6 +51,8 @@ export default function Navigation() {
               </Button>
             </Link>
             
+            {/* @deprecated - Storage page removed with database-only architecture */}
+            {/* 
             <Link href="/storage">
               <Button 
                 variant={location === "/storage" ? "default" : "ghost"}
@@ -60,6 +62,7 @@ export default function Navigation() {
                 <span>Storage</span>
               </Button>
             </Link>
+            */}
           </div>
           
           <div className="md:hidden">

@@ -1,3 +1,7 @@
+// @deprecated - Storage monitoring page no longer needed with database-only architecture
+// This page was used during development when multiple storage providers were supported
+// Now that the system uses PostgreSQL exclusively, storage monitoring is handled at the infrastructure level
+
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
