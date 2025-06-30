@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -26,6 +26,13 @@ export function FeedbackForm({ conversationId, onSuccess, onSubmissionChange }: 
     email: "",
     feedback: "",
   });
+
+  // Debug: Log conversation ID when component mounts or changes
+  useEffect(() => {
+    console.log('FeedbackForm: Received conversationId =', conversationId);
+  }, [conversationId]);
+
+
   
   const [errors, setErrors] = useState<Partial<FeedbackFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -80,6 +87,8 @@ export function FeedbackForm({ conversationId, onSuccess, onSubmissionChange }: 
         feedback: formData.feedback.trim() || undefined,
         conversationId: conversationId || undefined,
       };
+
+
 
       await apiRequest("POST", "/api/feedback", requestData);
 

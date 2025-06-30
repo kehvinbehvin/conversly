@@ -8,17 +8,21 @@ import { trackFeedbackModalOpened } from "@/lib/gtm";
 interface FeedbackModalProps {
   isOpen: boolean;
   onClose: () => void;
+  conversationId?: number;
 }
 
-export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
+export function FeedbackModal({ isOpen, onClose, conversationId }: FeedbackModalProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   // Track modal opening
   useEffect(() => {
     if (isOpen) {
-      trackFeedbackModalOpened('landing_page');
+      trackFeedbackModalOpened('review_page');
+      console.log('FeedbackModal: Opening with conversationId =', conversationId);
     }
-  }, [isOpen]);
+  }, [isOpen, conversationId]);
+
+
 
   const handleSubmissionChange = (submitted: boolean) => {
     setIsSubmitted(submitted);
@@ -40,7 +44,7 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
             </Button>
           </div>
         </DialogHeader>
-        <FeedbackForm onSubmissionChange={handleSubmissionChange} />
+        <FeedbackForm conversationId={conversationId} onSubmissionChange={handleSubmissionChange} />
       </DialogContent>
     </Dialog>
   );
