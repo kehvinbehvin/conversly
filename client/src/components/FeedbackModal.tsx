@@ -20,17 +20,13 @@ export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="w-full h-full max-w-none max-h-none m-0 rounded-none sm:w-auto sm:h-auto sm:max-w-2xl sm:max-h-[90vh] sm:m-auto sm:rounded-lg overflow-y-auto">
         <DialogHeader>
-          <div className="flex items-center justify-between">
-            {!isSubmitted && (
-              <DialogTitle className="text-heading-2 text-warm-brown-800">
-                Share Your Feedback
-              </DialogTitle>
-            )}
+          <DialogTitle className="sr-only">Feedback Form</DialogTitle>
+          <div className="flex justify-end">
             <Button
               variant="ghost"
               size="sm"
               onClick={onClose}
-              className="h-6 w-6 p-0 ml-auto"
+              className="h-6 w-6 p-0"
             >
               <X className="h-4 w-4" />
             </Button>
