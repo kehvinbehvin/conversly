@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -10,10 +10,12 @@ import {
 } from "lucide-react";
 import { AnonymousConversationProvider } from "@/contexts/AnonymousConversationContext";
 import UnifiedConversationInterface from "@/components/UnifiedConversationInterface";
-import { FeedbackSection } from "@/components/FeedbackSection";
+import { FeedbackModal } from "@/components/FeedbackModal";
 import { trackPageView, trackButtonClick, trackSectionView } from "@/lib/gtm";
 
 export default function Landing() {
+  const [isFeedbackModalOpen, setIsFeedbackModalOpen] = useState(false);
+
   // Track landing page view on component mount
   useEffect(() => {
     trackPageView('Landing Page', 'Homepage');
@@ -45,6 +47,11 @@ export default function Landing() {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const openFeedbackModal = () => {
+    trackButtonClick('Open feedback modal', 'Navigation');
+    setIsFeedbackModalOpen(true);
+  };
+
   return (
     <div className="min-h-screen bg-warm-brown-50">
       {/* Navigation */}
@@ -69,7 +76,7 @@ export default function Landing() {
                   Features
                 </button>
                 <button
-                  onClick={() => scrollToSection("feedback")}
+                  onClick={openFeedbackModal}
                   className="text-warm-brown-600 hover:text-warm-brown-800 font-medium transition-colors"
                 >
                   Feedback
@@ -232,8 +239,7 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* Feedback Section */}
-      <FeedbackSection />
+
 
       {/* Footer */}
       <footer className="bg-warm-brown-900 text-warm-brown-200">
@@ -268,7 +274,7 @@ export default function Landing() {
                 </li>
                 <li>
                   <button
-                    onClick={() => scrollToSection("feedback")}
+                    onClick={openFeedbackModal}
                     className="hover:text-white transition-colors"
                   >
                     Feedback
@@ -341,6 +347,12 @@ export default function Landing() {
           </div>
         </div>
       </footer>
+
+      {/* Feedback Modal */}
+      <FeedbackModal 
+        isOpen={isFeedbackModalOpen} 
+        onClose={() => setIsFeedbackModalOpen(false)} 
+      />
     </div>
   );
 }

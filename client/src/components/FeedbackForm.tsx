@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { apiRequest } from "@/lib/queryClient";
 import { CheckCircle, Loader2 } from "lucide-react";
 
@@ -15,9 +15,10 @@ interface FeedbackFormData {
 
 interface FeedbackFormProps {
   conversationId?: number;
+  onSuccess?: () => void;
 }
 
-export function FeedbackForm({ conversationId }: FeedbackFormProps) {
+export function FeedbackForm({ conversationId, onSuccess }: FeedbackFormProps) {
   const [formData, setFormData] = useState<FeedbackFormData>({
     name: "",
     email: "",
@@ -83,6 +84,11 @@ export function FeedbackForm({ conversationId }: FeedbackFormProps) {
       // Clear form and show success state
       setFormData({ name: "", email: "", feedback: "" });
       setIsSubmitted(true);
+      
+      // Call onSuccess callback if provided (for modal close)
+      if (onSuccess) {
+        onSuccess();
+      }
     } catch (error) {
       console.error("Failed to submit feedback:", error);
       setErrors({ 
@@ -131,6 +137,18 @@ export function FeedbackForm({ conversationId }: FeedbackFormProps) {
 
   return (
     <Card className="max-w-md mx-auto md:max-w-lg">
+      <CardHeader>
+        <div>
+          <h2 className="text-heading-1 text-warm-brown-800 mb-4">
+            Share Your Feedback
+          </h2>
+          <p className="text-body-lg text-warm-brown-600 max-w-2xl mx-auto">
+            Help us improve Conversly by sharing your thoughts, suggestions, or any issues you encountered. 
+            Your feedback helps us create a better conversation practice experience.
+          </p>
+        </div>
+      </CardHeader>
+      
       <CardContent className="p-6">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="space-y-4">
