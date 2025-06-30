@@ -104,14 +104,14 @@ Conversly is a conversational practice application designed to help users improv
 
 ## Recent Changes  
 - June 30, 2025: **FEEDBACK MODAL FEATURE COMPLETED** - Converted feedback form to popup modal with mobile-first responsive design
-  - **Modal Implementation**: Created FeedbackModal using Radix UI Dialog pattern with auto-close on success
-  - **Mobile Optimization**: Full-screen modal on mobile devices (w-full h-full), standard modal on desktop (max-w-2xl)
-  - **Navigation Update**: Changed feedback buttons from scroll behavior to modal toggle functionality
+  - **Modal Implementation**: Created FeedbackModal using Radix UI Dialog pattern, stays open after submission
+  - **Mobile Optimization**: Full-screen modal on mobile devices, standard modal on desktop, mobile navbar shows Feedback button
+  - **Navigation Update**: Changed feedback buttons from scroll behavior to modal toggle, visible on mobile navigation
   - **Clean Architecture**: Removed FeedbackSection from landing page, maintaining all form functionality
   - **State Management**: Added modal open/close state with proper GTM tracking integration
   - **API Security**: Maintained DOMPurify sanitization and validator email validation
   - **Form Validation**: Preserved character limits, required field validation, and malicious content detection
-  - **User Experience**: Modal auto-closes after successful submission, accessible from navigation and footer
+  - **User Experience**: Simplified success message, modal stays open for multiple submissions, accessible from navigation
 - June 29, 2025: **REAL-TIME MICROPHONE ACTIVITY DETECTION COMPLETED** - Side-by-side avatar display with speaking detection during conversations
   - **Speaking Detection Hook**: Created useSpeakingDetection hook using ElevenLabs SDK methods (getInputVolume, getInputByteFrequencyData)
   - **ConversationAvatar Component**: Built unified avatar component with border highlighting for speaking status (coral color scheme)

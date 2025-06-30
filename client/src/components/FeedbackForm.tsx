@@ -16,9 +16,10 @@ interface FeedbackFormData {
 interface FeedbackFormProps {
   conversationId?: number;
   onSuccess?: () => void;
+  onSubmissionChange?: (submitted: boolean) => void;
 }
 
-export function FeedbackForm({ conversationId, onSuccess }: FeedbackFormProps) {
+export function FeedbackForm({ conversationId, onSuccess, onSubmissionChange }: FeedbackFormProps) {
   const [formData, setFormData] = useState<FeedbackFormData>({
     name: "",
     email: "",
@@ -85,6 +86,11 @@ export function FeedbackForm({ conversationId, onSuccess }: FeedbackFormProps) {
       setFormData({ name: "", email: "", feedback: "" });
       setIsSubmitted(true);
       
+      // Notify parent component about submission state
+      if (onSubmissionChange) {
+        onSubmissionChange(true);
+      }
+      
       // Call onSuccess callback if provided (for modal close)
       if (onSuccess) {
         onSuccess();
@@ -111,6 +117,11 @@ export function FeedbackForm({ conversationId, onSuccess }: FeedbackFormProps) {
     setIsSubmitted(false);
     setFormData({ name: "", email: "", feedback: "" });
     setErrors({});
+    
+    // Notify parent component that we're back to form state
+    if (onSubmissionChange) {
+      onSubmissionChange(false);
+    }
   };
 
   if (isSubmitted) {
