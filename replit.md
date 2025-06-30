@@ -103,16 +103,15 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
-- June 29, 2025: **FEEDBACK FORM FEATURE COMPLETED** - Comprehensive feedback system with sanitization and validation
-  - **Database Schema**: Added feedback table with conversation linking, name, email, and feedback fields
-  - **API Security**: DOMPurify and validator package integration for XSS prevention and email validation
-  - **Form Validation**: Character limits (200 for name/email, 3000 for feedback), required field validation, malicious content detection
-  - **Frontend Component**: Responsive feedback form with real-time validation, success states, and error handling
-  - **Landing Page Integration**: Positioned feedback section below features with 600px minimum height
-  - **Navigation Enhancement**: Added feedback nav button with smooth scroll functionality
-  - **Multi-language Support**: Form accepts international characters while preventing injections
-  - **Conversation Linking**: Optional conversation ID linking for context-specific feedback
-  - **User Experience**: "Thank you" state with option to submit additional feedback
+- June 30, 2025: **FEEDBACK MODAL FEATURE COMPLETED** - Converted feedback form to popup modal with mobile-first responsive design
+  - **Modal Implementation**: Created FeedbackModal using Radix UI Dialog pattern with auto-close on success
+  - **Mobile Optimization**: Full-screen modal on mobile devices (w-full h-full), standard modal on desktop (max-w-2xl)
+  - **Navigation Update**: Changed feedback buttons from scroll behavior to modal toggle functionality
+  - **Clean Architecture**: Removed FeedbackSection from landing page, maintaining all form functionality
+  - **State Management**: Added modal open/close state with proper GTM tracking integration
+  - **API Security**: Maintained DOMPurify sanitization and validator email validation
+  - **Form Validation**: Preserved character limits, required field validation, and malicious content detection
+  - **User Experience**: Modal auto-closes after successful submission, accessible from navigation and footer
 - June 29, 2025: **REAL-TIME MICROPHONE ACTIVITY DETECTION COMPLETED** - Side-by-side avatar display with speaking detection during conversations
   - **Speaking Detection Hook**: Created useSpeakingDetection hook using ElevenLabs SDK methods (getInputVolume, getInputByteFrequencyData)
   - **ConversationAvatar Component**: Built unified avatar component with border highlighting for speaking status (coral color scheme)
