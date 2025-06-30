@@ -271,17 +271,23 @@ export default function UnifiedConversationInterface({
               Still suck at conversations after reading every book on conversational skills? <span className="text-coral-500">You need practice.</span> 
             </p>
             <div className="space-y-3 text-sm text-warm-brown-600">
-              <div className="flex items-center space-x-2">
-                <Check className="w-4 h-4 text-sage-500" />
-                <span>Free to try</span>
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 rounded-full bg-sage-500 text-white flex items-center justify-center text-xs font-semibold">
+                  1
+                </div>
+                <span>Select an Avatar</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Check className="w-4 h-4 text-sage-500" />
-                <span>Get feedback</span>
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 rounded-full bg-sage-500 text-white flex items-center justify-center text-xs font-semibold">
+                  2
+                </div>
+                <span>Prepare an opener based on the scenario</span>
               </div>
-              <div className="flex items-center space-x-2">
-                <Check className="w-4 h-4 text-sage-500" />
-                <span>No signup required</span>
+              <div className="flex items-center space-x-3">
+                <div className="w-6 h-6 rounded-full bg-sage-500 text-white flex items-center justify-center text-xs font-semibold">
+                  3
+                </div>
+                <span>Start practicing!</span>
               </div>
             </div>
           </div>
