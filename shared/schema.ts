@@ -28,6 +28,7 @@ export const conversations = pgTable("conversations", {
   elevenlabsConversationId: text("elevenlabs_conversation_id"),
   status: text("status").notNull().default("pending"), // pending, completed, analyzed
   metadata: jsonb("metadata"),
+  seen: timestamp("seen"), // Tracks when conversation was first accessed via API
   createdAt: timestamp("created_at").notNull().defaultNow(),
 });
 

@@ -160,15 +160,13 @@ export async function registerRoutes(app: Express): Promise<Server> {
           return res.status(404).json({ message: "Conversation not found" });
         }
 
-        // Check if conversation is older than 1 hour
-        const currentTime = new Date();
-        const conversationTime = new Date(conversation.createdAt);
-        const timeDifferenceMs = currentTime.getTime() - conversationTime.getTime();
-        const oneHourMs = 60 * 60 * 1000; // 1 hour in milliseconds
-
-        if (timeDifferenceMs > oneHourMs) {
-          return res.status(204).send(); // No Content - conversation expired
+        // Check if conversation has been seen before
+        if (conversation.seen !== null) {
+          return res.status(204).send(); // No Content - conversation already accessed
         }
+
+        // Mark conversation as seen (first access)
+        await storage.updateConversation(id, { seen: new Date() });
 
         const review = await storage.getReviewByConversationId(id);
 

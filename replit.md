@@ -103,6 +103,14 @@ Conversly is a conversational practice application designed to help users improv
 - **Braintrust Integration**: Run `braintrust pull --project-name "Yappy-first-project"` after updating prompts in Braintrust dashboard
 
 ## Recent Changes  
+- June 30, 2025: **SEEN-ONCE ACCESS CONTROL IMPLEMENTED** - Replaced 1-hour time limit with one-time conversation access
+  - **Database Schema**: Added `seen` timestamp column to conversations table for access tracking
+  - **Backfill Migration**: Updated 238 existing conversations with current timestamp for backward compatibility
+  - **API Logic**: Modified `/api/conversations/:id` to check `seen` field instead of creation time
+  - **Access Control**: First access returns data and marks conversation as seen, subsequent access returns HTTP 204
+  - **Webhook Exemption**: System access (webhook processing) remains unaffected by seen-once restriction
+  - **Frontend Integration**: Page refresh naturally resets state, eliminating need for special handling
+  - **Production Testing**: Verified complete workflow with fresh conversations and repeat access scenarios
 - June 30, 2025: **AVATAR LAYOUT STABILITY FIXES COMPLETED** - Eliminated all visual jumping and layout shifts in conversation interface
   - **Database Query Fix**: Added ORDER BY created_at DESC to getReviewByConversationId to return most recent review instead of first match
   - **Border Highlight Stability**: Fixed avatar border highlighting to use consistent ring-4 thickness with color-only changes (coral-500 for speaking)
