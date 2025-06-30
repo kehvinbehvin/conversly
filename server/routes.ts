@@ -57,23 +57,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     next();
   }
 
-  // Get current user (demo user for MVP)
-  app.get(
-    "/api/user",
-    express.json(),
-    express.urlencoded({ extended: false }),
-    async (req, res) => {
-      try {
-        const user = await storage.getUserByEmail("demo@conversly.com");
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
-        res.json(user);
-      } catch (error) {
-        res.status(500).json({ message: "Failed to get user" });
-      }
-    },
-  );
+
 
   // Get anonymous user for landing page
   app.get(
@@ -132,26 +116,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
     },
   );
 
-  // Get user conversations with reviews
-  app.get(
-    "/api/conversations",
-    express.json(),
-    express.urlencoded({ extended: false }),
-    async (req, res) => {
-      try {
-        // For MVP, use demo user
-        const user = await storage.getUserByEmail("demo@conversly.com");
-        if (!user) {
-          return res.status(404).json({ message: "User not found" });
-        }
 
-        const conversations = await storage.getConversationsByUserId(user.id);
-        res.json(conversations);
-      } catch (error) {
-        res.status(500).json({ message: "Failed to get conversations" });
-      }
-    },
-  );
 
   // Get specific conversation with review
   app.get(
@@ -885,6 +850,45 @@ export async function registerRoutes(app: Express): Promise<Server> {
     "/api/feedback/:id", 
     requireDevelopmentEnv,
     feedbackRoutes.getFeedback
+  );
+
+  app.get(
+    "/api/conversations",
+    requireDevelopmentEnv,
+    express.json(),
+    express.urlencoded({ extended: false }),
+    async (req, res) => {
+      try {
+        // For MVP, use demo user
+        const user = await storage.getUserByEmail("demo@conversly.com");
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+
+        const conversations = await storage.getConversationsByUserId(user.id);
+        res.json(conversations);
+      } catch (error) {
+        res.status(500).json({ message: "Failed to get conversations" });
+      }
+    },
+  );
+
+  app.get(
+    "/api/users/current",
+    requireDevelopmentEnv,
+    express.json(),
+    express.urlencoded({ extended: false }),
+    async (req, res) => {
+      try {
+        const user = await storage.getUserByEmail("demo@conversly.com");
+        if (!user) {
+          return res.status(404).json({ message: "User not found" });
+        }
+        res.json(user);
+      } catch (error) {
+        res.status(500).json({ message: "Failed to get user" });
+      }
+    },
   );
 
   // Feedback routes
