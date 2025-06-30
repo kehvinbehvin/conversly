@@ -26,13 +26,6 @@ export function FeedbackForm({ conversationId, onSuccess, onSubmissionChange }: 
     email: "",
     feedback: "",
   });
-
-  // Debug: Log conversation ID when component mounts or changes
-  useEffect(() => {
-    console.log('FeedbackForm: Received conversationId =', conversationId);
-  }, [conversationId]);
-
-
   
   const [errors, setErrors] = useState<Partial<FeedbackFormData>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);

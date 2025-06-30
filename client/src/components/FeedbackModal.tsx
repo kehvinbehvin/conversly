@@ -18,9 +18,8 @@ export function FeedbackModal({ isOpen, onClose, conversationId }: FeedbackModal
   useEffect(() => {
     if (isOpen) {
       trackFeedbackModalOpened('review_page');
-      console.log('FeedbackModal: Opening with conversationId =', conversationId);
     }
-  }, [isOpen, conversationId]);
+  }, [isOpen]);
 
 
 

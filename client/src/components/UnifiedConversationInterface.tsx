@@ -491,11 +491,7 @@ export default function UnifiedConversationInterface({
             {/* Action Buttons - Fixed at bottom */}
             <div className="pt-4 border-t border-warm-brown-100 space-y-3">
               <Button
-                onClick={() => {
-                  console.log('DEBUG: conversationData =', conversationData);
-                  console.log('DEBUG: conversationData?.id =', conversationData?.id);
-                  setIsFeedbackModalOpen(true);
-                }}
+                onClick={() => setIsFeedbackModalOpen(true)}
                 size="lg"
                 className="btn-primary w-full py-3 text-body-large font-semibold"
               >
