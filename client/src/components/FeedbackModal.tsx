@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { X } from "lucide-react";
 import { FeedbackForm } from "./FeedbackForm";
+import { trackFeedbackModalOpened } from "@/lib/gtm";
 
 interface FeedbackModalProps {
   isOpen: boolean;
@@ -11,6 +12,13 @@ interface FeedbackModalProps {
 
 export function FeedbackModal({ isOpen, onClose }: FeedbackModalProps) {
   const [isSubmitted, setIsSubmitted] = useState(false);
+
+  // Track modal opening
+  useEffect(() => {
+    if (isOpen) {
+      trackFeedbackModalOpened('landing_page');
+    }
+  }, [isOpen]);
 
   const handleSubmissionChange = (submitted: boolean) => {
     setIsSubmitted(submitted);

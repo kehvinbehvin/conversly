@@ -40,6 +40,10 @@ export const GTMEvents = {
   BUTTON_CLICK: 'button_click',
   FORM_SUBMIT: 'form_submit',
   
+  // Feedback Events
+  FEEDBACK_MODAL_OPENED: 'feedback_modal_opened',
+  FEEDBACK_SUBMITTED: 'feedback_submitted',
+  
   // Engagement Events
   SCROLL_DEPTH: 'scroll_depth',
   TIME_ON_PAGE: 'time_on_page',
@@ -62,10 +66,7 @@ export const pushGTMEvent = (eventData: GTMEvent): void => {
       dataLayer: enrichedEvent,
     });
 
-    // Log events in development for debugging
-    if (getEnvironment() === 'development') {
-      console.log('GTM Event:', enrichedEvent);
-    }
+
   } catch (error) {
     console.error('Failed to push GTM event:', error);
   }
@@ -185,6 +186,43 @@ export const trackSectionView = (
   pushGTMEvent({
     event: GTMEvents.SECTION_VIEW,
     section_name: sectionName,
+    page_url: window.location.href,
+    page_path: window.location.pathname,
+    timestamp: new Date().toISOString(),
+    ...additionalData,
+  });
+};
+
+/**
+ * Track feedback modal events
+ */
+export const trackFeedbackModalOpened = (
+  source?: string,
+  additionalData?: Record<string, any>
+): void => {
+  pushGTMEvent({
+    event: GTMEvents.FEEDBACK_MODAL_OPENED,
+    modal_source: source || 'unknown',
+    page_url: window.location.href,
+    page_path: window.location.pathname,
+    timestamp: new Date().toISOString(),
+    ...additionalData,
+  });
+};
+
+export const trackFeedbackSubmitted = (
+  hasName: boolean,
+  hasEmail: boolean,
+  feedbackLength: number,
+  conversationId?: number,
+  additionalData?: Record<string, any>
+): void => {
+  pushGTMEvent({
+    event: GTMEvents.FEEDBACK_SUBMITTED,
+    has_name: hasName,
+    has_email: hasEmail,
+    feedback_length: feedbackLength,
+    conversation_id: conversationId,
     page_url: window.location.href,
     page_path: window.location.pathname,
     timestamp: new Date().toISOString(),

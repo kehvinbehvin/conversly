@@ -35,14 +35,12 @@ export function useConversationTimer({
   useEffect(() => {
     if (isActive && !startTimeRef.current) {
       // Starting new timer
-      console.log('⏱️ Starting conversation timer for', durationMs / 1000, 'seconds');
       startTimeRef.current = Date.now();
       setTimeRemainingMs(durationMs);
       setIsExpired(false);
       hasExpiredRef.current = false;
     } else if (!isActive) {
       // Reset timer state when not active
-      console.log('⏱️ Resetting conversation timer');
       if (intervalRef.current) {
         clearInterval(intervalRef.current);
         intervalRef.current = null;
@@ -75,7 +73,6 @@ export function useConversationTimer({
 
       // Check if timer expired
       if (remaining <= 0 && !hasExpiredRef.current) {
-        console.log('⏰ Conversation timer expired');
         hasExpiredRef.current = true;
         setIsExpired(true);
         

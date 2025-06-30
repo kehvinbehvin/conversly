@@ -69,48 +69,20 @@ export default function UnifiedConversationInterface({
     isConnected,
   });
 
-  // Log speaking state changes for debugging
-  useEffect(() => {
-    if (isConnected) {
-      console.log(
-        `🎤 Speaking state changed: ${isSpeaking ? "Agent is speaking" : "Agent listening"} - Avatar: ${selectedAvatar.name}`,
-      );
-    }
-  }, [isSpeaking, isConnected, selectedAvatar.name]);
+
 
 
 
   // Determine current state
   const getState = (): ConversationState => {
-    console.log(
-      "🔍 State check - error:",
-      !!error,
-      "isReviewReady:",
-      isReviewReady,
-      "hasConversationData:",
-      !!conversationData,
-      "hasReview:",
-      !!conversationData?.review,
-      "conversationStatus:",
-      conversationData?.status,
-      "isConnected:",
-      isConnected,
-      "isConnecting:",
-      isConnecting,
-      "currentConversationId:",
-      !!currentConversationId,
-    );
-
     // Error state takes priority
     if (error) return "error";
     // Check for review state first - review is ready if we have both the flag and the data
     if (isReviewReady && conversationData?.review) {
-      console.log("🔍 Review state: isReviewReady=true AND hasReview=true");
       return "review";
     }
     // Alternative review check - if conversation is completed and has review, show review
     if (conversationData?.status === "completed" && conversationData?.review) {
-      console.log("🔍 Review state: conversation completed AND hasReview=true");
       return "review";
     }
     // Active state - currently connected to ElevenLabs

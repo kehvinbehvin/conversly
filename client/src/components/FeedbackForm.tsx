@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { apiRequest } from "@/lib/queryClient";
 import { CheckCircle, Loader2 } from "lucide-react";
+import { trackFeedbackSubmitted } from "@/lib/gtm";
 
 interface FeedbackFormData {
   name: string;
@@ -81,6 +82,14 @@ export function FeedbackForm({ conversationId, onSuccess, onSubmissionChange }: 
       };
 
       await apiRequest("POST", "/api/feedback", requestData);
+
+      // Track feedback submission
+      trackFeedbackSubmitted(
+        !!formData.name.trim(),
+        !!formData.email.trim(),
+        formData.feedback.trim().length,
+        conversationId
+      );
 
       // Clear form and show success state
       setFormData({ name: "", email: "", feedback: "" });
